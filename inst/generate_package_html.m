@@ -48,7 +48,7 @@
 ## @seealso{get_html_options}
 ## @end deftypefn
 
-function generate_package_html (name, outdir = ".", fundir = outdir, options = struct (), root = "")
+function generate_package_html (name, outdir = ".", options = struct (), fundir = outdir, root = "")
   ## Check input
   if (ischar (name))
     pkg ("load", name);
@@ -65,7 +65,7 @@ function generate_package_html (name, outdir = ".", fundir = outdir, options = s
   endif
   
   if (!ischar (fundir))
-    error ("generate_package_html: third input argument must be a string");
+    error ("generate_package_html: fourth input argument must be a string");
   endif
   
   ## Create output directory if needed
@@ -81,7 +81,7 @@ function generate_package_html (name, outdir = ".", fundir = outdir, options = s
   if (ischar (options))
     options = get_html_options (options);
   elseif (!isstruct (options))
-    error ("generate_package_html: fourth input argument must be a string or a structure");
+    error ("generate_package_html: third input argument must be a string or a structure");
   endif
   
   ##################################################  
