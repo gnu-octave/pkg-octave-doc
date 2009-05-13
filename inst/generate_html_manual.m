@@ -117,7 +117,7 @@ function generate_html_manual (srcdir, outdir = "manual", options = struct ())
   for k = 1:length (index)
     if (!isempty (index {k}))
       printf ("Chapter: %s\n", index {k}.name); fflush (stdout);
-      generate_package_html (index {k}, full_fun_dir, options, :, root);
+      generate_package_html (index {k}, outdir, options);
       %reference = txi2reference (index {k}.filename);
     endif
   endfor

@@ -48,13 +48,15 @@
 ## @seealso{get_html_options}
 ## @end deftypefn
 
-function generate_package_html (name, outdir = ".", options = struct (), fundir = outdir, root = "")
+function generate_package_html (name, outdir = "manual", options = struct ())
   ## Check input
   if (ischar (name))
+    packname = name;
     pkg ("load", name);
     desc = pkg ("describe", name){1};
   elseif (isstruct (name))
     desc = name;
+    packname = "";
   else
     error (["generate_package_html: first input must either be the name of a ", \
             "package, or a structure giving its description."]);
@@ -64,18 +66,16 @@ function generate_package_html (name, outdir = ".", options = struct (), fundir 
     error ("generate_package_html: second input argument must be a string");
   endif
   
-  if (!ischar (fundir))
-    error ("generate_package_html: fourth input argument must be a string");
-  endif
-  
   ## Create output directory if needed
   if (!exist (outdir, "dir"))
     mkdir (outdir);
   endif
-  
-  if (!exist (fundir, "dir"))
-    mkdir (fundir);
+
+  if (!exist (fullfile (outdir, packname), "dir"))
+    mkdir (fullfile (outdir, packname));
   endif
+
+  [local_fundir, fundir] = mk_function_dir (outdir, options);
   
   ## If options is a string, call get_html_options
   if (ischar (options))
@@ -111,7 +111,7 @@ function generate_package_html (name, outdir = ".", options = struct (), fundir 
       fun = F {l};
       outname = fullfile (fundir, sprintf ("%s.html", fun));
       try
-        html_help_text (fun, outname, options, root);
+        html_help_text (fun, outname, options, "../");
         implemented {k}{l} = true;
       catch
         warning ("marking '%s' as not implemented", fun);
@@ -125,12 +125,12 @@ function generate_package_html (name, outdir = ".", options = struct (), fundir 
   #########################
   overview_filename = get_overview_filename (options, desc.name);
 
-  fid = fopen (fullfile (outdir, overview_filename), "w");
+  fid = fopen (fullfile (outdir, packname, overview_filename), "w");
   if (fid < 0)
     error ("generate_package_html: couldn't open overview file for writing");
   endif
   
-  [header, title, footer] = get_overview_header_title_and_footer (options, desc.name, root);
+  [header, title, footer] = get_overview_header_title_and_footer (options, desc.name, "../");
 
   fprintf (fid, "%s\n", header);  
   fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
@@ -157,7 +157,7 @@ function generate_package_html (name, outdir = ".", options = struct (), fundir 
     for l = 1:length (F)
       fun = F {l};
       if (implemented {k}{l})
-        link = sprintf ("%s/%s/%s.html", root, fundir, fun);
+        link = sprintf ("../%s/%s.html", local_fundir, fun);
         fprintf (fid, "    <div class=\"func\"><b><a href=\"%s\">%s</a></b></div>\n",
                  link, fun);
         fprintf (fid, "    <div class=\"ftext\">%s</div>\n\n",
