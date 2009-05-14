@@ -15,12 +15,13 @@
 ## <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn {Function File} generate_operators (@var{name}, @var{options})
+## @deftypefn {Function File} generate_operators (@var{outdir}, @var{options})
+## Generate a HTML page with a list of operators available in GNU Octave.
 ## @end deftypefn
 
-function generate_operators (name, options = struct ())
+function generate_operators (outdir = "manual", options = struct ())
   ## Check input
-  if (!ischar (name))
+  if (!ischar (outdir))
     error ("generate_operators: first input argument must be a string");
   endif
     
@@ -30,6 +31,13 @@ function generate_operators (name, options = struct ())
   elseif (!isstruct (options))
     error ("generate_operators: second input argument must be a string or a structure");
   endif
+  
+  ## Create directories if needed
+  if (!exist (outdir, "dir"))
+    mkdir (outdir);
+  endif
+  various = mk_various_dir (outdir, options);
+  name = fullfile (various, "operators.html");
   
   ## Generate html
   title = "Operators and Keywords";

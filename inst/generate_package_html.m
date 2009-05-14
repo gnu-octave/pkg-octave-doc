@@ -50,13 +50,19 @@
 
 function generate_package_html (name, outdir = "manual", options = struct ())
   ## Check input
-  if (ischar (name))
-    packname = name;
-    pkg ("load", name);
-    desc = pkg ("describe", name){1};
+  if (isempty (name))
+    list = pkg ("list");
+    for k = 1:length (list)
+      generate_package_html (list {k}.name, outdir, options);
+    endfor
+    return;
   elseif (isstruct (name))
     desc = name;
     packname = "";
+  elseif (ischar (name))
+    packname = name;
+    pkg ("load", name);
+    desc = pkg ("describe", name){1};
   else
     error (["generate_package_html: first input must either be the name of a ", \
             "package, or a structure giving its description."]);
