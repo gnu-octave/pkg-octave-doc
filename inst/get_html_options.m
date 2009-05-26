@@ -125,14 +125,27 @@ function options = get_html_options (project_name)
       #options.overview_header = strrep (strrep (hh, "%date", date ()), "%body_command", "");
       options.manual_body_cmd = 'onload="javascript:fix_top_menu (); javascript:manual_menu ();"';
     
+      ## Options for package list page
+      options.include_package_list_item = true;
+      options.package_list_item = ...
+"<div class=\"package\" id=\"%name\">\n\
+<table class=\"package\"><tr>\n\
+<td><b><a href=\"javascript:unfold('%name');\" class=\"package_head_link\">\n\
+<img src=\"show.png\" id=\"%name_im\" alt=\"show/hide\" style=\"padding-right: 0.5em; border: none;\"/> %uppername </a></b></td>\n\
+<td style=\"text-align: right;\">&raquo; <a href=\"./%name/index.html\" class=\"package_link\">details</a> |\n\
+<a class=\"package_link\" href=\"http://downloads.sourceforge.net/octave/%name-%version.%extension?download\">download</a></td>\n\
+</tr></table>\n\
+<p id=\"%name_detailed\" style=\"display: none;\"> %shortdescription </p>\n\
+</div>\n";
+
       ## Options for index package
       options.download_link = "http://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
       
     case "octave"
       options.header = "__HEADER__(`%title')";
       options.footer = "__OCTAVE_TRAILER__";
-      options.title = "Function Reference: %name";
-      
+      options.title  = "Function Reference: %name";
+
     case "docbrowser"
       ## Basic HTML header
       hh = "\

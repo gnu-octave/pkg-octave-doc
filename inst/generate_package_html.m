@@ -48,7 +48,8 @@
 ## @seealso{get_html_options}
 ## @end deftypefn
 
-function generate_package_html (name, outdir = "manual", options = struct ())
+function generate_package_html (name = [], outdir = "manual", 
+				options = struct (), section = "extra")
   ## Check input
   if (isempty (name))
     list = pkg ("list");
@@ -58,13 +59,17 @@ function generate_package_html (name, outdir = "manual", options = struct ())
     return;
   elseif (isstruct (name))
     desc = name;
-    packname = "";
+    if (isfield (name, "name"))
+      packname = desc.name;
+    else
+      packname = "";
+    endif
   elseif (ischar (name))
     packname = name;
     pkg ("load", name);
     desc = pkg ("describe", name){1};
   else
-    error (["generate_package_html: first input must either be the name of a ", \
+    error (["generate_package_html: first input must either be the name of a ", ...
             "package, or a structure giving its description."]);
   endif
   
@@ -178,6 +183,30 @@ function generate_package_html (name, outdir = "manual", options = struct ())
   fprintf (fid, "\n%s\n", footer);
   fclose (fid);
 
+  #####################################################
+  ## Write short description for forge overview page ##
+  #####################################################
+  
+  if (options.include_package_list_item)
+
+    pkg_list_item_filename = get_pkg_list_item_filename (desc.name, outdir, section);
+
+    text = strrep (options.package_list_item, "%name", desc.name);
+    text = strrep (text, "%uppername", toupper(desc.name));
+    text = strrep (text, "%version", desc.version);
+    text = strrep (text, "%extension", "tar.gz");
+
+    fid = fopen (pkg_list_item_filename, "w");
+    if (fid > 0)
+      fprintf (fid, text);
+      fclose (fid);
+    else
+      error ("generate_package_html: unable to open file %s.", pkg_list_item_filename);
+    endif
+
+  endif
+
+
   ######################
   ## Write index file ##
   ######################
@@ -216,3 +245,4 @@ function generate_package_html (name, outdir = "manual", options = struct ())
   fprintf (fid, "\n%s\n", footer);
   fclose (fid);
 endfunction
+
