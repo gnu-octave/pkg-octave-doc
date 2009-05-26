@@ -125,6 +125,9 @@ function options = get_html_options (project_name)
       #options.overview_header = strrep (strrep (hh, "%date", date ()), "%body_command", "");
       options.manual_body_cmd = 'onload="javascript:fix_top_menu (); javascript:manual_menu ();"';
     
+      ## Options for index package
+      options.download_link = "http://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
+      
     case "octave"
       options.header = "__HEADER__(`%title')";
       options.footer = "__OCTAVE_TRAILER__";

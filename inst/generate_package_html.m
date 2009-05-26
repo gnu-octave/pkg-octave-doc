@@ -177,4 +177,42 @@ function generate_package_html (name, outdir = "manual", options = struct ())
   
   fprintf (fid, "\n%s\n", footer);
   fclose (fid);
+
+  ######################
+  ## Write index file ##
+  ######################
+  index_filename = "index.html";
+
+  fid = fopen (fullfile (outdir, packname, index_filename), "w");
+  if (fid < 0)
+    error ("generate_package_html: couldn't open index file for writing");
+  endif
+  
+  [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
+
+  fprintf (fid, "%s\n", header); 
+  fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
+  fprintf (fid, "<table id=\"main_package_table\">\n");
+  fprintf (fid, "<tr><td>Package Name:</td><td>%s</td></tr>\n", desc.name);
+  if (isfield (desc, "version"))
+    fprintf (fid, "<tr><td>Package Version:</td><td>%s</td></tr>\n", desc.version);
+  endif
+
+  if (isfield (options, "download_link"))
+    link = strrep (options.download_link, "%name", desc.name);
+    link = strrep (link, "%version", desc.version);
+    fprintf (fid, "<tr><td colspan=\"2\"><img src=\"../download.png\" alt=\"Download\"/>");
+    fprintf (fid, "<a href=\"%s\">Download this package</a></td></tr>\n", link);
+  endif
+
+  fprintf (fid, "<tr><td colspan=\"2\"><img src=\"../doc.png\" alt=\"Function Reference\"/>");
+  fprintf (fid, "<a href=\"%s\">Read package function reference</a></td></tr>\n", overview_filename);
+
+  fprintf (fid, "</table>\n");
+  
+  fprintf (fid, "<div id=\"description_box\">\n");
+  fprintf (fid, "%s\n</div>\n", desc.description);
+
+  fprintf (fid, "\n%s\n", footer);
+  fclose (fid);
 endfunction
