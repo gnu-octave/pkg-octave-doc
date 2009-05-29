@@ -82,10 +82,6 @@ function generate_package_html (name = [], outdir = "manual",
     mkdir (outdir);
   endif
 
-  if (!exist (fullfile (outdir, packname), "dir"))
-    mkdir (fullfile (outdir, packname));
-  endif
-
   [local_fundir, fundir] = mk_function_dir (outdir, options);
   
   ## If options is a string, call get_html_options
@@ -134,61 +130,66 @@ function generate_package_html (name = [], outdir = "manual",
   #########################
   ## Write overview file ##
   #########################
-  overview_filename = get_overview_filename (options, desc.name);
+  if (isfield (options, "include_overview") && options.include_overview)
+    overview_filename = get_overview_filename (options, desc.name);
 
-  fid = fopen (fullfile (outdir, packname, overview_filename), "w");
-  if (fid < 0)
-    error ("generate_package_html: couldn't open overview file for writing");
+    if (!exist (fullfile (outdir, packname), "dir"))
+      mkdir (fullfile (outdir, packname));
+    endif
+
+    fid = fopen (fullfile (outdir, packname, overview_filename), "w");
+    if (fid < 0)
+      error ("generate_package_html: couldn't open overview file for writing");
+    endif
+  
+    [header, title, footer] = get_overview_header_title_and_footer (options, desc.name, "../");
+
+    fprintf (fid, "%s\n", header);  
+    fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
+
+    fprintf (fid, "  <div class=\"package_description\">\n");
+    fprintf (fid, "    %s\n", desc.description);
+    fprintf (fid, "  </div>\n\n");
+  
+    fprintf (fid, "  <ul>\n");
+    for k = 1:num_categories
+      category = desc.provides {k}.category;
+      fprintf (fid, "    <li><a href=\"#%s\">%s</a></li>\n", anchors {k}, category);
+    endfor
+    fprintf (fid, "  </ul>\n\n");
+  
+    ## Generate function list by category
+    for k = 1:num_categories
+      F = desc.provides {k}.functions;
+      category = desc.provides {k}.category;
+      fprintf (fid, "  <h3 class=\"category\"><a name=\"%s\">%s</a></h3>\n\n",
+               anchors {k}, category);
+  
+      ## For each function in category
+      for l = 1:length (F)
+        fun = F {l};
+        if (implemented {k}{l})
+          link = sprintf ("../%s/%s.html", local_fundir, fun);
+          fprintf (fid, "    <div class=\"func\"><b><a href=\"%s\">%s</a></b></div>\n",
+                   link, fun);
+          fprintf (fid, "    <div class=\"ftext\">%s</div>\n\n",
+                   get_first_help_sentence (fun, 200));
+        else
+          fprintf (fid, "    <div class=\"func\"><b>%s</b></div>\n", fun);
+          fprintf (fid, "    <div class=\"ftext\">Not implemented.</div>\n\n");
+        endif
+      endfor
+    endfor
+  
+    fprintf (fid, "\n%s\n", footer);
+    fclose (fid);
   endif
   
-  [header, title, footer] = get_overview_header_title_and_footer (options, desc.name, "../");
-
-  fprintf (fid, "%s\n", header);  
-  fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
-
-  fprintf (fid, "  <div class=\"package_description\">\n");
-  fprintf (fid, "    %s\n", desc.description);
-  fprintf (fid, "  </div>\n\n");
-  
-  fprintf (fid, "  <ul>\n");
-  for k = 1:num_categories
-    category = desc.provides {k}.category;
-    fprintf (fid, "    <li><a href=\"#%s\">%s</a></li>\n", anchors {k}, category);
-  endfor
-  fprintf (fid, "  </ul>\n\n");
-  
-  ## Generate function list by category
-  for k = 1:num_categories
-    F = desc.provides {k}.functions;
-    category = desc.provides {k}.category;
-    fprintf (fid, "  <h3 class=\"category\"><a name=\"%s\">%s</a></h3>\n\n",
-             anchors {k}, category);
-  
-    ## For each function in category
-    for l = 1:length (F)
-      fun = F {l};
-      if (implemented {k}{l})
-        link = sprintf ("../%s/%s.html", local_fundir, fun);
-        fprintf (fid, "    <div class=\"func\"><b><a href=\"%s\">%s</a></b></div>\n",
-                 link, fun);
-        fprintf (fid, "    <div class=\"ftext\">%s</div>\n\n",
-                 get_first_help_sentence (fun, 200));
-      else
-        fprintf (fid, "    <div class=\"func\"><b>%s</b></div>\n", fun);
-        fprintf (fid, "    <div class=\"ftext\">Not implemented.</div>\n\n");
-      endif
-    endfor
-  endfor
-  
-  fprintf (fid, "\n%s\n", footer);
-  fclose (fid);
-
   #####################################################
   ## Write short description for forge overview page ##
   #####################################################
   
-  if (options.include_package_list_item)
-
+  if (isfield (options, "include_package_list_item") && options.include_package_list_item)
     pkg_list_item_filename = get_pkg_list_item_filename (desc.name, outdir, section);
 
     text = strrep (options.package_list_item, "%name", desc.name);
@@ -203,46 +204,51 @@ function generate_package_html (name = [], outdir = "manual",
     else
       error ("generate_package_html: unable to open file %s.", pkg_list_item_filename);
     endif
-
   endif
 
 
   ######################
   ## Write index file ##
   ######################
-  index_filename = "index.html";
+  if (isfield (options, "include_package_page") && options.include_package_page)
+    index_filename = "index.html";
 
-  fid = fopen (fullfile (outdir, packname, index_filename), "w");
-  if (fid < 0)
-    error ("generate_package_html: couldn't open index file for writing");
-  endif
+    if (!exist (fullfile (outdir, packname), "dir"))
+      mkdir (fullfile (outdir, packname));
+    endif
+
+    fid = fopen (fullfile (outdir, packname, index_filename), "w");
+    if (fid < 0)
+      error ("generate_package_html: couldn't open index file for writing");
+    endif
   
-  [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
+    [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
 
-  fprintf (fid, "%s\n", header); 
-  fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
-  fprintf (fid, "<table id=\"main_package_table\">\n");
-  fprintf (fid, "<tr><td>Package Name:</td><td>%s</td></tr>\n", desc.name);
-  if (isfield (desc, "version"))
-    fprintf (fid, "<tr><td>Package Version:</td><td>%s</td></tr>\n", desc.version);
-  endif
+    fprintf (fid, "%s\n", header); 
+    fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
+    fprintf (fid, "<table id=\"main_package_table\">\n");
+    fprintf (fid, "<tr><td>Package Name:</td><td>%s</td></tr>\n", desc.name);
+    if (isfield (desc, "version"))
+      fprintf (fid, "<tr><td>Package Version:</td><td>%s</td></tr>\n", desc.version);
+    endif
 
-  if (isfield (options, "download_link"))
-    link = strrep (options.download_link, "%name", desc.name);
-    link = strrep (link, "%version", desc.version);
-    fprintf (fid, "<tr><td colspan=\"2\"><img src=\"../download.png\" alt=\"Download\"/>");
-    fprintf (fid, "<a href=\"%s\">Download this package</a></td></tr>\n", link);
-  endif
+    if (isfield (options, "download_link"))
+      link = strrep (options.download_link, "%name", desc.name);
+      link = strrep (link, "%version", desc.version);
+      fprintf (fid, "<tr><td colspan=\"2\"><img src=\"../download.png\" alt=\"Download\"/>");
+      fprintf (fid, "<a href=\"%s\">Download this package</a></td></tr>\n", link);
+    endif
 
-  fprintf (fid, "<tr><td colspan=\"2\"><img src=\"../doc.png\" alt=\"Function Reference\"/>");
-  fprintf (fid, "<a href=\"%s\">Read package function reference</a></td></tr>\n", overview_filename);
+    fprintf (fid, "<tr><td colspan=\"2\"><img src=\"../doc.png\" alt=\"Function Reference\"/>");
+    fprintf (fid, "<a href=\"%s\">Read package function reference</a></td></tr>\n", overview_filename);
 
-  fprintf (fid, "</table>\n");
+    fprintf (fid, "</table>\n");
   
-  fprintf (fid, "<div id=\"description_box\">\n");
-  fprintf (fid, "%s\n</div>\n", desc.description);
+    fprintf (fid, "<div id=\"description_box\">\n");
+    fprintf (fid, "%s\n</div>\n", desc.description);
 
-  fprintf (fid, "\n%s\n", footer);
-  fclose (fid);
+    fprintf (fid, "\n%s\n", footer);
+    fclose (fid);
+  endif
 endfunction
 

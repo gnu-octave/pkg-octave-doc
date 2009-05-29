@@ -122,6 +122,7 @@ function options = get_html_options (project_name)
       options.include_demos = true;
       
       ## Options for overview page
+      options.include_overview = true;
       #options.overview_header = strrep (strrep (hh, "%date", date ()), "%body_command", "");
       options.manual_body_cmd = 'onload="javascript:fix_top_menu (); javascript:manual_menu ();"';
     
@@ -140,11 +141,13 @@ function options = get_html_options (project_name)
 
       ## Options for index package
       options.download_link = "http://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
+      options.include_package_page = true;
       
     case "octave"
       options.header = "__HEADER__(`%title')";
       options.footer = "__OCTAVE_TRAILER__";
       options.title  = "Function Reference: %name";
+      options.include_overview = true;
 
     case "docbrowser"
       ## Basic HTML header
@@ -172,6 +175,7 @@ function options = get_html_options (project_name)
       options.include_demos = true;
           
       ## Options for overview page
+      options.include_overview = true;
       options.overview_header = strrep (hh, "%css", sprintf ("../%s", css));
       options.overview_title = "Overview: %name";
       

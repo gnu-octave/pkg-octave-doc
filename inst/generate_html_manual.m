@@ -114,6 +114,9 @@ function generate_html_manual (srcdir, outdir = "manual", options = struct ())
   
   ## Generate the documentation
   root = get_root (outdir, full_fun_dir);
+  options.include_package_list_item = false;
+  options.include_package_page = false;
+      options.include_overview = false;
   for k = 1:length (index)
     if (!isempty (index {k}))
       printf ("Chapter: %s\n", index {k}.name); fflush (stdout);
