@@ -67,7 +67,7 @@ function generate_package_html (name = [], outdir = "manual",
   elseif (ischar (name))
     packname = name;
     pkg ("load", name);
-    desc = pkg ("describe", name){1};
+    desc = pkg ("describe", name) {1};
   else
     error (["generate_package_html: first input must either be the name of a ", ...
             "package, or a structure giving its description."]);
@@ -211,6 +211,19 @@ function generate_package_html (name = [], outdir = "manual",
   ## Write index file ##
   ######################
   if (isfield (options, "include_package_page") && options.include_package_page)
+    ## Get detailed information about the package
+    all_list = pkg ("list");
+    list = [];
+    for k = 1:length (all_list)
+      if (strcmp (all_list {k}.name, packname))
+        list = all_list {k};
+      endif
+    endfor
+    if (isempty (list))
+      error ("generate_package_html: couldn't locate package '%s'", packname);
+    endif
+
+    ## Open output file
     index_filename = "index.html";
 
     if (!exist (fullfile (outdir, packname), "dir"))
@@ -222,14 +235,16 @@ function generate_package_html (name = [], outdir = "manual",
       error ("generate_package_html: couldn't open index file for writing");
     endif
   
+    ## Write output
     [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
 
     fprintf (fid, "%s\n", header); 
     fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
     fprintf (fid, "<table id=\"main_package_table\">\n");
     fprintf (fid, "<tr><td>Package Name:</td><td>%s</td></tr>\n", desc.name);
-    if (isfield (desc, "version"))
-      fprintf (fid, "<tr><td>Package Version:</td><td>%s</td></tr>\n", desc.version);
+    fprintf (fid, "<tr><td>Package Version:</td><td>%s</td></tr>\n", list.version);
+    if (isfield (list, "license"))
+      fprintf (fid, "<tr><td>Package License:</td><td>%s</td></tr>\n", list.license);
     endif
 
     if (isfield (options, "download_link"))
