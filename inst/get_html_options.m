@@ -142,6 +142,7 @@ function options = get_html_options (project_name)
       ## Options for index package
       options.download_link = "http://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
       options.include_package_page = true;
+      options.include_package_license = true;
       
     case "octave"
       options.header = "__HEADER__(`%title')";

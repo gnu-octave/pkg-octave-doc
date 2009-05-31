@@ -240,28 +240,155 @@ function generate_package_html (name = [], outdir = "manual",
 
     fprintf (fid, "%s\n", header); 
     fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
-    fprintf (fid, "<table id=\"main_package_table\">\n");
-    fprintf (fid, "<tr><td>Package Name:</td><td>%s</td></tr>\n", desc.name);
-    fprintf (fid, "<tr><td>Package Version:</td><td>%s</td></tr>\n", list.version);
-    if (isfield (list, "license"))
-      fprintf (fid, "<tr><td>Package License:</td><td>%s</td></tr>\n", list.license);
-    endif
 
+    fprintf (fid, "<table>\n");
+    fprintf (fid, "<tr><td rowspan=\"2\" class=\"box_table\">\n");
+    fprintf (fid, "<div class=\"package_box\">\n");
+    fprintf (fid, "  <div class=\"package_box_header\">%s</div>\n", desc.name);
+    fprintf (fid, "  <div class=\"package_box_contents\">\n");
+    fprintf (fid, "    <table>\n");
+    fprintf (fid, "      <tr><td class=\"package_table\">Package Version:</td><td>%s</td></tr>\n",
+            list.version);
+    fprintf (fid, "      <tr><td class=\"package_table\">Last Release Date:</td><td>%s</td></tr>\n",
+             list.date);
+    fprintf (fid, "      <tr><td class=\"package_table\">Package Author:</td><td>%s</td></tr>\n",
+             list.author);
+    fprintf (fid, "      <tr><td class=\"package_table\">Package Maintainer:</td><td>%s</td></tr>\n",
+             list.maintainer);
+    fprintf (fid, "      <tr><td class=\"package_table\">License:</td><td><a href=\"COPYING.html\">");
+    if (isfield (list, "license"))
+      fprintf (fid, "%s</a></td></tr>\n", list.license);
+    else
+      fprintf (fid, "Read license</a></td></tr>\n");
+    endif
+    fprintf (fid, "    </table>\n");
+    fprintf (fid, "  </div>\n");
+    fprintf (fid, "</div>\n");
+    fprintf (fid, "</td>\n\n");
+    
+    fprintf (fid, "<td>\n");
     if (isfield (options, "download_link"))
+      fprintf (fid, "<div class=\"download_package\">\n");
+      fprintf (fid, "  <table><tr><td>\n");
+      fprintf (fid, "    <img src=\"../download.png\"/>\n");
+      fprintf (fid, "  </td><td>\n");
       link = strrep (options.download_link, "%name", desc.name);
       link = strrep (link, "%version", desc.version);
-      fprintf (fid, "<tr><td colspan=\"2\"><img src=\"../download.png\" alt=\"Download\"/>");
-      fprintf (fid, "<a href=\"%s\">Download this package</a></td></tr>\n", link);
+      fprintf (fid, "    <a href=\"%s\"\n", link);
+      fprintf (fid, "     class=\"download_link\">\n");
+      fprintf (fid, "      Download Package\n");
+      fprintf (fid, "    </a>\n");
+      fprintf (fid, "  </td></tr></table>\n");
+      fprintf (fid, "</div>\n");
+    endif
+    fprintf (fid, "</td></tr>\n");
+    fprintf (fid, "<tr><td>\n");
+    fprintf (fid, "<div class=\"package_function_reference\">\n");
+    fprintf (fid, "  <table><tr><td>\n");
+    fprintf (fid, "    <img src=\"../doc.png\"/>\n");
+    fprintf (fid, "  </td><td>\n");
+    fprintf (fid, "    <a href=\"%s\" class=\"function_reference_link\">\n", overview_filename);
+    fprintf (fid, "      Function Reference\n");
+    fprintf (fid, "    </a>\n");
+    fprintf (fid, "  </td></tr></table>\n");
+    fprintf (fid, "</div>\n");
+    fprintf (fid, "</td></tr>\n");
+    fprintf (fid, "</table>\n\n");
+
+    fprintf (fid, "<h3>Description</h3>\n");
+    fprintf (fid, "  <div id=\"description_box\">\n")
+    fprintf (fid, list.description);
+    fprintf (fid, "  </div>\n\n")
+
+    fprintf (fid, "<h3>Details</h3>\n");
+    fprintf (fid, "  <table id=\"extra_package_table\">\n");
+    
+    if (isfield (list, "depends"))
+      fprintf (fid, "    <tr><td>Dependencies: </td><td>\n");
+      for k = 1:length (list.depends)
+        p = list.depends {k}.package;
+        if (isfield (list.depends {k}, "operator") && isfield (list.depends {k}, "version"))
+          o = list.depends {k}.operator;
+          v = list.depends {k}.version;
+          vt = sprintf ("(%s %s) ", o, v);
+        else
+          vt = "";
+        endif
+      
+        if (strcmpi (p, "octave"))
+          fprintf (fid, "<a href=\"http://www.octave.org\">Octave</a> ");
+        else
+          fprintf (fid, "<a href=\"../%s\">%s</a> ", p, p);
+        endif
+        fprintf (fid, vt);
+      endfor
+      fprintf (fid, "</td></tr>\n");
+    endif
+  
+    if (isfield (list, "buildrequires"))
+      fprintf (fid, "    <tr><td>Build Dependencies:</td><td>%s</td></tr>\n", list.buildrequires);
+    endif
+  
+    if (isfield (list, "autoload"))
+      if (list.autoload)
+        a = "Yes";
+      else
+        a = "No";
+      endif
+      fprintf (fid, "    <tr><td>Autoload:</td><td>%s</td></tr>\n", a);
+    endif
+  
+    fprintf (fid, "  </table>\n\n");
+  
+    fprintf (fid, "\n%s\n", footer);
+    fclose (fid);
+  endif
+
+  ######################
+  ## Write COPYING file ##
+  ######################
+  if (isfield (options, "include_package_license") && options.include_package_license)
+    ## Get detailed information about the package
+    all_list = pkg ("list");
+    list = [];
+    for k = 1:length (all_list)
+      if (strcmp (all_list {k}.name, packname))
+        list = all_list {k};
+      endif
+    endfor
+    if (isempty (list))
+      error ("generate_package_html: couldn't locate package '%s'", packname);
     endif
 
-    fprintf (fid, "<tr><td colspan=\"2\"><img src=\"../doc.png\" alt=\"Function Reference\"/>");
-    fprintf (fid, "<a href=\"%s\">Read package function reference</a></td></tr>\n", overview_filename);
+    ## Read license
+    filename = fullfile (list.dir, "packinfo", "COPYING");
+    fid = fopen (filename, "r");
+    if (fid < 0)
+      error ("generate_package_html: couldn't open license for reading");
+    endif
+    contents = char (fread (fid).');
+    fclose (fid);
 
-    fprintf (fid, "</table>\n");
+    ## Open output file
+    copying_filename = "COPYING.html";
+
+    if (!exist (fullfile (outdir, packname), "dir"))
+      mkdir (fullfile (outdir, packname));
+    endif
+
+    fid = fopen (fullfile (outdir, packname, copying_filename), "w");
+    if (fid < 0)
+      error ("generate_package_html: couldn't open COPYING file for writing");
+    endif
   
-    fprintf (fid, "<div id=\"description_box\">\n");
-    fprintf (fid, "%s\n</div>\n", desc.description);
+    ## Write output
+    [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
+    
+    fprintf (fid, "%s\n", header); 
+    fprintf (fid, "<h2 class=\"tbdesc\">License for '%s' Package</h2>\n\n", desc.name);
 
+    fprintf (fid, "<pre>%s</pre>\n\n", contents);
+    
     fprintf (fid, "\n%s\n", footer);
     fclose (fid);
   endif
