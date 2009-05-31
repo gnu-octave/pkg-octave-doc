@@ -318,7 +318,7 @@ function generate_package_html (name = [], outdir = "manual",
         if (strcmpi (p, "octave"))
           fprintf (fid, "<a href=\"http://www.octave.org\">Octave</a> ");
         else
-          fprintf (fid, "<a href=\"../%s\">%s</a> ", p, p);
+          fprintf (fid, "<a href=\"../%s/index.html\">%s</a> ", p, p);
         endif
         fprintf (fid, vt);
       endfor

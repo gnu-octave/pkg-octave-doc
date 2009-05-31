@@ -84,15 +84,15 @@ function options = get_html_options (project_name)
       <tr>\n\
         <td class=\"menu\">\n\
 \n\
- <a href=\"index.html\" class=\"menu\">Home</a> &middot;\n\
- <a href=\"packages.html\" class=\"menu\">Packages</a> &middot;\n\
- <a href=\"developers.html\" class=\"menu\">Developers</a> &middot;\n\
- <a href=\"docs.html\" class=\"menu\">Documentation</a> &middot;\n\
- <a href=\"doc/index.html\" class=\"menu\">Function Reference</a> &middot;\n\
- <a href=\"FAQ.html\" class=\"menu\">FAQ</a> &middot;\n\
- <a href=\"bugs.html\" class=\"menu\">Bugs</a> &middot;\n\
- <a href=\"archive.html\" class=\"menu\">Mailing Lists</a> &middot;\n\
- <a href=\"links.html\" class=\"menu\">Links</a> &middot;\n\
+ <a href=\"%rootindex.html\" class=\"menu\">Home</a> &middot;\n\
+ <a href=\"%rootpackages.html\" class=\"menu\">Packages</a> &middot;\n\
+ <a href=\"%rootdevelopers.html\" class=\"menu\">Developers</a> &middot;\n\
+ <a href=\"%rootdocs.html\" class=\"menu\">Documentation</a> &middot;\n\
+ <a href=\"%rootdoc/index.html\" class=\"menu\">Function Reference</a> &middot;\n\
+ <a href=\"%rootFAQ.html\" class=\"menu\">FAQ</a> &middot;\n\
+ <a href=\"%rootbugs.html\" class=\"menu\">Bugs</a> &middot;\n\
+ <a href=\"%rootarchive.html\" class=\"menu\">Mailing Lists</a> &middot;\n\
+ <a href=\"%rootlinks.html\" class=\"menu\">Links</a> &middot;\n\
  <a href=\"http://sourceforge.net/svn/?group_id=2888\" class=\"menu\">SVN</a>\n\
 \n\
         </td>\n\
