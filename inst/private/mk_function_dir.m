@@ -14,8 +14,6 @@
 ## along with this program; see the file COPYING.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-## THIS FUNCTION SHOULD BE private
-
 function [location, full_location] = mk_function_dir (outdir, options)
   if (isfield (options, "function_dir"))
     location = options.function_dir;
@@ -24,6 +22,7 @@ function [location, full_location] = mk_function_dir (outdir, options)
   endif
   
   full_location = fullfile (outdir, location);
+  location = strcat (outdir, "/", location);
   
   ## Create output directory if needed
   if (!exist (full_location, "dir"))

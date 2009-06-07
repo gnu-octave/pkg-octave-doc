@@ -73,7 +73,9 @@ function generate_package_html (name = [], outdir = "manual",
             "package, or a structure giving its description."]);
   endif
   
-  if (!ischar (outdir))
+  if (isempty (outdir))
+    outdir = name;
+  elseif (!ischar (outdir))
     error ("generate_package_html: second input argument must be a string");
   endif
   
@@ -82,7 +84,12 @@ function generate_package_html (name = [], outdir = "manual",
     mkdir (outdir);
   endif
 
-  [local_fundir, fundir] = mk_function_dir (outdir, options);
+  packdir = fullfile (outdir, name);
+  if (!exist (packdir, "dir"))
+    mkdir (packdir);
+  endif
+
+  [local_fundir, fundir] = mk_function_dir (packdir, name, options);
   
   ## If options is a string, call get_html_options
   if (ischar (options))
@@ -118,7 +125,7 @@ function generate_package_html (name = [], outdir = "manual",
       fun = F {l};
       outname = fullfile (fundir, sprintf ("%s.html", fun));
       try
-        html_help_text (fun, outname, options, "../");
+        html_help_text (fun, outname, options, "../../");
         implemented {k}{l} = true;
       catch
         warning ("marking '%s' as not implemented", fun);
@@ -133,11 +140,7 @@ function generate_package_html (name = [], outdir = "manual",
   if (isfield (options, "include_overview") && options.include_overview)
     overview_filename = get_overview_filename (options, desc.name);
 
-    if (!exist (fullfile (outdir, packname), "dir"))
-      mkdir (fullfile (outdir, packname));
-    endif
-
-    fid = fopen (fullfile (outdir, packname, overview_filename), "w");
+    fid = fopen (fullfile (packdir, overview_filename), "w");
     if (fid < 0)
       error ("generate_package_html: couldn't open overview file for writing");
     endif
@@ -169,7 +172,7 @@ function generate_package_html (name = [], outdir = "manual",
       for l = 1:length (F)
         fun = F {l};
         if (implemented {k}{l})
-          link = sprintf ("../%s/%s.html", local_fundir, fun);
+          link = sprintf ("../../%s/%s.html", local_fundir, fun);
           fprintf (fid, "    <div class=\"func\"><b><a href=\"%s\">%s</a></b></div>\n",
                    link, fun);
           fprintf (fid, "    <div class=\"ftext\">%s</div>\n\n",
@@ -226,11 +229,7 @@ function generate_package_html (name = [], outdir = "manual",
     ## Open output file
     index_filename = "index.html";
 
-    if (!exist (fullfile (outdir, packname), "dir"))
-      mkdir (fullfile (outdir, packname));
-    endif
-
-    fid = fopen (fullfile (outdir, packname, index_filename), "w");
+    fid = fopen (fullfile (packdir, index_filename), "w");
     if (fid < 0)
       error ("generate_package_html: couldn't open index file for writing");
     endif
@@ -372,11 +371,7 @@ function generate_package_html (name = [], outdir = "manual",
     ## Open output file
     copying_filename = "COPYING.html";
 
-    if (!exist (fullfile (outdir, packname), "dir"))
-      mkdir (fullfile (outdir, packname));
-    endif
-
-    fid = fopen (fullfile (outdir, packname, copying_filename), "w");
+    fid = fopen (fullfile (packdir, copying_filename), "w");
     if (fid < 0)
       error ("generate_package_html: couldn't open COPYING file for writing");
     endif
