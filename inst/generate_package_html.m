@@ -74,7 +74,7 @@ function generate_package_html (name = [], outdir = "manual",
   endif
   
   if (isempty (outdir))
-    outdir = name;
+    outdir = packname;
   elseif (!ischar (outdir))
     error ("generate_package_html: second input argument must be a string");
   endif
@@ -84,12 +84,12 @@ function generate_package_html (name = [], outdir = "manual",
     mkdir (outdir);
   endif
 
-  packdir = fullfile (outdir, name);
+  packdir = fullfile (outdir, packname);
   if (!exist (packdir, "dir"))
     mkdir (packdir);
   endif
 
-  [local_fundir, fundir] = mk_function_dir (packdir, name, options);
+  [local_fundir, fundir] = mk_function_dir (packdir, packname, options);
   
   ## If options is a string, call get_html_options
   if (ischar (options))
