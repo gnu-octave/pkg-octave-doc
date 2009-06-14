@@ -43,11 +43,15 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   if (!exist (outdir, "dir"))
     mkdir (outdir);
   endif
+  outdir = fullfile (outdir, "manual");
+  if (!exist (outdir, "dir"))
+    mkdir (outdir);
+  endif
   
   chapter_dir = mk_chapter_dir (outdir, options);
-  [fun_dir, full_fun_dir] = mk_function_dir (outdir, options);
+  mk_function_dir (outdir, options);
   
-  ds_handler = @(fun) docstring_handler (fun, fun_dir);
+  ds_handler = @(fun) docstring_handler (fun);
   
   ## Get file list
   file_list = get_txi_files (srcdir);
@@ -95,7 +99,7 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
     text = strcat ("@defindex op\n\n", text);
 
     ## Convert to HTML and write to disc
-    [header, body, footer] = texi2html (text, options, get_root (outdir, chapter_dir));
+    [header, body, footer] = texi2html (text, options, "../../");
     
     fid = fopen (fullfile (chapter_dir, sprintf ("%s.html", name)), "w");
     fprintf (fid, "%s\n%s\n%s\n", header, body, footer);
@@ -113,7 +117,6 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   index = txi2index (srcdir);
   
   ## Generate the documentation
-  root = get_root (outdir, full_fun_dir);
   options.include_package_list_item = false;
   options.include_package_page = false;
   options.include_overview = false;
@@ -121,14 +124,14 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   for k = 1:length (index)
     if (!isempty (index {k}))
       printf ("Chapter: %s\n", index {k}.name); fflush (stdout);
+      index {k}.name = ""; # remove the name to avoid  each chapter having its own dir
       generate_package_html (index {k}, outdir, options);
-      %reference = txi2reference (index {k}.filename);
     endif
   endfor
 endfunction
 
-function retval = docstring_handler (fun, fun_dir)
-  retval = sprintf ("@ifhtml\n@html\n<div class='seefun'>See <a href='../%s/%s.html'>%s</a></div>\n@end html\n@end ifhtml\n",
-                    fun_dir, fun, fun);
+function retval = docstring_handler (fun)
+  retval = sprintf ("@ifhtml\n@html\n<div class='seefun'>See <a href='../function/%s.html'>%s</a></div>\n@end html\n@end ifhtml\n",
+                    fun, fun);
 endfunction
 

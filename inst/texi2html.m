@@ -70,9 +70,11 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
   endif
 
   ## Run makeinfo
+  orig_text = text;
   [text, status] = __makeinfo__ (text, "html", seealso);
   if (status != 0)
-    warning ("texi2html: couln't parse texinfo."); # XXX: make this an error
+    txi_out = orig_text (1:min (100, length (orig_text)));
+    warning ("texi2html: couldn't parse texinfo: \n%s", txi_out); # XXX: make this an error
   endif
       
   ## Split text into header, body, and footer using the text we added above
