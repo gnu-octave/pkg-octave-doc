@@ -18,7 +18,7 @@
 ## @deftypefn {Function File} generate_html_manual (@var{srcdir}, @var{outdir})
 ## @end deftypefn
 
-function generate_html_manual (srcdir, outdir = "manual", options = struct ())
+function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   ## Check input
   if (nargin == 0)
     print_usage ();

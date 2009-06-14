@@ -19,7 +19,7 @@
 ## Generate a HTML page with a list of operators available in GNU Octave.
 ## @end deftypefn
 
-function generate_operators (outdir = "manual", options = struct ())
+function generate_operators (outdir = "htdocs", options = struct ())
   ## Check input
   if (!ischar (outdir))
     error ("generate_operators: first input argument must be a string");

@@ -48,7 +48,7 @@
 ## @seealso{get_html_options}
 ## @end deftypefn
 
-function generate_package_html (name = [], outdir = "manual", 
+function generate_package_html (name = [], outdir = "htdocs", 
 				options = struct (), section = "extra")
   ## Check input
   if (isempty (name))
