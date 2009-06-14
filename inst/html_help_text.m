@@ -192,52 +192,57 @@ function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
   if (exist (diary_file, "file"))
     delete (diary_file);
   endif
-  def = get (0, "defaultfigurevisible");
-  set (0, "defaultfigurevisible", "off");
-  more_val = page_screen_output (false);
   
-  ## Evaluate the code
-  diary (diary_file);
-  eval (code);
-  diary ("off");
+  unwind_protect
+    ## Setup figure and pager properties
+    def = get (0, "defaultfigurevisible");
+    set (0, "defaultfigurevisible", "off");
+    more_val = page_screen_output (false);
   
-  ## Read the results
-  fid = fopen (diary_file, "r");
-  diary_data = char (fread (fid).');
-  fclose (fid);
-  delete (diary_file);
+    ## Evaluate the code
+    diary (diary_file);
+    eval (code);
+    diary ("off");
+  
+    ## Read the results
+    fid = fopen (diary_file, "r");
+    diary_data = char (fread (fid).');
+    fclose (fid);
 
-  ## Remove 'diary ("off");' from the diary
-  idx = strfind (diary_data, "diary (\"off\");");
-  if (isempty (idx))
-    text = diary_data;
-  else
-    text = diary_data (1:idx (end)-1);
-  endif
-  text = strtrim (text);
+    ## Remove 'diary ("off");' from the diary
+    idx = strfind (diary_data, "diary (\"off\");");
+    if (isempty (idx))
+      text = diary_data;
+    else
+      text = diary_data (1:idx (end)-1);
+    endif
+    text = strtrim (text);
   
-  ## Save figures
-  if (!isempty (get (0, "currentfigure")) && !exist (full_imagedir, "dir"))
-    mkdir (full_imagedir);
-  endif
+    ## Save figures
+    if (!isempty (get (0, "currentfigure")) && !exist (full_imagedir, "dir"))
+      mkdir (full_imagedir);
+    endif
   
-  images = {};
-  while (!isempty (get (0, "currentfigure")))
-    fig = gcf ();
-    r = round (1000*rand ());
-    name = sprintf ("%s_%d.png", fileprefix, r);
-    full_filename = fullfile (full_imagedir, name);
-    filename = fullfile (imagedir, name);
-    print (fig, full_filename);
-    images {end+1} = filename;
-    close (fig);
-  endwhile
+    images = {};
+    while (!isempty (get (0, "currentfigure")))
+      fig = gcf ();
+      r = round (1000*rand ());
+      name = sprintf ("%s_%d.png", fileprefix, r);
+      full_filename = fullfile (full_imagedir, name);
+      filename = fullfile (imagedir, name);
+      print (fig, full_filename);
+      images {end+1} = filename;
+      close (fig);
+    endwhile
   
-  ## Reverse image list, since we got them latest-first
-  images = images (end:-1:1);
+    ## Reverse image list, since we got them latest-first
+    images = images (end:-1:1);
 
-  set (0, "defaultfigurevisible", def);
-  page_screen_output (more_val);
+  unwind_protect_cleanup
+    delete (diary_file);
+    set (0, "defaultfigurevisible", def);
+    page_screen_output (more_val);
+  end_unwind_protect
 endfunction
 
 function text = images_in_html (images)
