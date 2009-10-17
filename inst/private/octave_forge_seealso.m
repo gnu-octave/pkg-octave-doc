@@ -1,4 +1,4 @@
-## Copyright (C) 2009 Carlo de Falco
+## Copyright (C) 2009 Soren Hauberg
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -14,22 +14,17 @@
 ## along with this program; see the file COPYING.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-## THIS FUNCTION SHOULD BE private
-
-function pkg_list_item_filename = get_pkg_list_item_filename (name, outdir)
-
-  filename = "short_package_description";
-  ld = fullfile (outdir, name);
+function expanded = octave_forge_seealso (arg)
+  header = "@html\n<div class=\"seealso\">\n<b>See also</b>: ";
+  footer = "\n</div>\n@end html\n";
   
-  if (!exist (ld, "dir"))
-    [succ, msg] = mkdir (ld);
-    if (!succ)
-      error ("generate_package_html: unable to create directory %s:\n %s", 
-	     ld, msg);
-    endif
-  endif
-
-  pkg_list_item_filename = fullfile (ld, filename);
+  format = " <a href=\"../../find_function.php?fun=%s\">%s</a> ";
   
+  arg2 = cell (1, 2*length (arg));
+  arg2 (1:2:end) = arg;
+  arg2 (2:2:end) = arg;
+  
+  list = sprintf (format, arg2 {:});
+  
+  expanded = strcat (header, list, footer);
 endfunction
-

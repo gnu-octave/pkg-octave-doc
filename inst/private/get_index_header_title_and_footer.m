@@ -28,7 +28,9 @@ function [header, title, footer] = get_index_header_title_and_footer (options, n
   endif
   
   header = strrep (header, "%root", root);
-  if (isfield (options, "body_command"))
+  if (isfield (options, "index_body_command"))
+    header = strrep (header, "%body_command", options.index_body_command);
+  elseif (isfield (options, "body_command"))
     header = strrep (header, "%body_command", options.body_command);
   endif
   

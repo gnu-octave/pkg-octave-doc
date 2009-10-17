@@ -83,6 +83,9 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
   header = text (1:start_idx - 1);
   footer = text (stop_idx + length (stop):end);
   text = text (start_idx + length (start):stop_idx - 1);
+  
+  ## Hack around 'makeinfo' bug that forgets to put <p>'s before function declarations
+  text = strrep (text, "&mdash;", "<p class=\"functionfile\">");
             
   ## Read 'options' input argument
   [header, title, footer] = get_header_title_and_footer (options, :, root);

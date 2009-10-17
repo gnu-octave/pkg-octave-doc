@@ -36,13 +36,12 @@ function generate_operators (outdir = "htdocs", options = struct ())
   if (!exist (outdir, "dir"))
     mkdir (outdir);
   endif
-  various = mk_various_dir (outdir, options);
-  name = fullfile (various, "operators.html");
+  name = fullfile (outdir, "operators.html");
   
   ## Generate html
   title = "Operators and Keywords";
-  options.body_command = 'onload="javascript:fix_top_menu (); javascript:alphabetical_menu ();"';
-  [header, title, footer] = get_overview_header_title_and_footer (options, title, "../");
+  options.body_command = 'onload="javascript:fix_top_menu ();"';
+  [header, title, footer] = get_overview_header_title_and_footer (options, title);
 
   fid = fopen (name, "w");
   if (fid < 0)

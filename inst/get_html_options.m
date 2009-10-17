@@ -85,10 +85,10 @@ function options = get_html_options (project_name)
         <td class=\"menu\">\n\
 \n\
  <a href=\"%rootindex.html\" class=\"menu\">Home</a> &middot;\n\
- <a href=\"%rootpackages.html\" class=\"menu\">Packages</a> &middot;\n\
+ <a href=\"%rootpackages.php\" class=\"menu\">Packages</a> &middot;\n\
  <a href=\"%rootdevelopers.html\" class=\"menu\">Developers</a> &middot;\n\
  <a href=\"%rootdocs.html\" class=\"menu\">Documentation</a> &middot;\n\
- <a href=\"%rootdoc/index.html\" class=\"menu\">Function Reference</a> &middot;\n\
+ <a href=\"%rootfunref.html\" class=\"menu\">Function Reference</a> &middot;\n\
  <a href=\"%rootFAQ.html\" class=\"menu\">FAQ</a> &middot;\n\
  <a href=\"%rootbugs.html\" class=\"menu\">Bugs</a> &middot;\n\
  <a href=\"%rootarchive.html\" class=\"menu\">Mailing Lists</a> &middot;\n\
@@ -99,27 +99,41 @@ function options = get_html_options (project_name)
       </tr>\n\
     </table>\n\
   </div>\n\
-<div id=\"left-menu-span\">\n\
-<!--[if IE]>\n\
-<table id=\"left-menu\">\n\
-  <tr><td>\n\
-    <div id=\"menu-contents\">\n\
-    </div>\n\
-  </td></tr>\n\
-</table>\n\
-<![endif]-->\n\
+<div id=\"left-menu\">\n\
+  <h3>Navigation</h3>\n\
+  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootmanual/index.html\">Octave Manual</a></p>\n\
+  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootoperators.html\">Operators and Keywords</a></p>\n\
+  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootfunction_list.html\">Function List:</a>\n\
+  <ul class=\"left-menu-list\">\n\
+    <li class=\"left-menu-list\">\n\
+      <a  class=\"left-menu-link\" href=\"%rootfunctions_by_package.php\">&#187; by package</a>\n\
+    </li>\n\
+    <li class=\"left-menu-list\">\n\
+      <a  class=\"left-menu-link\" href=\"%rootfunctions_by_alpha.php\">&#187; alphabetical</a>\n\
+    </li>\n\
+  </ul>\n\
+  </p>\n\
+  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootdoxygen/html\">C++ API</a></p>\n\
 </div>\n\
 <div id=\"doccontent\">\n";
 
       ## CSS
       options.css = "octave-forge.css";
+      
+      ## Options for alphabetical lists
+      options.include_alpha = true;
     
       ## Options for individual function pages
-      options.pack_body_cmd = 'onload="javascript:fix_top_menu (); javascript:package_menu ();"';
+      options.pack_body_cmd = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
       options.header = strrep (hh, "%date", date ());
-      options.footer = "</div>\n</body>\n</html>\n";
+      options.footer = "<div id=\"sf_logo\">\n\
+         <a href=\"http://sourceforge.net\">\
+         <img src=\"http://sourceforge.net/sflogo.php?group_id=2888&amp;type=1\"\
+         width=\"88\" height=\"31\" style=\"border: 0;\" alt=\"SourceForge.net Logo\"/>\
+         </a>\n</div>\n</div>\n</body>\n</html>\n";
       options.title = "Function Reference: %name";
       options.include_demos = true;
+      options.seealso = @octave_forge_seealso;
       
       ## Options for overview page
       options.include_overview = true;
@@ -132,7 +146,7 @@ function options = get_html_options (project_name)
 "<div class=\"package\" id=\"%name\">\n\
 <table class=\"package\"><tr>\n\
 <td><b><a href=\"javascript:unfold('%name');\" class=\"package_head_link\">\n\
-<img src=\"show.png\" id=\"%name_im\" alt=\"show/hide\" style=\"padding-right: 0.5em; border: none;\"/> %uppername </a></b></td>\n\
+<img src=\"show.png\" id=\"%name_im\" alt=\"show/hide\" style=\"padding-right: 0.5em; border: none;\"/> %name </a></b></td>\n\
 <td style=\"text-align: right;\">&raquo; <a href=\"./%name/index.html\" class=\"package_link\">details</a> |\n\
 <a class=\"package_link\" href=\"http://downloads.sourceforge.net/octave/%name-%version.%extension?download\">download</a></td>\n\
 </tr></table>\n\
@@ -143,6 +157,7 @@ function options = get_html_options (project_name)
       options.download_link = "http://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
       options.include_package_page = true;
       options.include_package_license = true;
+      options.index_body_command = "onload=\"javascript:fix_top_menu ();\"";
       
     case "octave"
       options.header = "__HEADER__(`%title')";

@@ -22,7 +22,7 @@ function [location, full_location] = mk_function_dir (outdir, options)
   endif
   
   full_location = fullfile (outdir, location);
-  location = strcat (outdir, "/", location);
+  %location = strcat (outdir, "/", location);
   
   ## Create output directory if needed
   if (!exist (full_location, "dir"))

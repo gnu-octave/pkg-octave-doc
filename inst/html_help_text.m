@@ -93,6 +93,9 @@ function html_help_text (name, outname, options = struct (), root = "")
       footer = text (stop_idx + length (stop):end);
       text = text (start_idx + length (start):stop_idx - 1);
             
+      ## Hack around 'makeinfo' bug that forgets to put <p>'s before function declarations
+      text = strrep (text, "&mdash;", "<p class=\"functionfile\">");
+            
     case "not found"
       error ("html_help_text: `%s' not found\n", name);
     otherwise

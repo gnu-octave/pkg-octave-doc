@@ -28,7 +28,9 @@ function [header, title, footer] = get_overview_header_title_and_footer (options
   endif
   
   header = strrep (header, "%root", root);
-  if (isfield (options, "body_command"))
+  if (isfield (options, "pack_body_cmd"))
+    header = strrep (header, "%body_command", options.pack_body_cmd);
+  elseif (isfield (options, "body_command"))
     header = strrep (header, "%body_command", options.body_command);
   endif
   
