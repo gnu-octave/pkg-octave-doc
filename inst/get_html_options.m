@@ -154,6 +154,7 @@ function options = get_html_options (project_name)
 </div>\n";
 
       ## Options for index package
+      options.index_title = "The '%name' Package";
       options.download_link = "http://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
       options.include_package_page = true;
       options.include_package_license = true;
