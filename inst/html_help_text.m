@@ -124,6 +124,9 @@ function html_help_text (name, outname, options = struct (), root = "")
         try
           [output, images] = get_output (code_k, imagedir, full_imagedir, name);
         catch
+          disp ("XXXXXXXXXXXXXXXXXXX");
+          lasterr ()
+          disp ("XXXXXXXXXXXXXXXXXXX");
           continue;
         end_try_catch
         has_text = !isempty (output);
@@ -233,7 +236,9 @@ function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
       name = sprintf ("%s_%d.png", fileprefix, r);
       full_filename = fullfile (full_imagedir, name);
       filename = fullfile (imagedir, name);
+      disp ("&&&&&&&&&&&&&&&&&");
       print (fig, full_filename);
+      disp ("/////////////////");
       images {end+1} = filename;
       close (fig);
     endwhile

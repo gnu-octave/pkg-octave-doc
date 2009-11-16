@@ -154,12 +154,12 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "    %s\n", desc.description);
     fprintf (fid, "  </div>\n\n");
   
-    fprintf (fid, "  <ul>\n");
+    fprintf (fid, "<p>Select category:  <select name=\"cat\" onchange=\"location = this.options[this.selectedIndex].value;\">\n");
     for k = 1:num_categories
       category = desc.provides {k}.category;
-      fprintf (fid, "    <li><a href=\"#%s\">%s</a></li>\n", anchors {k}, category);
+      fprintf (fid, "    <option value=\"#%s\">%s</option>\n", anchors {k}, category);
     endfor
-    fprintf (fid, "  </ul>\n\n");
+    fprintf (fid, "  </select></p>\n\n");
   
     ## Generate function list by category
     for k = 1:num_categories

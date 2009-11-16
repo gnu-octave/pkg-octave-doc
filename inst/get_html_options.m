@@ -88,7 +88,6 @@ function options = get_html_options (project_name)
  <a href=\"%rootpackages.php\" class=\"menu\">Packages</a> &middot;\n\
  <a href=\"%rootdevelopers.html\" class=\"menu\">Developers</a> &middot;\n\
  <a href=\"%rootdocs.html\" class=\"menu\">Documentation</a> &middot;\n\
- <a href=\"%rootfunref.html\" class=\"menu\">Function Reference</a> &middot;\n\
  <a href=\"%rootFAQ.html\" class=\"menu\">FAQ</a> &middot;\n\
  <a href=\"%rootbugs.html\" class=\"menu\">Bugs</a> &middot;\n\
  <a href=\"%rootarchive.html\" class=\"menu\">Mailing Lists</a> &middot;\n\
@@ -101,10 +100,12 @@ function options = get_html_options (project_name)
   </div>\n\
 <div id=\"left-menu\">\n\
   <h3>Navigation</h3>\n\
-  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootmanual/index.html\">Octave Manual</a></p>\n\
   <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootoperators.html\">Operators and Keywords</a></p>\n\
   <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootfunction_list.html\">Function List:</a>\n\
   <ul class=\"left-menu-list\">\n\
+    <li class=\"left-menu-list\">\n\
+      <a  class=\"left-menu-link\" href=\"%rootoctave/overview.html\">&#187; Octave core</a>\n\
+    </li>\n\
     <li class=\"left-menu-list\">\n\
       <a  class=\"left-menu-link\" href=\"%rootfunctions_by_package.php\">&#187; by package</a>\n\
     </li>\n\
