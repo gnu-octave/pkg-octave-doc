@@ -65,7 +65,8 @@ function all_index = txi2index (srcdir)
   
     fid = fopen (filename, "r");
     if (fid < 0)
-      error ("txi2index: couldn't open '%s' for reading", filename);
+      warning ("txi2index: couldn't open '%s' for reading", filename);
+      continue;
     endif
   
     idx = 0;
