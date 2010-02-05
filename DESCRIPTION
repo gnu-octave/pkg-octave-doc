@@ -1,6 +1,6 @@
 Name: generate_html
-Version: 0.0.9
-Date: 2009-02-07
+Version: 0.1.0
+Date: 2010-02-05
 Author: Søren Hauberg
 Maintainer: Søren Hauberg
 Title: Generate HTML web page from help texts
