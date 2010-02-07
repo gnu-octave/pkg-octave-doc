@@ -276,7 +276,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "<table>\n");
     fprintf (fid, "<tr><td rowspan=\"2\" class=\"box_table\">\n");
     fprintf (fid, "<div class=\"package_box\">\n");
-    fprintf (fid, "  <div class=\"package_box_header\">%s</div>\n", desc.name);
+    fprintf (fid, "  <div class=\"package_box_header\"></div>\n");
     fprintf (fid, "  <div class=\"package_box_contents\">\n");
     fprintf (fid, "    <table>\n");
     fprintf (fid, "      <tr><td class=\"package_table\">Package Version:</td><td>%s</td></tr>\n",
@@ -309,7 +309,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "    <a href=\"%s\"\n", link);
       fprintf (fid, "     class=\"download_link\">\n");
       fprintf (fid, "      Download Package\n");
-      fprintf (fid, "    </a>\n");
+      fprintf (fid, "    </a><br>\n");
+      fprintf (fid, "    <a href=\"http://sourceforge.net/projects/octave/files/\"");
+      fprintf (fid, " class=\"older_versions_download\">(older versions)</a>\n");
       fprintf (fid, "  </td></tr></table>\n");
       fprintf (fid, "</div>\n");
     endif
@@ -414,6 +416,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     
     fprintf (fid, "%s\n", header); 
     fprintf (fid, "<h2 class=\"tbdesc\">License for '%s' Package</h2>\n\n", desc.name);
+    fprintf (fid, "<p><a href=\"index.html\">Return to the '%s' package</a></p>\n\n", desc.name);
 
     fprintf (fid, "<pre>%s</pre>\n\n", contents);
     
