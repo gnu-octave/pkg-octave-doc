@@ -122,6 +122,10 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     implemented {k} = cell (1, num_functions);
     for l = 1:num_functions
       fun = F {l};
+      if (any (fun == filesep ()))
+        at_dir = fileparts (fun);
+        mkdir (fullfile (fundir, at_dir));
+      endif
       outname = fullfile (fundir, sprintf ("%s.html", fun));
       try
         html_help_text (fun, outname, options, "../../");
