@@ -125,10 +125,13 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       if (any (fun == filesep ()))
         at_dir = fileparts (fun);
         mkdir (fullfile (fundir, at_dir));
+        r = "../../../";
+      else
+        r = "../../";
       endif
       outname = fullfile (fundir, sprintf ("%s.html", fun));
       try
-        html_help_text (fun, outname, options, "../../");
+        html_help_text (fun, outname, options, r);
         implemented {k}{l} = true;
       catch
         warning ("marking '%s' as not implemented", fun);
