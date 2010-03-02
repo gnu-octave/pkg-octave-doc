@@ -14,17 +14,26 @@
 ## along with this program; see the file COPYING.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-function expanded = octave_forge_seealso (arg)
+function expanded = octave_forge_seealso (root, arg)
   header = "@html\n<div class=\"seealso\">\n<b>See also</b>: ";
   footer = "\n</div>\n@end html\n";
   
-  format = " <a href=\"../../find_function.php?fun=%s\">%s</a> ";
+  ## XXX: Deal properly with the root directory
+  format = sprintf (" <a href=\"%sfind_function.php?fun=%%s\">%%s</a> ", root);
+  kw_format = sprintf (" <a href=\"%soperators.html#%%s\">%%s</a> ", root);
   
-  arg2 = cell (1, 2*length (arg));
-  arg2 (1:2:end) = arg;
-  arg2 (2:2:end) = arg;
+  keywords = __keywords__ ();
   
-  list = sprintf (format, arg2 {:});
+  help_list = "";
+  for k = 1:length (arg)
+    f = arg {k};
+    if (any (strcmp (f, keywords)))
+      elem = sprintf (kw_format, f, f);
+    else
+      elem = sprintf (format, f, f);
+    endif
+    help_list = strcat (help_list, elem);
+  endfor
   
-  expanded = strcat (header, list, footer);
+  expanded = strcat (header, help_list, footer);
 endfunction

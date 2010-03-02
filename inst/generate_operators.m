@@ -51,16 +51,16 @@ function generate_operators (outdir = "htdocs", options = struct ())
   fprintf (fid, "%s\n", header);  
   
   fprintf (fid, "<h2 class=\"tbdesc\">Operators</h2>\n\n");
-  write_list (__operators__, fid);
+  write_list (__operators__, fid, false);
 
   fprintf (fid, "<h2 class=\"tbdesc\">Keywords</h2>\n\n");
-  write_list (__keywords__, fid);
+  write_list (__keywords__, fid, true);
 
   fprintf (fid, "\n%s\n", footer);
   fclose (fid);
 endfunction
 
-function write_list (list, fid)
+function write_list (list, fid, write_anchors)
   for k = 1:length (list)
     elem = list {k};
     [text, format] = get_help_text (elem);
@@ -68,8 +68,14 @@ function write_list (list, fid)
       text = strip_defs (text);
       text = __makeinfo__ (text, "plain text");
     endif
+    if (write_anchors)
+      fprintf (fid, "<a name=\"%s\">\n", elem);
+    endif
     fprintf (fid, "<div class=\"func\"><b>%s</b></div>\n", elem);
     fprintf (fid, "<div class=\"ftext\">%s</div>\n", text); # XXX: don't use text
+    if (write_anchors)
+      fprintf (fid, "</a>\n\n");
+    endif
   endfor
 endfunction
 

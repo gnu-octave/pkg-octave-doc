@@ -54,19 +54,10 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
   text = sprintf ("%s\n%s\n%s\n", start, text, stop);
       
   ## Handle @seealso
-  if (isfield (options, "seealso_prefix"))
-    seealso_prefix = options.seealso_prefix;
-    if (length (seealso_prefix) > 0 && seealso_prefix (end) != "/")
-      seealso_prefix (end+1) = "/";
-    endif
-  else
-    seealso_prefix = "";
-  endif
-
   if (isfield (options, "seealso"))
     seealso = options.seealso;
   else
-    seealso = @(args) html_see_also_with_prefix (seealso_prefix, args {:});
+    seealso = @(args) html_see_also_with_prefix (root, args {:});
   endif
 
   ## Run makeinfo

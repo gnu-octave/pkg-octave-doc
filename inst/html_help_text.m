@@ -65,19 +65,10 @@ function html_help_text (name, outname, options = struct (), root = "")
       text = sprintf ("%s\n%s\n%s\n", start, text, stop);
       
       ## Handle @seealso
-      if (isfield (options, "seealso_prefix"))
-        seealso_prefix = options.seealso_prefix;
-        if (length (seealso_prefix) > 0 && seealso_prefix (end) != "/")
-          seealso_prefix (end+1) = "/";
-        endif
-      else
-        seealso_prefix = "";
-      endif
-
       if (isfield (options, "seealso"))
-        seealso = options.seealso;
+        seealso = @(args) options.seealso (root, args);
       else
-        seealso = @(args) html_see_also_with_prefix (seealso_prefix, args {:});
+        seealso = @(args) html_see_also_with_prefix (root, args {:});
       endif
 
       ## Run makeinfo
@@ -174,7 +165,7 @@ function html_help_text (name, outname, options = struct (), root = "")
 
 endfunction
 
-function expanded = html_see_also_with_prefix (prefix, varargin)
+function expanded = html_see_also_with_prefix (prefix, root, varargin)
   header = "@html\n<div class=\"seealso\">\n<b>See also</b>: ";
   footer = "\n</div>\n@end html\n";
   
