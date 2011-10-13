@@ -72,6 +72,7 @@ function html_help_text (name, outname, options = struct (), root = "")
       endif
 
       ## Run makeinfo
+pwd
       [text, status] = __makeinfo__ (text, "html", seealso);
       if (status != 0)
         error ("html_help_text: couln't parse file '%s'", name);
