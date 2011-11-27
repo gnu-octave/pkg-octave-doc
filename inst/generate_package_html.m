@@ -109,7 +109,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       options.body_command = "";
     endif
   endif
-  
+
+  options.footer = strrep (options.footer, "%package", packname);
+
   num_categories = length (desc.provides);
   anchors = implemented = cell (1, num_categories);
   for k = 1:num_categories
