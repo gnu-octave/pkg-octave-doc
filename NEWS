@@ -5,5 +5,8 @@ Summary of important user-visible changes for generate_html 0.1.4:
     package that the function belongs too and have a link for the
     package main page.
 
+ ** Autoload field when generating a package index.html page is now
+    correct.
+
  ** keywords on the `See also:' will be interpreted properly (rather
     than just function names).

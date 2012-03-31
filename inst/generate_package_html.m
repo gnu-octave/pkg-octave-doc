@@ -1,4 +1,4 @@
-## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
+## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>a
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -371,15 +371,16 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     if (isfield (list, "buildrequires"))
       fprintf (fid, "    <tr><td>Build Dependencies:</td><td>%s</td></tr>\n", list.buildrequires);
     endif
-  
-    if (isfield (list, "autoload"))
-      if (list.autoload)
-        a = "Yes";
-      else
-        a = "No";
-      endif
-      fprintf (fid, "    <tr><td>Autoload:</td><td>%s</td></tr>\n", a);
+
+    ## if the package does not specify, then it is not autoloaded. Also, sometimes
+    ## the value is 1 (true) but other times the value is a string
+    if (isfield (list, "autoload") && (list.autoload == 1 ||
+                                       any (strcmpi ({"yes", "on", "true"}, list.autoload))))
+      a = "Yes";
+    else
+      a = "No";
     endif
+    fprintf (fid, "    <tr><td>Autoload:</td><td>%s</td></tr>\n", a);
   
     fprintf (fid, "  </table>\n\n");
   
