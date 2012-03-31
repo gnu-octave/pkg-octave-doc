@@ -1,4 +1,4 @@
-## Copyright (C) 2009 Carlo de Falco
+## Copyright (C) 2009 Carlo de Falco <carlo.defalco@gmail.com>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
