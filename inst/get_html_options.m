@@ -92,7 +92,7 @@ function options = get_html_options (project_name)
  <a href=\"%rootbugs.html\" class=\"menu\">Bugs</a> &middot;\n\
  <a href=\"%rootarchive.html\" class=\"menu\">Mailing Lists</a> &middot;\n\
  <a href=\"%rootlinks.html\" class=\"menu\">Links</a> &middot;\n\
- <a href=\"http://sourceforge.net/svn/?group_id=2888\" class=\"menu\">SVN</a>\n\
+ <a href=\"https://sourceforge.net/p/octave/code\" class=\"menu\">SVN</a>\n\
 \n\
         </td>\n\
       </tr>\n\
