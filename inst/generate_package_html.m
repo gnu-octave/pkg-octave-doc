@@ -280,7 +280,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       [~, doc_fn, doc_ext] = fileparts (options.package_doc);
       doc_root_dir = fullfile (list.dir, "doc");
       doc_src = fullfile (doc_root_dir, [doc_fn, doc_ext]);
-      doc_out_dir = fullfile (packdir, "package_doc");
+      doc_subdir = "package_doc";
+      doc_out_dir = fullfile (packdir, doc_subdir);
     else
       write_package_documentation = false;
     endif
@@ -365,7 +366,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "  <table><tr><td>\n");
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n",
-               fullfile (doc_out_dir, "index.html"));
+               fullfile (doc_subdir, "index.html"));
       fprintf (fid, "      Package Documentation\n");
       fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td></tr></table>\n");
