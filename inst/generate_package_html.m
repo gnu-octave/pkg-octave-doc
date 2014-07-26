@@ -1,4 +1,4 @@
-## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>a
+## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -43,6 +43,13 @@
 ## @example
 ## generate_package_html ("image", "image_html", "octave-forge");
 ## @end example
+##
+## If you want to include prepared package documentation in html format,
+## you have to set @var{options}.package_doc manually with the filename
+## of its texinfo source, which must be in the packages "doc" directory.
+## Contained images are automatically copied if they are at the paths
+## specified in the texinfo source relative to the packages "doc"
+## directory.
 ##
 ## It should be noted that the function only works for installed packages.
 ## @seealso{get_html_options}
@@ -96,7 +103,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   elseif (!isstruct (options))
     error ("generate_package_html: third input argument must be a string or a structure");
   endif
-  
+
   ##################################################  
   ## Generate html pages for individual functions ##
   ##################################################
@@ -268,6 +275,16 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       error ("generate_package_html: couldn't locate package '%s'", packname);
     endif
 
+    if (isfield (options, "package_doc"))
+      write_package_documentation = true;
+      [~, doc_fn, doc_ext] = fileparts (options.package_doc);
+      doc_root_dir = fullfile (list.dir, "doc");
+      doc_src = fullfile (doc_root_dir, [doc_fn, doc_ext]);
+      doc_out_dir = fullfile (packdir, "package_doc");
+    else
+      write_package_documentation = false;
+    endif
+  
     ## Open output file
     index_filename = "index.html";
 
@@ -335,6 +352,25 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "    </a>\n");
     fprintf (fid, "  </td></tr></table>\n");
     fprintf (fid, "</div>\n");
+    fprintf (fid, "<div class=\"news_file\">\n");
+    fprintf (fid, "  <table><tr><td>\n");
+    fprintf (fid, "  </td><td>\n");
+    fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");
+    fprintf (fid, "      NEWS\n");
+    fprintf (fid, "    </a>\n");
+    fprintf (fid, "  </td></tr></table>\n");
+    fprintf (fid, "</div>\n");
+    if (write_package_documentation)
+      fprintf (fid, "<div class=\"package_doc\">\n");
+      fprintf (fid, "  <table><tr><td>\n");
+      fprintf (fid, "  </td><td>\n");
+      fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n",
+               fullfile (doc_out_dir, "index.html"));
+      fprintf (fid, "      Package Documentation\n");
+      fprintf (fid, "    </a>\n");
+      fprintf (fid, "  </td></tr></table>\n");
+      fprintf (fid, "</div>\n");
+    endif
     fprintf (fid, "</td></tr>\n");
     fprintf (fid, "</table>\n\n");
 
@@ -433,5 +469,108 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "\n%s\n", footer);
     fclose (fid);
   endif
+
+  #####################
+  ## Write NEWS file ##
+  #####################
+  if (isfield (options, "include_package_news") && options.include_package_news)
+    ## Get detailed information about the package
+    all_list = pkg ("list");
+    list = [];
+    for k = 1:length (all_list)
+      if (strcmp (all_list {k}.name, packname))
+        list = all_list {k};
+      endif
+    endfor
+    if (isempty (list))
+      error ("generate_package_html: couldn't locate package '%s'", packname);
+    endif
+
+    ## Read news
+    filename = fullfile (list.dir, "packinfo", "NEWS");
+    fid = fopen (filename, "r");
+    if (fid < 0)
+      error ("generate_package_html: couldn't open NEWS for reading");
+    endif
+    contents = char (fread (fid).');
+    fclose (fid);
+
+    ## Open output file
+    news_filename = "NEWS.html";
+
+    fid = fopen (fullfile (packdir, news_filename), "w");
+    if (fid < 0)
+      error ("generate_package_html: couldn't open NEWS file for writing");
+    endif
+  
+    ## Write output
+    [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
+    
+    fprintf (fid, "%s\n", header); 
+    fprintf (fid, "<h2 class=\"tbdesc\">NEWS for '%s' Package</h2>\n\n", desc.name);
+    fprintf (fid, "<p><a href=\"index.html\">Return to the '%s' package</a></p>\n\n", desc.name);
+
+    fprintf (fid, "<pre>%s</pre>\n\n", contents);
+    
+    fprintf (fid, "\n%s\n", footer);
+    fclose (fid);
+  endif
+
+  #################################
+  ## Write package documentation ##
+  #################################
+  if (write_package_documentation)
+
+    ## Convert texinfo source
+    status = system (sprintf ("%s --html -o %s %s",
+                              makeinfo_program (),
+                              doc_out_dir,
+                              doc_src));
+    if (status == 127)
+      error ("program `%s' not found", makeinfo_program ());
+    elseif (status)
+      error ("program `%s' returned failure code %i",
+             makeinfo_program (), status);
+    endif
+
+    ## Read image references from generated files and copy images
+    filelist = glob (fullfile (doc_out_dir, "*"));
+    for id = 1 : numel (filelist)
+      copy_images (filelist{id}, doc_root_dir, doc_out_dir);
+    endfor
+
+  endif
+
 endfunction
 
+function copy_images (file, doc_root_dir, doc_out_dir)
+
+  if ((fid = fopen (file)) < 0)
+    error ("couldn't open %s for reading", file);
+  endif
+  while (! isnumeric (l = fgetl (fid)))
+    m = regexp (l, "<img.+src=""([^""]+)"".*>", "tokens");
+    if (! isempty (m))
+      url = m{1}{1};
+      ## exclude external links
+      if (isempty (strfind (url, "//")))
+        if (! isempty (strfind (url, "..")))
+          warning ("not copying image %s because path contains '..'",
+                   url);
+        else
+          if (! isempty (imgdir = fileparts (url)) &&
+              ! strcmp (imgdir, "./") &&
+              ! exist (imgoutdir = fullfile (doc_out_dir, imgdir), "dir"))
+            mkdir (imgoutdir);
+          endif
+          if (! ([status, msg] = copyfile (fullfile (doc_root_dir, url),
+                                           fullfile (doc_out_dir, url))))
+            warning ("could not copy image file %s: %s", url, msg);
+          endif
+        endif
+      endif
+    endif
+  endwhile
+  fclose (fid);
+
+endfunction

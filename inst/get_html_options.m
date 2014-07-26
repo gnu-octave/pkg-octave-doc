@@ -159,6 +159,7 @@ function options = get_html_options (project_name)
       options.download_link = "http://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
       options.include_package_page = true;
       options.include_package_license = true;
+      options.include_package_news = true;
       options.index_body_command = "onload=\"javascript:fix_top_menu ();\"";
       
     case "octave"
