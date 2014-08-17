@@ -140,7 +140,13 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       endif
       outname = fullfile (fundir, sprintf ("%s.html", fun));
       try
-        html_help_text (fun, outname, options, r);
+        opts = options;
+        ## object methods of @class type will be one level above the others
+        if (strcmp (fun(1), "@"))
+          opts.footer = strrep (opts.footer, 'href="../index.html"',
+                                             'href="../../index.html"');
+        endif
+        html_help_text (fun, outname, opts, r);
         implemented {k}{l} = true;
       catch
         warning ("marking '%s' as not implemented", fun);
