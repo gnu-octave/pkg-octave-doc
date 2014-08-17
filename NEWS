@@ -1,4 +1,18 @@
- ** Support including NEWS and prepared package documentation in html.
+Summary of important user-visible changes for generate_html 0.1.6:
+-------------------------------------------------------------------
+
+ ** Create page with content of each package NEWS file.
+
+ ** Create package documentation in html from Texinfo sources in doc/.
+    Note that this is the package documentation/manual, and in addition
+    to the help text of individual functions.
+
+ ** Fix broken links from the pages of methods of a @class type, to the
+    package index package.
+
+ ** Link on each page header to the source of Octave Forge now points to
+    the code page of Octave Forge website.  It previously pointed to the
+    SVN repository in Sourceforge which has been retired.
 
 Summary of important user-visible changes for generate_html 0.1.5:
 -------------------------------------------------------------------
