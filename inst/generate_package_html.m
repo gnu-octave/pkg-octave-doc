@@ -242,7 +242,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fclose (name_fid);
       fclose (desc_fid);
     endfor
-  endif  
+  endif
   
   #####################################################
   ## Write short description for forge overview page ##
@@ -262,6 +262,56 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fclose (fid);
     else
       error ("generate_package_html: unable to open file %s.", pkg_list_item_filename);
+    endif
+  endif
+
+  #####################
+  ## Write NEWS file ##
+  #####################
+  if (isfield (options, "include_package_news") && options.include_package_news)
+    ## Get detailed information about the package
+    all_list = pkg ("list");
+    list = [];
+    for k = 1:length (all_list)
+      if (strcmp (all_list {k}.name, packname))
+        list = all_list {k};
+      endif
+    endfor
+    if (isempty (list))
+      error ("generate_package_html: couldn't locate package '%s'", packname);
+    endif
+
+    ## Read news
+    filename = fullfile (list.dir, "packinfo", "NEWS");
+    fid = fopen (filename, "r");
+    if (fid < 0)
+      warning ("generate_package_html: couldn't open NEWS for reading");
+      write_package_news = false;
+    else
+      write_package_news = true;
+
+      news_content = char (fread (fid).');
+      fclose (fid);
+
+      ## Open output file
+      news_filename = "NEWS.html";
+
+      fid = fopen (fullfile (packdir, news_filename), "w");
+      if (fid < 0)
+        error ("generate_package_html: couldn't open NEWS file for writing");
+      endif
+
+      ## Write output
+      [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
+
+      fprintf (fid, "%s\n", header);
+      fprintf (fid, "<h2 class=\"tbdesc\">NEWS for '%s' Package</h2>\n\n", desc.name);
+      fprintf (fid, "<p><a href=\"index.html\">Return to the '%s' package</a></p>\n\n", desc.name);
+
+      fprintf (fid, "<pre>%s</pre>\n\n", news_content);
+
+      fprintf (fid, "\n%s\n", footer);
+      fclose (fid);
     endif
   endif
 
@@ -303,7 +353,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     ## Write output
     [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
 
-    fprintf (fid, "%s\n", header); 
+    fprintf (fid, "%s\n", header);
     fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
 
     fprintf (fid, "<table>\n");
@@ -359,14 +409,16 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "    </a>\n");
     fprintf (fid, "  </td></tr></table>\n");
     fprintf (fid, "</div>\n");
-    fprintf (fid, "<div class=\"news_file\">\n");
-    fprintf (fid, "  <table><tr><td>\n");
-    fprintf (fid, "  </td><td>\n");
-    fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");
-    fprintf (fid, "      NEWS\n");
-    fprintf (fid, "    </a>\n");
-    fprintf (fid, "  </td></tr></table>\n");
-    fprintf (fid, "</div>\n");
+    if (write_package_news)
+      fprintf (fid, "<div class=\"news_file\">\n");
+      fprintf (fid, "  <table><tr><td>\n");
+      fprintf (fid, "  </td><td>\n");
+      fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");
+      fprintf (fid, "      NEWS\n");
+      fprintf (fid, "    </a>\n");
+      fprintf (fid, "  </td></tr></table>\n");
+      fprintf (fid, "</div>\n");
+    endif
     if (write_package_documentation)
       fprintf (fid, "<div class=\"package_doc\">\n");
       fprintf (fid, "  <table><tr><td>\n");
@@ -467,54 +519,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     ## Write output
     [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
     
-    fprintf (fid, "%s\n", header); 
+    fprintf (fid, "%s\n", header);
     fprintf (fid, "<h2 class=\"tbdesc\">License for '%s' Package</h2>\n\n", desc.name);
-    fprintf (fid, "<p><a href=\"index.html\">Return to the '%s' package</a></p>\n\n", desc.name);
-
-    fprintf (fid, "<pre>%s</pre>\n\n", contents);
-    
-    fprintf (fid, "\n%s\n", footer);
-    fclose (fid);
-  endif
-
-  #####################
-  ## Write NEWS file ##
-  #####################
-  if (isfield (options, "include_package_news") && options.include_package_news)
-    ## Get detailed information about the package
-    all_list = pkg ("list");
-    list = [];
-    for k = 1:length (all_list)
-      if (strcmp (all_list {k}.name, packname))
-        list = all_list {k};
-      endif
-    endfor
-    if (isempty (list))
-      error ("generate_package_html: couldn't locate package '%s'", packname);
-    endif
-
-    ## Read news
-    filename = fullfile (list.dir, "packinfo", "NEWS");
-    fid = fopen (filename, "r");
-    if (fid < 0)
-      error ("generate_package_html: couldn't open NEWS for reading");
-    endif
-    contents = char (fread (fid).');
-    fclose (fid);
-
-    ## Open output file
-    news_filename = "NEWS.html";
-
-    fid = fopen (fullfile (packdir, news_filename), "w");
-    if (fid < 0)
-      error ("generate_package_html: couldn't open NEWS file for writing");
-    endif
-  
-    ## Write output
-    [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
-    
-    fprintf (fid, "%s\n", header); 
-    fprintf (fid, "<h2 class=\"tbdesc\">NEWS for '%s' Package</h2>\n\n", desc.name);
     fprintf (fid, "<p><a href=\"index.html\">Return to the '%s' package</a></p>\n\n", desc.name);
 
     fprintf (fid, "<pre>%s</pre>\n\n", contents);
