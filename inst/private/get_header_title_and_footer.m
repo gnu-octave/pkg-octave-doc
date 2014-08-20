@@ -1,3 +1,4 @@
+## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ##
 ## This program is free software; you can redistribute it and/or modify it
@@ -14,7 +15,9 @@
 ## along with this program; see the file COPYING.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-function [header, title, footer] = get_header_title_and_footer (options, name = "", root = "")
+function [header, title, footer] = get_header_title_and_footer ...
+  (options, name = "", root = "", pkgroot = "", pkgname = "")
+  
   if (isfield (options, "header"))
     header = options.header;
   else
@@ -49,5 +52,10 @@ function [header, title, footer] = get_header_title_and_footer (options, name = 
     footer = options.footer;
   else
     footer = "</body></html>";
-  endif  
+  endif
+  
+  footer = strrep (footer, "%root", root);
+  footer = strrep (footer, "%pkgroot", pkgroot);
+  footer = strrep (footer, "%package", pkgname);
+  
 endfunction

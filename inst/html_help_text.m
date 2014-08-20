@@ -1,3 +1,4 @@
+## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ##
 ## This program is free software; you can redistribute it and/or modify it
@@ -42,7 +43,9 @@
 ## @seealso{get_html_options, generate_package_html}
 ## @end deftypefn
 
-function html_help_text (name, outname, options = struct (), root = "")
+function html_help_text ...
+  (name, outname, options = struct (), root = "", pkgroot = "", pkgname = "")
+  
   ## Get the help text of the function
   [text, format] = get_help_text (name);
   
@@ -94,7 +97,8 @@ function html_help_text (name, outname, options = struct (), root = "")
   endswitch
 
   ## Read 'options' input argument
-  [header, title, footer] = get_header_title_and_footer (options, name, root);
+  [header, title, footer] = get_header_title_and_footer ...
+    (options, name, root, pkgroot, pkgname);
   
   ## Add demo:// links if requested
   if (isfield (options, "include_demos") && options.include_demos)

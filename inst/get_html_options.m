@@ -1,3 +1,4 @@
+## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ##
 ## This program is free software; you can redistribute it and/or modify it
@@ -127,11 +128,19 @@ function options = get_html_options (project_name)
       ## Options for individual function pages
       options.pack_body_cmd = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
       options.header = strrep (hh, "%date", date ());
-      options.footer = "<p>Package: <a href=\"../index.html\">%package</a></p>\n<div id=\"sf_logo\">\n\
-         <a href=\"http://sourceforge.net\">\
-         <img src=\"http://sourceforge.net/sflogo.php?group_id=2888&amp;type=1\"\
-         width=\"88\" height=\"31\" style=\"border: 0;\" alt=\"SourceForge.net Logo\"/>\
-         </a>\n</div>\n</div>\n</body>\n</html>\n";
+      options.index_footer = ...
+        "<div id=\"sf_logo\">\n\
+           <a href=\"http://sourceforge.net\">\
+           <img src=\"http://sourceforge.net/sflogo.php?group_id=2888&amp;type=1\"\
+            width=\"88\" height=\"31\" style=\"border: 0;\" alt=\"SourceForge.net Logo\"/>\
+           </a>\n\
+         </div>\n</div>\n</body>\n</html>\n";
+      options.overview_footer = [ ...
+        "<p>Package: <a href=\"index.html\">%package</a></p>\n" ...
+        options.index_footer];
+      options.footer = [ ...
+        "<p>Package: <a href=\"%pkgrootindex.html\">%package</a></p>\n" ...
+        options.index_footer];
       options.title = "Function Reference: %name";
       options.include_demos = true;
       options.seealso = @octave_forge_seealso;

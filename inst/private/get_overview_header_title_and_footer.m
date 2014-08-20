@@ -1,3 +1,4 @@
+## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ##
 ## This program is free software; you can redistribute it and/or modify it
@@ -14,7 +15,9 @@
 ## along with this program; see the file COPYING.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-function [header, title, footer] = get_overview_header_title_and_footer (options, name, root = "")
+function [header, title, footer] = get_overview_header_title_and_footer ...
+  (options, name, root = "", pkgroot = "", pkgname = "")
+  
   if (isfield (options, "overview_header"))
     header = options.overview_header;
   elseif (isfield (options, "header"))
@@ -28,6 +31,7 @@ function [header, title, footer] = get_overview_header_title_and_footer (options
   endif
   
   header = strrep (header, "%root", root);
+  
   if (isfield (options, "pack_body_cmd"))
     header = strrep (header, "%body_command", options.pack_body_cmd);
   elseif (isfield (options, "body_command"))
@@ -51,12 +55,18 @@ function [header, title, footer] = get_overview_header_title_and_footer (options
     header = strrep (header, "%title", title);
   endif
 
-    ## Write footer of overview page
-    if (isfield (options, "overview_footer"))
-      footer = options.overview_footer;
-    elseif (isfield (options, "footer"))
-      footer = options.footer;
-    else
-      footer = "</body></html>";
-    endif
+  ## Write footer of overview page
+  if (isfield (options, "overview_footer"))
+    footer = options.overview_footer;
+  elseif (isfield (options, "footer"))
+    footer = options.footer;
+  else
+    footer = "</body></html>";
+  endif
+  
+  footer = strrep (footer, "%root", root);
+  footer = strrep (footer, "%pkgroot", pkgroot);
+  footer = strrep (footer, "%package", pkgname);
+  
 endfunction
+

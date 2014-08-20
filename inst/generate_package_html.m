@@ -1,3 +1,4 @@
+## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ##
 ## This program is free software; you can redistribute it and/or modify it
@@ -117,8 +118,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
   endif
 
-  options.footer = strrep (options.footer, "%package", packname);
-
   num_categories = length (desc.provides);
   anchors = implemented = cell (1, num_categories);
   for k = 1:num_categories
@@ -131,22 +130,17 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     implemented {k} = cell (1, num_functions);
     for l = 1:num_functions
       fun = F {l};
-      if (any (fun == filesep ()))
+      if (fun(1) == "@")
         at_dir = fileparts (fun);
         mkdir (fullfile (fundir, at_dir));
-        r = "../../../";
+        pkgroot = "../../";        
       else
-        r = "../../";
+        pkgroot = "../";
       endif
+      root = ["../" pkgroot];
       outname = fullfile (fundir, sprintf ("%s.html", fun));
       try
-        opts = options;
-        ## object methods of @class type will be one level above the others
-        if (strcmp (fun(1), "@"))
-          opts.footer = strrep (opts.footer, 'href="../index.html"',
-                                             'href="../../index.html"');
-        endif
-        html_help_text (fun, outname, opts, r);
+        html_help_text (fun, outname, options, root, pkgroot, packname);
         implemented {k}{l} = true;
       catch
         warning ("marking '%s' as not implemented", fun);
@@ -167,7 +161,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       error ("generate_package_html: couldn't open overview file for writing");
     endif
   
-    [header, title, footer] = get_overview_header_title_and_footer (options, desc.name, "../");
+    [header, title, footer] = get_overview_header_title_and_footer ...
+      (options, desc.name, "../", "", packname);
 
     fprintf (fid, "%s\n", header);  
     fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
@@ -301,9 +296,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
         error ("generate_package_html: couldn't open NEWS file for writing");
       endif
 
-      ## Write output
-      [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
+      ## For the NEWS page, use the header and footer of the overview page
+      [header, title, footer] = get_overview_header_title_and_footer ...
+        (options, desc.name, "../", "", packname);
 
+      ## Write output
       fprintf (fid, "%s\n", header);
       fprintf (fid, "<h2 class=\"tbdesc\">NEWS for '%s' Package</h2>\n\n", desc.name);
       fprintf (fid, "<p><a href=\"index.html\">Return to the '%s' package</a></p>\n\n", desc.name);
@@ -351,7 +348,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
   
     ## Write output
-    [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
+    [header, title, footer] = get_index_header_title_and_footer ...
+      (options, desc.name, "../", "", packname);
 
     fprintf (fid, "%s\n", header);
     fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
@@ -516,9 +514,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       error ("generate_package_html: couldn't open COPYING file for writing");
     endif
   
-    ## Write output
-    [header, title, footer] = get_index_header_title_and_footer (options, desc.name, "../");
+    ## For the COPYING page, use the header and footer of the overview page    
+    [header, title, footer] = get_overview_header_title_and_footer ...
+      (options, desc.name, "../", "", packname);
     
+    ## Write output
     fprintf (fid, "%s\n", header);
     fprintf (fid, "<h2 class=\"tbdesc\">License for '%s' Package</h2>\n\n", desc.name);
     fprintf (fid, "<p><a href=\"index.html\">Return to the '%s' package</a></p>\n\n", desc.name);

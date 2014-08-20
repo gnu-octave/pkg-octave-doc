@@ -1,3 +1,4 @@
+## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ##
 ## This program is free software; you can redistribute it and/or modify it
@@ -14,7 +15,9 @@
 ## along with this program; see the file COPYING.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-function [header, title, footer] = get_index_header_title_and_footer (options, name, root = "")
+function [header, title, footer] = get_index_header_title_and_footer ...
+  (options, name, root = "", pkgroot = "", pkgname = "")
+  
   if (isfield (options, "index_header"))
     header = options.index_header;
   elseif (isfield (options, "header"))
@@ -51,12 +54,17 @@ function [header, title, footer] = get_index_header_title_and_footer (options, n
     header = strrep (header, "%title", title);
   endif
 
-    ## Write footer of index page
-    if (isfield (options, "index_footer"))
-      footer = options.index_footer;
-    elseif (isfield (options, "footer"))
-      footer = options.footer;
-    else
-      footer = "</body></html>";
-    endif
+  ## Write footer of index page
+  if (isfield (options, "index_footer"))
+    footer = options.index_footer;
+  elseif (isfield (options, "footer"))
+    footer = options.footer;
+  else
+    footer = "</body></html>";
+  endif
+
+  footer = strrep (footer, "%root", root);
+  footer = strrep (footer, "%pkgroot", pkgroot);
+  footer = strrep (footer, "%package", pkgname);
+  
 endfunction
