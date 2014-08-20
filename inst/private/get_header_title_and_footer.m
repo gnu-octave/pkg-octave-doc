@@ -16,31 +16,24 @@
 ## <http://www.gnu.org/licenses/>.
 
 function [header, title, footer] = get_header_title_and_footer ...
-  (options, name = "", root = "", pkgroot = "", pkgname = "")
+  (page_type, options, name, root = "", pkgroot = "", pkgname = "")
   
-  if (isfield (options, "header"))
-    header = options.header;
-  else
-    header = "<html><head><title></title><head><body>";
-  endif
-  
+  header = get_feature (page_type, "header", options);
+    
   if (isfield (options, "css"))
     header = strrep (header, "%css", options.css);
   endif
 
   header = strrep (header, "%root", root);
-  if (isfield (options, "body_command"))
-    header = strrep (header, "%body_command", options.body_command);
-  endif
   
-  if (isfield (options, "title"))
-    title = options.title;
-  else
-    title = "%name";
-  endif
+  body_command = get_feature (page_type, "body_command", options);
+  header = strrep (header, "%body_command", body_command);
+  
+  title = get_feature (page_type, "title", options);  
   title = strrep (title, "%name", name);
   title_start_idx = strfind (lower (header), "<title>");
   title_stop_idx = strfind (lower (header), "</title>");
+  
   if (!isempty (title_start_idx) && !isempty (title_stop_idx))
     header = sprintf ("%s<title>%s%s", header (1:title_start_idx-1), title, 
                       header (title_stop_idx:end));
@@ -48,12 +41,7 @@ function [header, title, footer] = get_header_title_and_footer ...
     header = strrep (header, "%title", title);
   endif
   
-  if (isfield (options, "footer"))
-    footer = options.footer;
-  else
-    footer = "</body></html>";
-  endif
-  
+  footer = get_feature (page_type, "footer", options);  
   footer = strrep (footer, "%root", root);
   footer = strrep (footer, "%pkgroot", pkgroot);
   footer = strrep (footer, "%package", pkgname);

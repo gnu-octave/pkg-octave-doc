@@ -126,7 +126,7 @@ function options = get_html_options (project_name)
       options.include_alpha = true;
     
       ## Options for individual function pages
-      options.pack_body_cmd = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
+      options.overview_body_command = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
       options.header = strrep (hh, "%date", date ());
       options.index_footer = ...
         "<div id=\"sf_logo\">\n\

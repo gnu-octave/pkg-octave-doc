@@ -57,9 +57,7 @@ function html_help_text ...
   ## Take action depending on help text format
   switch (lower (format))
     case "plain text"
-      header = "<html><head><title></title></head><body>\n";
       text = sprintf ("<pre>%s</pre>\n", text);
-      footer = "</body></html>\n";
       
     case "texinfo"
       ## Add easily recognisable text before and after real text
@@ -80,11 +78,10 @@ function html_help_text ...
         error ("html_help_text: couln't parse file '%s'", name);
       endif
       
-      ## Split text into header, body, and footer using the text we added above
+      ## Extract the body of makeinfo's output
       start_idx = strfind (text, start);
       stop_idx = strfind (text, stop);
       header = text (1:start_idx - 1);
-      footer = text (stop_idx + length (stop):end);
       text = text (start_idx + length (start):stop_idx - 1);
             
       ## Hack around 'makeinfo' bug that forgets to put <p>'s before function declarations
@@ -98,7 +95,7 @@ function html_help_text ...
 
   ## Read 'options' input argument
   [header, title, footer] = get_header_title_and_footer ...
-    (options, name, root, pkgroot, pkgname);
+    ("function", options, name, root, pkgroot, pkgname);
   
   ## Add demo:// links if requested
   if (isfield (options, "include_demos") && options.include_demos)

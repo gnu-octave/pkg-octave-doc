@@ -111,8 +111,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
   ## Set javascript startup
   if (!isfield (options, "body_command"))
-    if (isfield (options, "pack_body_cmd"))
-      options.body_command = options.pack_body_cmd;
+    if (isfield (options, "overview_body_command"))
+      options.body_command = options.overview_body_command;
     else
       options.body_command = "";
     endif
@@ -161,8 +161,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       error ("generate_package_html: couldn't open overview file for writing");
     endif
   
-    [header, title, footer] = get_overview_header_title_and_footer ...
-      (options, desc.name, "../", "", packname);
+    [header, title, footer] = get_header_title_and_footer ...
+      ("overview", options, desc.name, "../", "", packname);
 
     fprintf (fid, "%s\n", header);  
     fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
@@ -297,8 +297,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       endif
 
       ## For the NEWS page, use the header and footer of the overview page
-      [header, title, footer] = get_overview_header_title_and_footer ...
-        (options, desc.name, "../", "", packname);
+      [header, title, footer] = get_header_title_and_footer ...
+        ("overview", options, desc.name, "../", "", packname);
 
       ## Write output
       fprintf (fid, "%s\n", header);
@@ -348,8 +348,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
   
     ## Write output
-    [header, title, footer] = get_index_header_title_and_footer ...
-      (options, desc.name, "../", "", packname);
+    [header, title, footer] = get_header_title_and_footer ...
+      ("index", options, desc.name, "../", "", packname);
 
     fprintf (fid, "%s\n", header);
     fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
@@ -515,8 +515,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
   
     ## For the COPYING page, use the header and footer of the overview page    
-    [header, title, footer] = get_overview_header_title_and_footer ...
-      (options, desc.name, "../", "", packname);
+    [header, title, footer] = get_header_title_and_footer ...
+      ("overview", options, desc.name, "../", "", packname);
     
     ## Write output
     fprintf (fid, "%s\n", header);

@@ -1,3 +1,4 @@
+## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ##
 ## This program is free software; you can redistribute it and/or modify it
@@ -41,7 +42,7 @@ function generate_operators (outdir = "htdocs", options = struct ())
   ## Generate html
   title = "Operators and Keywords";
   options.body_command = 'onload="javascript:fix_top_menu ();"';
-  [header, title, footer] = get_overview_header_title_and_footer (options, title);
+  [header, title, footer] = get_header_title_and_footer ("overview", options, title);
 
   fid = fopen (name, "w");
   if (fid < 0)

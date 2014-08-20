@@ -79,7 +79,9 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
   text = strrep (text, "&mdash;", "<p class=\"functionfile\">");
             
   ## Read 'options' input argument
-  [header, title, footer] = get_header_title_and_footer (options, :, root);
+  [header, title, footer] = get_header_title_and_footer ...
+    ("function", options, :, root);
+  
 endfunction
 
 function expanded = html_see_also_with_prefix (prefix, varargin)
