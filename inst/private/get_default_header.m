@@ -19,6 +19,6 @@
 
 function header = get_default_header (page_type, options)
 
-header = "<html><head><title></title><head><body>";
+header = "<html><head><title>%title</title><head><body>";
 
 endfunction

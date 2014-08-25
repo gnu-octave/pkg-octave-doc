@@ -31,15 +31,7 @@ function [header, title, footer] = get_header_title_and_footer ...
   
   title = get_feature (page_type, "title", options);  
   title = strrep (title, "%name", name);
-  title_start_idx = strfind (lower (header), "<title>");
-  title_stop_idx = strfind (lower (header), "</title>");
-  
-  if (!isempty (title_start_idx) && !isempty (title_stop_idx))
-    header = sprintf ("%s<title>%s%s", header (1:title_start_idx-1), title, 
-                      header (title_stop_idx:end));
-  else
-    header = strrep (header, "%title", title);
-  endif
+  header = strrep (header, "%title", title);
   
   footer = get_feature (page_type, "footer", options);  
   footer = strrep (footer, "%root", root);
