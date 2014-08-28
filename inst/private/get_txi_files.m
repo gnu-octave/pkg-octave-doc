@@ -1,3 +1,4 @@
+## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ##
 ## This program is free software; you can redistribute it and/or modify it
@@ -14,10 +15,10 @@
 ## along with this program; see the file COPYING.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-function [file_list, file_pattern] = get_txi_files (srcdir)
+function file_list = get_txi_files (srcdir)
+
   txi_dir = fullfile (srcdir, "doc", "interpreter");
   octave_texi = fullfile (txi_dir, "octave.texi");
-  file_pattern = fullfile (txi_dir, "*.txi");
   include = "@include";
   
   fid = fopen (octave_texi, "r");
