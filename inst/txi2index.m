@@ -44,14 +44,13 @@ function all_index = txi2index (srcdir)
     error ("txi2index: input argument must be a string");
   endif
   
-  [file_list, file_pattern] = get_txi_files (srcdir);
-  [global_dir, name, ext] = fileparts (file_pattern);
+  file_list = get_txi_files (srcdir);
   
   all_index = cell (size (file_list));
   for k = 1:length (file_list)
     filename = file_list{k};
 
-    [not_used, name, ext] = fileparts (filename);
+    [not_used, name] = fileparts (filename);
     index.filename = filename;
     index.name = name;
     index.description = "";
