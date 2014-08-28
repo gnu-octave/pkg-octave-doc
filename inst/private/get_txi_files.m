@@ -19,7 +19,9 @@ function file_list = get_txi_files (srcdir)
 
   txi_dir = fullfile (srcdir, "doc", "interpreter");
   octave_texi = fullfile (txi_dir, "octave.texi");
-  include = "@include";
+  
+  ## Pattern for finding @include lines in octave.texi
+  pat = '^@include\s*(?<filename>\S*?)\.texi\s*$';
   
   fid = fopen (octave_texi, "r");
   file_list = {};
@@ -29,13 +31,11 @@ function file_list = get_txi_files (srcdir)
       break;
     endif
     
-    n = min (length (include), length (line));
-    if (strcmp (line (1:n), include))
-      fun = strtrim (line (n+1:end));
-      
-      if (~ any (strcmpi (fun, {"macros.texi", "version.texi"})))
-        fun = strrep (fun, ".texi", ".txi");
-        file_list {end+1} = fullfile (txi_dir, fun);
+    s = regexp (line, pat, "names");
+    f = s(1).filename;
+    if (~ isempty (f))
+      if (~ any (strcmpi (f, {"macros", "version"})))
+        file_list {end+1} = fullfile (txi_dir, [f ".txi"]);
       endif
     endif
   endwhile
