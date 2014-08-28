@@ -23,7 +23,13 @@ function file_list = get_txi_files (srcdir)
   ## Pattern for finding @include lines in octave.texi
   pat = '^@include\s*(?<filename>\S*?)\.texi\s*$';
   
-  fid = fopen (octave_texi, "r");
+  ## Open octave.texi for reading
+  [fid, errmsg] = fopen (octave_texi, "rt");
+  if (fid == -1)
+    fprintf (stderr, "\nCannot open %s for reading.\n\n", octave_texi);
+    error (errmsg);
+  endif
+  
   file_list = {};
   while (true)
     line = fgetl (fid);
