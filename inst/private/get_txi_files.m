@@ -31,11 +31,11 @@ function [file_list, file_pattern] = get_txi_files (srcdir)
     n = min (length (include), length (line));
     if (strcmp (line (1:n), include))
       fun = strtrim (line (n+1:end));
-      if (strcmpi (fun, "conf.texi"))
-        continue;
+      
+      if (~ any (strcmpi (fun, {"macros.texi", "version.texi"})))
+        fun = strrep (fun, ".texi", ".txi");
+        file_list {end+1} = fullfile (txi_dir, fun);
       endif
-      fun = strrep (fun, ".texi", ".txi");
-      file_list {end+1} = fullfile (txi_dir, fun);
     endif
   endwhile
   fclose (fid);
