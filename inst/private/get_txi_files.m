@@ -40,15 +40,3 @@ function [file_list, file_pattern] = get_txi_files (srcdir)
   endwhile
   fclose (fid);
 endfunction
-
-function [file_list, file_pattern] = old_get_txi_files (srcdir)
-  file_pattern = fullfile (txi_dir, "*.txi");
-  fl = dir(file_pattern);
-  file_list = {};
-  for k = 1:length (fl)
-    if (any (strcmpi (fl (k).name, {".", ".."})))
-      continue;
-    endif
-    file_list {end+1} = fullfile (txi_dir, fl (k).name);
-  endfor
-endfunction
