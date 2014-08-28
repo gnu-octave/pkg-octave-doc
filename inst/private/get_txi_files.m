@@ -23,6 +23,9 @@ function file_list = get_txi_files (srcdir)
   ## Pattern for finding @include lines in octave.texi
   pat = '^@include\s*(?<filename>\S*?)\.texi\s*$';
   
+  ## List of *.texi files to be ignored
+  ignore_list = {"macros", "version"};
+  
   ## Open octave.texi for reading
   [fid, errmsg] = fopen (octave_texi, "rt");
   if (fid == -1)
@@ -32,18 +35,24 @@ function file_list = get_txi_files (srcdir)
   
   file_list = {};
   while (true)
+  
+    ## Read one more line
     line = fgetl (fid);
     if (line == -1)
       break;
     endif
     
+    ## Pattern matching
     s = regexp (line, pat, "names");
     f = s(1).filename;
-    if (~ isempty (f))
-      if (~ any (strcmpi (f, {"macros", "version"})))
-        file_list {end+1} = fullfile (txi_dir, [f ".txi"]);
-      endif
+    
+    ## Add to the file list
+    if (~ isempty (f)) && (~ any (strcmpi (f, ignore_list)))
+      file_list {end+1} = fullfile (txi_dir, [f ".txi"]);
     endif
+    
   endwhile
+  
   fclose (fid);
+  
 endfunction
