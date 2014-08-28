@@ -14,8 +14,6 @@
 ## along with this program; see the file COPYING.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-## THIS FUNCTION SHOULD BE private
-
 function [file_list, file_pattern] = get_txi_files (srcdir)
   txi_dir = fullfile (srcdir, "doc", "interpreter");
   octave_texi = fullfile (txi_dir, "octave.texi");
