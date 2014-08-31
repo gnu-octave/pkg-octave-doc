@@ -312,9 +312,25 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
   endif
 
+  #########################################
+  ## Should we include the package doc ? ##
+  #########################################
+
+  if (isfield (options, "package_doc"))
+    write_package_documentation = true;
+    [~, doc_fn, doc_ext] = fileparts (options.package_doc);
+    doc_root_dir = fullfile (list.dir, "doc");
+    doc_src = fullfile (doc_root_dir, [doc_fn, doc_ext]);
+    doc_subdir = "package_doc";
+    doc_out_dir = fullfile (packdir, doc_subdir);
+  else
+    write_package_documentation = false;
+  endif
+
   ######################
   ## Write index file ##
   ######################
+
   if (isfield (options, "include_package_page") && options.include_package_page)
     ## Get detailed information about the package
     all_list = pkg ("list");
@@ -326,17 +342,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endfor
     if (isempty (list))
       error ("generate_package_html: couldn't locate package '%s'", packname);
-    endif
-
-    if (isfield (options, "package_doc"))
-      write_package_documentation = true;
-      [~, doc_fn, doc_ext] = fileparts (options.package_doc);
-      doc_root_dir = fullfile (list.dir, "doc");
-      doc_src = fullfile (doc_root_dir, [doc_fn, doc_ext]);
-      doc_subdir = "package_doc";
-      doc_out_dir = fullfile (packdir, doc_subdir);
-    else
-      write_package_documentation = false;
     endif
   
     ## Open output file
