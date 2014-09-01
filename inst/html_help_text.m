@@ -48,6 +48,7 @@ function html_help_text ...
   
   ## Get the help text of the function
   [text, format] = get_help_text (name);
+  text = insert_char_entities (text);
   
   ## If options is a string, call get_html_options
   if (ischar (options))

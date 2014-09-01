@@ -199,7 +199,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
           link = sprintf ("%s/%s.html", local_fundir, fun);
           fprintf (fid, "    <div class=\"func\"><b><a href=\"%s\">%s</a></b></div>\n",
                    link, fun);
-          fprintf (fid, "    <div class=\"ftext\">%s</div>\n\n", first_sentences {k}{l});
+          fprintf (fid, "    <div class=\"ftext\">%s</div>\n\n", ...
+                   insert_char_entities (first_sentences {k}{l}));
         else
           fprintf (fid, "    <div class=\"func\"><b>%s</b></div>\n", fun);
           fprintf (fid, "    <div class=\"ftext\">Not implemented.</div>\n\n");
