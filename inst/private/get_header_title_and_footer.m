@@ -25,6 +25,8 @@ function [header, title, footer] = get_header_title_and_footer ...
   endif
 
   header = strrep (header, "%root", root);
+  header = strrep (header, "%pkgroot", pkgroot);
+  header = strrep (header, "%package", pkgname);
   
   body_command = get_feature (page_type, "body_command", options);
   header = strrep (header, "%body_command", body_command);
