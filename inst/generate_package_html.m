@@ -123,7 +123,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   for k = 1:num_categories
     F = desc.provides {k}.functions;
     category = desc.provides {k}.category;
-    anchors {k} = strrep (category, " ", ""); # anchor names
+    
+    ## Create a valid anchor name by keeping only alphabetical characters
+    anchors {k} = regexprep (category, "[^a-zA-Z]", "_");
    
     ## For each function in category
     num_functions = length (F);
