@@ -26,7 +26,7 @@ if (isfield (options, page_specific_feature))
 elseif (isfield (options, feature))
   s = options.(feature);
 else
-  s = eval (sprintf ('get_default_%s ()', feature));
+  s = feval (['get_default_', feature], page_type);
 endif
 
 endfunction
