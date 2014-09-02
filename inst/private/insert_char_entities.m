@@ -18,8 +18,11 @@
 
 function s = insert_char_entities (s)
 
+# This one has to be first
+#  (otherwise we would get, e.g.,  <  ==>  &lt;  ==>  &amp;lt;)
+s = regexprep (s, "&", "&amp;");
+
 s = regexprep (s, "<", "&lt;");
 s = regexprep (s, ">", "&gt;");
-s = regexprep (s, "&", "&amp;");
 
 endfunction
