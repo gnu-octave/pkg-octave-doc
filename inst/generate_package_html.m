@@ -79,13 +79,13 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     error (["generate_package_html: first input must either be the name of a ", ...
             "package, or a structure giving its description."]);
   endif
-  
+
   if (isempty (outdir))
     outdir = packname;
   elseif (!ischar (outdir))
     error ("generate_package_html: second input argument must be a string");
   endif
-  
+
   ## Create output directory if needed
   if (!exist (outdir, "dir"))
     mkdir (outdir);
@@ -97,7 +97,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   endif
 
   [local_fundir, fundir] = mk_function_dir (packdir, packname, options);
-  
+
   ## If options is a string, call get_html_options
   if (ischar (options))
     options = get_html_options (options);
@@ -105,7 +105,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     error ("generate_package_html: third input argument must be a string or a structure");
   endif
 
-  ##################################################  
+  ##################################################
   ## Generate html pages for individual functions ##
   ##################################################
 
@@ -123,10 +123,10 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   for k = 1:num_categories
     F = desc.provides {k}.functions;
     category = desc.provides {k}.category;
-    
+
     ## Create a valid anchor name by keeping only alphabetical characters
     anchors {k} = regexprep (category, "[^a-zA-Z]", "_");
-   
+
     ## For each function in category
     num_functions = length (F);
     implemented {k} = cell (1, num_functions);
@@ -135,7 +135,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       if (fun(1) == "@")
         at_dir = fileparts (fun);
         mkdir (fullfile (fundir, at_dir));
-        pkgroot = "../../";        
+        pkgroot = "../../";
       else
         pkgroot = "../";
       endif
@@ -149,7 +149,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
         implemented {k}{l} = false;
      end_try_catch
     endfor
-  endfor  
+  endfor
 
   #########################
   ## Write overview file ##
@@ -162,40 +162,40 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     if (fid < 0)
       error ("generate_package_html: couldn't open overview file for writing");
     endif
-  
+
     [header, title, footer] = get_header_title_and_footer ...
       ("overview", options, desc.name, "../", "", packname);
 
-    fprintf (fid, "%s\n", header);  
+    fprintf (fid, "%s\n", header);
     fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
 
     fprintf (fid, "  <div class=\"package_description\">\n");
     fprintf (fid, "    %s\n", desc.description);
     fprintf (fid, "  </div>\n\n");
-  
+
     fprintf (fid, "<p>Select category:  <select name=\"cat\" onchange=\"location = this.options[this.selectedIndex].value;\">\n");
     for k = 1:num_categories
       category = desc.provides {k}.category;
       fprintf (fid, "    <option value=\"#%s\">%s</option>\n", anchors {k}, category);
     endfor
     fprintf (fid, "  </select></p>\n\n");
-  
+
     ## Generate function list by category
     for k = 1:num_categories
       F = desc.provides {k}.functions;
       category = desc.provides {k}.category;
       fprintf (fid, "  <h3 class=\"category\"><a name=\"%s\">%s</a></h3>\n\n",
                anchors {k}, category);
-  
+
       first_sentences {k} = cell (1, length (F));
-      
+
       ## For each function in category
       for l = 1:length (F)
         fun = F {l};
         if (implemented {k}{l})
           first_sentences {k}{l} = get_first_help_sentence (fun, 200);
           first_sentences {k}{l} = strrep (first_sentences {k}{l}, "\n", " ");
-          
+
           link = sprintf ("%s/%s.html", local_fundir, fun);
           fprintf (fid, "    <div class=\"func\"><b><a href=\"%s\">%s</a></b></div>\n",
                    link, fun);
@@ -207,11 +207,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
         endif
       endfor
     endfor
-  
+
     fprintf (fid, "\n%s\n", footer);
     fclose (fid);
   endif
-  
+
   ################################################
   ## Write function data for alphabetical lists ##
   ################################################
@@ -223,29 +223,29 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       if (name_fid == -1 || desc_fid == -1)
         error ("generate_package_html: could not open alphabet database for writing");
       endif
-      
+
       for k = 1:num_categories
         F = desc.provides {k}.functions;
         for l = 1:length (F)
           fun = F {l};
           if (implemented {k}{l} && lower (fun (1)) == letter)
             fs = first_sentences {k}{l};
-            
+
             fprintf (name_fid, "%s\n", fun);
             fprintf (desc_fid, "%s\n", fs);
           endif
         endfor
       endfor
-      
+
       fclose (name_fid);
       fclose (desc_fid);
     endfor
   endif
-  
+
   #####################################################
   ## Write short description for forge overview page ##
   #####################################################
-  
+
   if (isfield (options, "include_package_list_item") && options.include_package_list_item)
     pkg_list_item_filename = get_pkg_list_item_filename (desc.name, outdir);
 
@@ -346,7 +346,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     if (isempty (list))
       error ("generate_package_html: couldn't locate package '%s'", packname);
     endif
-  
+
     ## Open output file
     index_filename = "index.html";
 
@@ -354,7 +354,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     if (fid < 0)
       error ("generate_package_html: couldn't open index file for writing");
     endif
-  
+
     ## Write output
     [header, title, footer] = get_header_title_and_footer ...
       ("index", options, desc.name, "../", "", packname);
@@ -386,7 +386,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "  </div>\n");
     fprintf (fid, "</div>\n");
     fprintf (fid, "</td>\n\n");
-    
+
     fprintf (fid, "<td>\n");
     if (isfield (options, "download_link"))
       fprintf (fid, "<div class=\"download_package\">\n");
@@ -446,7 +446,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
     fprintf (fid, "<h3>Details</h3>\n");
     fprintf (fid, "  <table id=\"extra_package_table\">\n");
-    
+
     if (isfield (list, "depends"))
       fprintf (fid, "    <tr><td>Dependencies: </td><td>\n");
       for k = 1:length (list.depends)
@@ -458,7 +458,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
         else
           vt = "";
         endif
-      
+
         if (strcmpi (p, "octave"))
           fprintf (fid, "<a href=\"http://www.octave.org\">Octave</a> ");
         else
@@ -468,7 +468,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       endfor
       fprintf (fid, "</td></tr>\n");
     endif
-  
+
     if (isfield (list, "buildrequires"))
       fprintf (fid, "    <tr><td>Build Dependencies:</td><td>%s</td></tr>\n", list.buildrequires);
     endif
@@ -482,9 +482,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       a = "No";
     endif
     fprintf (fid, "    <tr><td>Autoload:</td><td>%s</td></tr>\n", a);
-  
+
     fprintf (fid, "  </table>\n\n");
-  
+
     fprintf (fid, "\n%s\n", footer);
     fclose (fid);
   endif
@@ -521,18 +521,18 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     if (fid < 0)
       error ("generate_package_html: couldn't open COPYING file for writing");
     endif
-  
-    ## For the COPYING page, use the header and footer of the overview page    
+
+    ## For the COPYING page, use the header and footer of the overview page
     [header, title, footer] = get_header_title_and_footer ...
       ("overview", options, desc.name, "../", "", packname);
-    
+
     ## Write output
     fprintf (fid, "%s\n", header);
     fprintf (fid, "<h2 class=\"tbdesc\">License for '%s' Package</h2>\n\n", desc.name);
     fprintf (fid, "<p><a href=\"index.html\">Return to the '%s' package</a></p>\n\n", desc.name);
 
     fprintf (fid, "<pre>%s</pre>\n\n", contents);
-    
+
     fprintf (fid, "\n%s\n", footer);
     fclose (fid);
   endif

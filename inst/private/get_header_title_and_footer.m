@@ -1,5 +1,5 @@
-## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
+## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
 
 function [header, title, footer] = get_header_title_and_footer ...
   (page_type, options, name, root = "", pkgroot = "", pkgname = "")
-  
+
   header = get_feature (page_type, "header", options);
-    
+
   if (isfield (options, "css"))
     header = strrep (header, "%css", options.css);
   endif
@@ -27,17 +27,17 @@ function [header, title, footer] = get_header_title_and_footer ...
   header = strrep (header, "%root", root);
   header = strrep (header, "%pkgroot", pkgroot);
   header = strrep (header, "%package", pkgname);
-  
+
   body_command = get_feature (page_type, "body_command", options);
   header = strrep (header, "%body_command", body_command);
-  
-  title = get_feature (page_type, "title", options);  
+
+  title = get_feature (page_type, "title", options);
   title = strrep (title, "%name", name);
   header = strrep (header, "%title", title);
-  
-  footer = get_feature (page_type, "footer", options);  
+
+  footer = get_feature (page_type, "footer", options);
   footer = strrep (footer, "%root", root);
   footer = strrep (footer, "%pkgroot", pkgroot);
   footer = strrep (footer, "%package", pkgname);
-  
+
 endfunction

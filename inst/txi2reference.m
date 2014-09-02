@@ -42,11 +42,11 @@ function result = txi2reference (filename, docstring_handler = @default_docstrin
   if (!ischar (filename))
     error ("txi2reference: first input argument must be a string");
   endif
-  
+
   if (!isa (docstring_handler, "function_handle"))
     error ("txi2reference: second input argument must be a function handle");
   endif
-  
+
   ## Constants for string matching
   DOCSTRING = "@DOCSTRING";
   DS_start = "(";
@@ -60,7 +60,7 @@ function result = txi2reference (filename, docstring_handler = @default_docstrin
 
   text = char (fread (fid).');
   fclose (fid);
-    
+
   ## Search for @DOCSTRING
   DOCSTRING_idx = strfind (text, DOCSTRING);
   DS_start_idx = find (text == DS_start);

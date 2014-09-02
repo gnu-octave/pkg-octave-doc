@@ -43,11 +43,11 @@ function options = get_html_options (project_name)
   if (nargin == 0)
     error ("get_html_options: not enough input arguments");
   endif
-  
+
   if (!ischar (project_name))
     error ("get_html_options: first input argument must be a string");
   endif
-  
+
   ## Generate options depending on project
   switch (lower (project_name))
     case "octave-forge"
@@ -121,10 +121,10 @@ function options = get_html_options (project_name)
 
       ## CSS
       options.css = "octave-forge.css";
-      
+
       ## Options for alphabetical lists
       options.include_alpha = true;
-    
+
       ## Options for individual function pages
       options.overview_body_command = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
       options.header = strrep (hh, "%date", date ());
@@ -144,12 +144,12 @@ function options = get_html_options (project_name)
       options.title = "Function Reference: %name";
       options.include_demos = true;
       options.seealso = @octave_forge_seealso;
-      
+
       ## Options for overview page
       options.include_overview = true;
       #options.overview_header = strrep (strrep (hh, "%date", date ()), "%body_command", "");
       options.manual_body_cmd = 'onload="javascript:fix_top_menu (); javascript:manual_menu ();"';
-    
+
       ## Options for package list page
       options.include_package_list_item = true;
       options.package_list_item = ...
@@ -170,7 +170,7 @@ function options = get_html_options (project_name)
       options.include_package_license = true;
       options.include_package_news = true;
       options.index_body_command = "onload=\"javascript:fix_top_menu ();\"";
-      
+
     case "octave"
       options.header = "__HEADER__(`%title')";
       options.footer = "__OCTAVE_TRAILER__";
@@ -194,19 +194,19 @@ function options = get_html_options (project_name)
 <div id=\"top\">Function Reference</div>\n\
 <div id=\"doccontent\">\n";
       hh = strrep (hh, "%date", date ());
-    
+
       ## Options for individual function pages
       css = "doc.css";
       options.header = strrep (hh, "%css", css);
       options.footer = "</div>\n</body>\n</html>\n";
       options.title = "Function: %name";
       options.include_demos = true;
-          
+
       ## Options for overview page
       options.include_overview = true;
       options.overview_header = strrep (hh, "%css", sprintf ("../%s", css));
       options.overview_title = "Overview: %name";
-      
+
     otherwise
       error ("get_html_options: unknown project name: %s", project_name);
   endswitch

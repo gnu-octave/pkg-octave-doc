@@ -22,7 +22,7 @@ function [name_filename, desc_filename] = get_alpha_database (outdir, name, lett
       error ("get_alpha_database: could not create '%s': %s", directory, msg);
     endif
   endif
-  
+
   name_filename = fullfile (directory, sprintf ("function_names_%s", letter));
   desc_filename = fullfile (directory, sprintf ("function_descriptions_%s", letter));
 endfunction

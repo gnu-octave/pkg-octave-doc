@@ -20,7 +20,7 @@ function [package, found] = find_package (name)
   p = which (name);
   found = !isempty (p);
   l = pkg ("list");
-  
+
   for k = 1:length (l)
     d = l {k}.dir;
     idx = strfind (p, d);

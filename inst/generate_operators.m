@@ -25,20 +25,20 @@ function generate_operators (outdir = "htdocs", options = struct ())
   if (!ischar (outdir))
     error ("generate_operators: first input argument must be a string");
   endif
-    
+
   ## If options is a string, call get_html_options
   if (ischar (options))
     options = get_html_options (options);
   elseif (!isstruct (options))
     error ("generate_operators: second input argument must be a string or a structure");
   endif
-  
+
   ## Create directories if needed
   if (!exist (outdir, "dir"))
     mkdir (outdir);
   endif
   name = fullfile (outdir, "operators.html");
-  
+
   ## Generate html
   title = "Operators and Keywords";
   options.body_command = 'onload="javascript:fix_top_menu ();"';
@@ -48,9 +48,9 @@ function generate_operators (outdir = "htdocs", options = struct ())
   if (fid < 0)
     error ("generate_operators: couldn't open file for writing");
   endif
-  
-  fprintf (fid, "%s\n", header);  
-  
+
+  fprintf (fid, "%s\n", header);
+
   fprintf (fid, "<h2 class=\"tbdesc\">Operators</h2>\n\n");
   write_list (__operators__, fid, false);
 
@@ -84,7 +84,7 @@ function text = strip_defs (text)
   ## Lines ending with "@\n" are continuation lines, so they should be concatenated
   ## with the following line.
   text = strrep (text, "@\n", " ");
-  
+
   ## Find, and remove, lines that start with @def. This should remove things
   ## such as @deftypefn, @deftypefnx, @defvar, etc.
   keep = true (size (text));
@@ -99,7 +99,7 @@ function text = strip_defs (text)
         keep (def_idx (k):endl) = false;
       endif
     endfor
-  
+
     ## Remove the @end ... that corresponds to the @def we removed above
     def1 = def_idx (1);
     space_idx = find (text == " ");
@@ -122,7 +122,7 @@ function text = strip_defs (text)
     else
       keep (end_idx:endl) = false;
     endif
-    
+
     text = text (keep);
   endif
 endfunction

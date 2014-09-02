@@ -18,15 +18,15 @@
 
 function root = get_root (outdir, subdir)
   web_sep = '/';
-  
+
   if (outdir (end) == web_sep)
     outdir (end) = [];
   endif
-  
+
   if (subdir (end) == web_sep)
     subdir (end) = [];
   endif
-  
+
   n = sum (subdir == web_sep) - sum (outdir == web_sep);
   root = repmat ("../", 1, n);
 endfunction

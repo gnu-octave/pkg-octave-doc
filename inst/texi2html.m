@@ -47,12 +47,12 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
   if (ischar (options))
     options = get_html_options (options);
   endif
-    
+
   ## Add easily recognisable text before and after real text
   start = "###### OCTAVE START ######";
   stop  = "###### OCTAVE STOP ######";
   text = sprintf ("%s\n%s\n%s\n", start, text, stop);
-      
+
   ## Handle @seealso
   if (isfield (options, "seealso"))
     seealso = options.seealso;
@@ -67,35 +67,35 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
     txi_out = orig_text (1:min (100, length (orig_text)));
     warning ("texi2html: couldn't parse texinfo: \n%s", txi_out); # XXX: make this an error
   endif
-      
+
   ## Split text into header, body, and footer using the text we added above
   start_idx = strfind (text, start);
   stop_idx = strfind (text, stop);
   header = text (1:start_idx - 1);
   footer = text (stop_idx + length (stop):end);
   text = text (start_idx + length (start):stop_idx - 1);
-  
+
   ## Hack around 'makeinfo' bug that forgets to put <p>'s before function declarations
   text = strrep (text, "&mdash;", "<p class=\"functionfile\">");
-            
+
   ## Read 'options' input argument
   [header, title, footer] = get_header_title_and_footer ...
     ("function", options, :, root);
-  
+
 endfunction
 
 function expanded = html_see_also_with_prefix (prefix, varargin)
   header = "@html\n<div class=\"seealso\">\n<b>See also</b>: ";
   footer = "\n</div>\n@end html\n";
-  
+
   format = sprintf (" <a href=\"%s%%s.html\">%%s</a> ", prefix);
-  
+
   varargin2 = cell (1, 2*length (varargin));
   varargin2 (1:2:end) = varargin;
   varargin2 (2:2:end) = varargin;
-  
+
   list = sprintf (format, varargin2 {:});
-  
+
   expanded = strcat (header, list, footer);
 endfunction
 

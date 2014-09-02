@@ -23,6 +23,6 @@ function overview_filename = get_overview_filename (options, name)
   else
     overview_filename = sprintf ("overview.html", name);
   endif
-  
+
   overview_filename = strrep (overview_filename, " ", "_");
 endfunction

@@ -1,5 +1,5 @@
-## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
+## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -19,40 +19,40 @@ function file_list = get_txi_files (srcdir)
 
   txi_dir = fullfile (srcdir, "doc", "interpreter");
   octave_texi = fullfile (txi_dir, "octave.texi");
-  
+
   ## Pattern for finding @include lines in octave.texi
   pat = '^@include\s*(?<filename>\S*?)\.texi\s*$';
-  
+
   ## List of *.texi files to be ignored
   ignore_list = {"macros", "version"};
-  
+
   ## Open octave.texi for reading
   [fid, errmsg] = fopen (octave_texi, "rt");
   if (fid == -1)
     fprintf (stderr, "\nCannot open %s for reading.\n\n", octave_texi);
     error (errmsg);
   endif
-  
+
   file_list = {};
   while (true)
-  
+
     ## Read one more line
     line = fgetl (fid);
     if (line == -1)
       break;
     endif
-    
+
     ## Pattern matching
     s = regexp (line, pat, "names");
     f = s(1).filename;
-    
+
     ## Add to the file list
     if (~ isempty (f)) && (~ any (strcmpi (f, ignore_list)))
       file_list {end+1} = fullfile (txi_dir, [f ".txi"]);
     endif
-    
+
   endwhile
-  
+
   fclose (fid);
-  
+
 endfunction

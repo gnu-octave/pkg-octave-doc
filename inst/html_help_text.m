@@ -45,27 +45,27 @@
 
 function html_help_text ...
   (name, outname, options = struct (), root = "", pkgroot = "", pkgname = "")
-  
+
   ## Get the help text of the function
   [text, format] = get_help_text (name);
   text = insert_char_entities (text);
-  
+
   ## If options is a string, call get_html_options
   if (ischar (options))
     options = get_html_options (options);
   endif
-    
+
   ## Take action depending on help text format
   switch (lower (format))
     case "plain text"
       text = sprintf ("<pre>%s</pre>\n", text);
-      
+
     case "texinfo"
       ## Add easily recognisable text before and after real text
       start = "###### OCTAVE START ######";
       stop  = "###### OCTAVE STOP ######";
       text = sprintf ("%s\n%s\n%s\n", start, text, stop);
-      
+
       ## Handle @seealso
       if (isfield (options, "seealso"))
         seealso = @(args) options.seealso (root, args);
@@ -78,16 +78,16 @@ function html_help_text ...
       if (status != 0)
         error ("html_help_text: couln't parse file '%s'", name);
       endif
-      
+
       ## Extract the body of makeinfo's output
       start_idx = strfind (text, start);
       stop_idx = strfind (text, stop);
       header = text (1:start_idx - 1);
       text = text (start_idx + length (start):stop_idx - 1);
-            
+
       ## Hack around 'makeinfo' bug that forgets to put <p>'s before function declarations
       text = strrep (text, "&mdash;", "<p class=\"functionfile\">");
-            
+
     case "not found"
       error ("html_help_text: `%s' not found\n", name);
     otherwise
@@ -97,7 +97,7 @@ function html_help_text ...
   ## Read 'options' input argument
   [header, title, footer] = get_header_title_and_footer ...
     ("function", options, name, root, pkgroot, pkgname);
-  
+
   ## Add demo:// links if requested
   if (isfield (options, "include_demos") && options.include_demos)
     ## Determine if we have demos
@@ -105,7 +105,7 @@ function html_help_text ...
     if (length (idx) > 1)
       ## Demos to the main text
       demo_text = "";
-      
+
       outdir = fileparts (outname);
       imagedir = "images";
       full_imagedir = fullfile (outdir, imagedir);
@@ -132,7 +132,7 @@ function html_help_text ...
         demo_num ++;
         demo_header = sprintf ("<h2>Demonstration %d</h2>\n<div class=\"demo\">\n", demo_num);
         demo_footer = "</div>\n";
-        
+
         demo_k {1} = "<p>The following code</p>\n";
         demo_k {2} = sprintf ("<pre class=\"example\">%s</pre>\n", code_k);
         if (has_text && has_images)
@@ -142,21 +142,21 @@ function html_help_text ...
           demo_k {6} = sprintf ("<p>%s</p>\n", images_in_html (images));
         elseif (has_text) # no images
           demo_k {3} = "<p>Produces the following output</p>\n";
-          demo_k {4} = sprintf ("<pre class=\"example\">%s</pre>\n", output);        
+          demo_k {4} = sprintf ("<pre class=\"example\">%s</pre>\n", output);
         elseif (has_images) # no text
           demo_k {3} = sprintf ("<p>Produces the following %s</p>\n", ft);
           demo_k {6} = sprintf ("<p>%s</p>\n", images_in_html (images));
         else # neither text nor images
           demo_k {3} = sprintf ("<p>gives an example of how '%s' is used.</p>\n", name);
         endif
-        
+
         demo_text = strcat (demo_text, demo_header, demo_k {:}, demo_footer);
       endfor
-      
+
       text = strcat (text, demo_text);
     endif
   endif
-  
+
   ## Write result to disk
   fid = fopen (outname, "w");
   if (fid < 0)
@@ -170,15 +170,15 @@ endfunction
 function expanded = html_see_also_with_prefix (prefix, root, varargin)
   header = "@html\n<div class=\"seealso\">\n<b>See also</b>: ";
   footer = "\n</div>\n@end html\n";
-  
+
   format = sprintf (" <a href=\"%s%%s.html\">%%s</a> ", prefix);
-  
+
   varargin2 = cell (1, 2*length (varargin));
   varargin2 (1:2:end) = varargin;
   varargin2 (2:2:end) = varargin;
-  
+
   list = sprintf (format, varargin2 {:});
-  
+
   expanded = strcat (header, list, footer);
 endfunction
 
@@ -189,18 +189,18 @@ function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
   if (exist (diary_file, "file"))
     delete (diary_file);
   endif
-  
+
   unwind_protect
     ## Setup figure and pager properties
     def = get (0, "defaultfigurevisible");
     set (0, "defaultfigurevisible", "off");
     more_val = page_screen_output (false);
-  
+
     ## Evaluate the code
     diary (diary_file);
     eval (code);
     diary ("off");
-  
+
     ## Read the results
     fid = fopen (diary_file, "r");
     diary_data = char (fread (fid).');
@@ -214,12 +214,12 @@ function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
       text = diary_data (1:idx (end)-1);
     endif
     text = strtrim (text);
-  
+
     ## Save figures
     if (!isempty (get (0, "currentfigure")) && !exist (full_imagedir, "dir"))
       mkdir (full_imagedir);
     endif
-  
+
     images = {};
     while (!isempty (get (0, "currentfigure")))
       fig = gcf ();
@@ -231,7 +231,7 @@ function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
       images {end+1} = filename;
       close (fig);
     endwhile
-  
+
     ## Reverse image list, since we got them latest-first
     images = images (end:-1:1);
 

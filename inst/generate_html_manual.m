@@ -31,14 +31,14 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   if (!ischar (outdir))
     error ("generate_html_manual: second input argument must be a string");
   endif
-  
+
   ## If options is a string, call get_html_options
   if (ischar (options))
     options = get_html_options (options);
   elseif (!isstruct (options))
     error ("generate_html_manual: third input argument must be a string or a structure");
   endif
-  
+
   ## Create directories
   if (!exist (outdir, "dir"))
     mkdir (outdir);
@@ -47,23 +47,23 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   %if (!exist (outdir, "dir"))
   %  mkdir (outdir);
   %endif
-  
+
   %chapter_dir = mk_chapter_dir (outdir, options);
   %mk_function_dir (outdir, options);
   %
   %ds_handler = @(fun) docstring_handler (fun);
-  
+
   ## Get file list
   %file_list = get_txi_files (srcdir);
   %txi_dir = fileparts (file_list {1});
   %
   %texi_header = sprintf ("%s\n", get_texi_conf (srcdir));
-  
+
   ## Copy images from Octave build
   %txi_dir = fullfile (srcdir, "doc", "interpreter");
   %pngs = fullfile (txi_dir, "*.png");
   %copyfile (pngs, ".");
-  
+
   ## Set javascript startup
   %if (!isfield (options, "body_command"))
   %  if (isfield (options, "manual_body_cmd"))
@@ -77,11 +77,11 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   %for k = 1:length (file_list)
   %  file = file_list {k};
   %  [notused, name] = fileparts (file);
-  %  
+  %
   %  text = txi2reference (file, ds_handler);
-  %  
-  %  text = strcat (texi_header, text);   
-  %  
+  %
+  %  text = strcat (texi_header, text);
+  %
   %  ## Remove numbers from headings as this has been broken since we handle
   %  ## each chapter as a seperate file
   %  text = strrep (text, "@chapter", "@unnumbered");
@@ -89,26 +89,26 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   %  text = strrep (text, "@section", "@unnumberedsec");
   %  text = strrep (text, "@subsection", "@unnumberedsubsec");
   %  text = strrep (text, "@subsubsection", "@unnumberedsubsubsec");
-  %  
+  %
   %  ## Make sure any @include's work
   %  include = "@include ";
   %  include_with_path = sprintf ("@include %s%s", txi_dir, filesep ());
   %  text = strrep (text, include, include_with_path);
-  %  
+  %
   %  ## Add 'op' index
   %  text = strcat ("@defindex op\n\n", text);
   %
   %  ## Convert to HTML and write to disc
   %  [header, body, footer] = texi2html (text, options, "../../");
-  %  
+  %
   %  fid = fopen (fullfile (chapter_dir, sprintf ("%s.html", name)), "w");
   %  fprintf (fid, "%s\n%s\n%s\n", header, body, footer);
   %  fclose (fid);
   %endfor
-  
+
   ## Move images into the chapter dir
   %movefile ("*.png", chapter_dir);
-  
+
   ###################################################
   ##  Generate reference for individual functions  ##
   ###################################################
@@ -125,12 +125,12 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
       index.provides (end+1:end+length (ikp)) = ikp;
     endif
   endfor
-  
+
   ## Generate the documentation
   options.include_package_list_item = false;
   options.include_package_page = false;
   options.include_package_license = false;
-  
+
   generate_package_html (index, outdir, options);
   %for k = 1:length (index)
   %  if (!isempty (index {k}))

@@ -25,32 +25,32 @@ function generate_alphabet (directory, data_file, root, options = struct ())
   if (!ischar (directory))
     error ("generate_alphabet: first input argument must be a string");
   endif
-    
+
   if (!ischar (data_file))
     error ("generate_alphabet: second input argument must be a string");
   endif
-    
+
   if (!ischar (root))
     error ("generate_alphabet: third input argument must be a string");
   endif
-    
+
   ## If options is a string, call get_html_options
   if (ischar (options))
     options = get_html_options (options);
   elseif (!isstruct (options))
     error ("generate_alphabet: fourth input argument must be a string or a structure");
   endif
-  
+
   ## Load data
   data = load (data_file);
   data = data.functions;
-  
+
   ## Sort data
   data = sort (data);
-  
+
   ## Convert data to lower case but also keep the original in memory
   ldata = lower (data);
-  
+
   ## Iterate over each function
   ## First we find the first function that starts with 'a'
   for a = 1:length (data)
@@ -58,7 +58,7 @@ function generate_alphabet (directory, data_file, root, options = struct ())
       break;
     endif
   endfor
-  
+
   ## Then we iterate over each function until we get something that doesn't start with 'z'
   current = data {a}(1);
   [fid, footer] = new_file (directory, current, options);
@@ -70,7 +70,7 @@ function generate_alphabet (directory, data_file, root, options = struct ())
       current = ldata {idx}(1);
       [fid, footer] = new_file (directory, current, options);
     endif
-    
+
     ## Write the actual function to the file
     fun = data {idx};
     fprintf (fid, "<div class=\"func\"><b><a href=\"%s/function/%s.html\">%s</a></b></div>\n",
@@ -95,7 +95,7 @@ function [fid, footer] = new_file (directory, current, options)
   if (fid <= 0)
     error ("generate_alphabet: could not open '%s' for writing", filename);
   endif
-  
+
   options.body_command = 'onload="javascript:fix_top_menu (); javascript:alphabetical_menu ();"';
   title = sprintf ("Alphabetical List of Functions: %s", current);
   [header, title, footer] = get_header_title_and_footer ("overview", options, title, "../");

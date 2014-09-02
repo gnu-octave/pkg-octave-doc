@@ -43,9 +43,9 @@ function all_index = txi2index (srcdir)
   if (!ischar (srcdir))
     error ("txi2index: input argument must be a string");
   endif
-  
+
   file_list = get_txi_files (srcdir);
-  
+
   all_index = cell (size (file_list));
   for k = 1:length (file_list)
     filename = file_list{k};
@@ -55,19 +55,19 @@ function all_index = txi2index (srcdir)
     index.name = name;
     index.description = "";
     index.provides = {};
-  
+
     CHAPTER = "@chapter ";
     APPENDIX = "@appendix ";
     SECTION = "@section ";
     DOCSTRING = "@DOCSTRING";
     default_section = "General";
-  
+
     fid = fopen (filename, "r");
     if (fid < 0)
       warning ("txi2index: couldn't open '%s' for reading", filename);
       continue;
     endif
-  
+
     idx = 0;
     txi_has_contents = false;
     while (true)
@@ -75,7 +75,7 @@ function all_index = txi2index (srcdir)
       if (line == -1)
         break;
       endif
-    
+
       if (strncmpi (CHAPTER, line, length (CHAPTER)))
         index.name = strtrim (line (length (CHAPTER)+1:end));
       elseif (strncmpi (APPENDIX, line, length (APPENDIX)))
@@ -85,37 +85,37 @@ function all_index = txi2index (srcdir)
         if (idx == 0 || !isempty (index.provides {idx}.functions))
           idx ++;
         endif
-      
+
         index.provides {idx} = struct ();
         index.provides {idx}.category = section;
         index.provides {idx}.functions = {};
       elseif (strncmpi (DOCSTRING, line, length (DOCSTRING)))
         if (idx == 0)
           idx ++;
-      
+
           index.provides {idx} = struct ();
           index.provides {idx}.category = default_section;
           index.provides {idx}.functions = {};
         endif
-      
+
         start = find (line == "(", 1);
         stop = find (line == ")", 1);
         if (isempty (start) || isempty (stop))
           warning ("txi2index: invalid @DOCSTRING: %s", line);
           continue;
         endif
-      
+
         fun = strtrim (line (start+1:stop-1));
         index.provides {idx}.functions {end+1} = fun;
         txi_has_contents = true;
       endif
     endwhile
     fclose (fid);
-    
+
     if (idx > 0 && isempty (index.provides {idx}.functions))
       index.provides = index.provides (1:idx-1);
     endif
-    
+
     if (txi_has_contents)
       all_index {k} = index;
     else

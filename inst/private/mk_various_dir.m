@@ -22,9 +22,9 @@ function location = mk_various_dir (outdir, options)
   else
     location = "various";
   endif
-  
+
   location = fullfile (outdir, location);
-  
+
   ## Create output directory if needed
   if (!exist (location, "dir"))
     mkdir (location);

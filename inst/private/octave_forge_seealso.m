@@ -17,13 +17,13 @@
 function expanded = octave_forge_seealso (root, arg)
   header = "@html\n<div class=\"seealso\">\n<b>See also</b>: ";
   footer = "\n</div>\n@end html\n";
-  
+
   ## XXX: Deal properly with the root directory
   format = sprintf (" <a href=\"%sfind_function.php?fun=%%s\">%%s</a> ", root);
   kw_format = sprintf (" <a href=\"%soperators.html#%%s\">%%s</a> ", root);
-  
+
   keywords = __keywords__ ();
-  
+
   help_list = "";
   for k = 1:length (arg)
     f = arg {k};
@@ -34,6 +34,6 @@ function expanded = octave_forge_seealso (root, arg)
     endif
     help_list = strcat (help_list, elem);
   endfor
-  
+
   expanded = strcat (header, help_list, footer);
 endfunction

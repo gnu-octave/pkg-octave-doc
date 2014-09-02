@@ -22,9 +22,9 @@ function location = mk_chapter_dir (outdir, options)
   else
     location = "chapter";
   endif
-  
+
   location = fullfile (outdir, location);
-  
+
   ## Create output directory if needed
   if (!exist (location, "dir"))
     mkdir (location);
