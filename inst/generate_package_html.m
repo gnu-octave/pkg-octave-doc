@@ -373,9 +373,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "      <tr><td class=\"package_table\">Last Release Date:</td><td>%s</td></tr>\n",
              list.date);
     fprintf (fid, "      <tr><td class=\"package_table\">Package Author:</td><td>%s</td></tr>\n",
-             regexprep (list.author, '<.*?@.*?>', ''));
+             insert_char_entities (list.author));
     fprintf (fid, "      <tr><td class=\"package_table\">Package Maintainer:</td><td>%s</td></tr>\n",
-             regexprep (list.maintainer, '<.*?@.*?>', ''));
+             insert_char_entities (list.maintainer));
     fprintf (fid, "      <tr><td class=\"package_table\">License:</td><td><a href=\"COPYING.html\">");
     if (isfield (list, "license"))
       fprintf (fid, "%s</a></td></tr>\n", list.license);
