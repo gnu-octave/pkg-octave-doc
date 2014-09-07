@@ -147,7 +147,6 @@ function options = get_html_options (project_name)
 
       ## Options for overview page
       options.include_overview = true;
-      #options.overview_header = strrep (strrep (hh, "%date", date ()), "%body_command", "");
       options.manual_body_cmd = 'onload="javascript:fix_top_menu (); javascript:manual_menu ();"';
 
       ## Options for package list page
