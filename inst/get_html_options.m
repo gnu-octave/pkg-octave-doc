@@ -193,14 +193,15 @@ function options = get_html_options (project_name)
 <div id=\"doccontent\">\n";
 
       ## Options for individual function pages
-      css = "doc.css";
+      options.css = "doc.css";
       options.footer = "</div>\n</body>\n</html>\n";
       options.title = "Function: %name";
       options.include_demos = true;
 
       ## Options for overview page
       options.include_overview = true;
-      options.overview_header = strrep (hh, "%css", sprintf ("../%s", css));
+      options.overview_header = strrep (hh, "%css", ...
+         sprintf ("../%s", options.css));
       options.overview_title = "Overview: %name";
 
     otherwise
