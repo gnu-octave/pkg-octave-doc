@@ -24,10 +24,8 @@ function [header, title, footer] = get_header_title_and_footer ...
     header = strrep (header, "%css", options.css);
   endif
 
-  header = strrep (header, "%root", root);
-  header = strrep (header, "%pkgroot", pkgroot);
-  header = strrep (header, "%package", pkgname);
-
+  header = instantiate_template (header, root, pkgroot, pkgname);
+    
   body_command = get_feature (page_type, "body_command", options);
   header = strrep (header, "%body_command", body_command);
 
@@ -36,8 +34,17 @@ function [header, title, footer] = get_header_title_and_footer ...
   header = strrep (header, "%title", title);
 
   footer = get_feature (page_type, "footer", options);
-  footer = strrep (footer, "%root", root);
-  footer = strrep (footer, "%pkgroot", pkgroot);
-  footer = strrep (footer, "%package", pkgname);
+  
+  footer = instantiate_template (footer, root, pkgroot, pkgname);
+  
+endfunction
+
+
+function s = instantiate_template (s, root, pkgroot, pkgname)
+
+  s = strrep (s, "%root", root);
+  s = strrep (s, "%pkgroot", pkgroot);
+  s = strrep (s, "%package", pkgname);
+  s = strrep (s, "%date", date ());
 
 endfunction

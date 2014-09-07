@@ -52,7 +52,7 @@ function options = get_html_options (project_name)
   switch (lower (project_name))
     case "octave-forge"
       ## Basic HTML header
-      hh = "\
+      options.header = "\
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\
  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\
 <html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n\
@@ -127,7 +127,6 @@ function options = get_html_options (project_name)
 
       ## Options for individual function pages
       options.overview_body_command = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
-      options.header = strrep (hh, "%date", date ());
       options.index_footer = ...
         "<div id=\"sf_logo\">\n\
            <a href=\"http://sourceforge.net\">\
@@ -178,7 +177,7 @@ function options = get_html_options (project_name)
 
     case "docbrowser"
       ## Basic HTML header
-      hh = "\
+      options.header = "\
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\
  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\
 <html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n\
@@ -192,11 +191,9 @@ function options = get_html_options (project_name)
 <body>\n\
 <div id=\"top\">Function Reference</div>\n\
 <div id=\"doccontent\">\n";
-      hh = strrep (hh, "%date", date ());
 
       ## Options for individual function pages
       css = "doc.css";
-      options.header = strrep (hh, "%css", css);
       options.footer = "</div>\n</body>\n</html>\n";
       options.title = "Function: %name";
       options.include_demos = true;
