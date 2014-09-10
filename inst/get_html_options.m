@@ -31,9 +31,6 @@
 ## Design corresponding to the pages at @t{http://octave.org}. The pages are
 ## meant to be processed with the @code{m4} preprocessor, using the macros for
 ## the site.
-##
-## @item "docbrowser"
-## Design corresponding to the pages in the documentation browser.
 ## @end table
 ## @seealso{generate_package_html, html_help_text}
 ## @end deftypefn
@@ -174,35 +171,6 @@ function options = get_html_options (project_name)
       options.footer = "__OCTAVE_TRAILER__";
       options.title  = "Function Reference: %name";
       options.include_overview = true;
-
-    case "docbrowser"
-      ## Basic HTML header
-      options.header = "\
-<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\
- \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\
-<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n\
-  <head>\n\
-  <meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\" />\n\
-  <meta name=\"date\" content=\"%date\"/>\n\
-  <meta name=\"author\" content=\"The Octave Community\" />\n\
-  <title>%title</title>\n\
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"%css\" />\n\
-  </head>\n\
-<body>\n\
-<div id=\"top\">Function Reference</div>\n\
-<div id=\"doccontent\">\n";
-
-      ## Options for individual function pages
-      options.css = "doc.css";
-      options.footer = "</div>\n</body>\n</html>\n";
-      options.title = "Function: %name";
-      options.include_demos = true;
-
-      ## Options for overview page
-      options.include_overview = true;
-      options.overview_header = strrep (hh, "%css", ...
-         sprintf ("../%s", options.css));
-      options.overview_title = "Overview: %name";
 
     otherwise
       error ("get_html_options: unknown project name: %s", project_name);
