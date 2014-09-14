@@ -287,7 +287,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       write_package_news = false;
     else
       write_package_news = true;
-
       news_content = char (fread (fid).');
       fclose (fid);
 
@@ -308,7 +307,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "<h2 class=\"tbdesc\">NEWS for '%s' Package</h2>\n\n", desc.name);
       fprintf (fid, "<p><a href=\"index.html\">Return to the '%s' package</a></p>\n\n", desc.name);
 
-      fprintf (fid, "<pre>%s</pre>\n\n", news_content);
+      fprintf (fid, "<pre>%s</pre>\n\n", insert_char_entities (news_content));
 
       fprintf (fid, "\n%s\n", footer);
       fclose (fid);
