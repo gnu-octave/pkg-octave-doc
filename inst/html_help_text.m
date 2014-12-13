@@ -191,9 +191,14 @@ function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
   endif
 
   unwind_protect
-    ## Setup figure and pager properties
+    ## Hide figures only if gnuplot is in use
+    ## (fltk doesn't currently support offscreen printing; see bug #33180)
     def = get (0, "defaultfigurevisible");
-    set (0, "defaultfigurevisible", "off");
+    if strcmp (graphics_toolkit, "gnuplot")
+      set (0, "defaultfigurevisible", "off");
+    endif
+
+    ## Pager off
     more_val = page_screen_output (false);
 
     ## Evaluate the code
