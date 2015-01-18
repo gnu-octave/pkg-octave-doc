@@ -510,7 +510,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     if (fid < 0)
       error ("generate_package_html: couldn't open license for reading");
     endif
-    contents = char (fread (fid).');
+    copying_contents = char (fread (fid).');
     fclose (fid);
 
     ## Open output file
@@ -530,7 +530,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "<h2 class=\"tbdesc\">License for '%s' Package</h2>\n\n", desc.name);
     fprintf (fid, "<p><a href=\"index.html\">Return to the '%s' package</a></p>\n\n", desc.name);
 
-    fprintf (fid, "<pre>%s</pre>\n\n", contents);
+    fprintf (fid, "<pre>%s</pre>\n\n", insert_char_entities (copying_contents));
 
     fprintf (fid, "\n%s\n", footer);
     fclose (fid);
