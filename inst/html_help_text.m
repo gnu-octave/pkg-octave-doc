@@ -48,7 +48,6 @@ function html_help_text ...
 
   ## Get the help text of the function
   [text, format] = get_help_text (name);
-  text = insert_char_entities (text);
 
   ## If options is a string, call get_html_options
   if (ischar (options))
@@ -93,7 +92,7 @@ function html_help_text ...
     otherwise
       error ("html_help_text: internal error: unsupported help text format: '%s'\n", format);
   endswitch
-
+ 
   ## Read 'options' input argument
   [header, title, footer] = get_header_title_and_footer ...
     ("function", options, name, root, pkgroot, pkgname);
