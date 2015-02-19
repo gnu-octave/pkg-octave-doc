@@ -54,7 +54,7 @@ function options = get_html_options (project_name)
  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\
 <html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n\
   <head>\n\
-  <meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-1\" />\n\
+  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />\n\
   <meta name=\"date\" content=\"%date\"/>\n\
   <meta name=\"author\" content=\"The Octave-Forge Community\" />\n\
   <meta name=\"description\" content=\"Octave-Forge is a collection of packages\
