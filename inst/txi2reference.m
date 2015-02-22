@@ -40,11 +40,11 @@ function result = txi2reference (filename, docstring_handler = @default_docstrin
   endif
 
   if (!ischar (filename))
-    error ("txi2reference: first input argument must be a string");
+    error ("First input argument must be a string");
   endif
 
   if (!isa (docstring_handler, "function_handle"))
-    error ("txi2reference: second input argument must be a function handle");
+    error ("Second input argument must be a function handle");
   endif
 
   ## Constants for string matching
@@ -55,7 +55,7 @@ function result = txi2reference (filename, docstring_handler = @default_docstrin
   ## Open and read file
   fid = fopen (filename, "r");
   if (fid < 0)
-    error ("txi2reference: couldn't open '%s' for reading", filename);
+    error ("Couldn't open '%s' for reading", filename);
   endif
 
   text = char (fread (fid).');

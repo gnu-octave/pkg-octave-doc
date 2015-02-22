@@ -25,18 +25,18 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   endif
 
   if (!ischar (srcdir))
-    error ("generate_html_manual: first input argument must be a string");
+    error ("First input argument must be a string");
   endif
 
   if (!ischar (outdir))
-    error ("generate_html_manual: second input argument must be a string");
+    error ("Second input argument must be a string");
   endif
 
   ## If options is a string, call get_html_options
   if (ischar (options))
     options = get_html_options (options);
   elseif (!isstruct (options))
-    error ("generate_html_manual: third input argument must be a string or a structure");
+    error ("Third input argument must be a string or a structure");
   endif
 
   ## Create directories

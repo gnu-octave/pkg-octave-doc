@@ -24,8 +24,7 @@ function pkg_list_item_filename = get_pkg_list_item_filename (name, outdir)
   if (!exist (ld, "dir"))
     [succ, msg] = mkdir (ld);
     if (!succ)
-      error ("generate_package_html: unable to create directory %s:\n %s",
-             ld, msg);
+      error ("Unable to create directory %s:\n %s", ld, msg);
     endif
   endif
 

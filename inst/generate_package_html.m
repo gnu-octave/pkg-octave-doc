@@ -76,14 +76,14 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     pkg ("load", name);
     desc = pkg ("describe", name) {1};
   else
-    error (["generate_package_html: first input must either be the name of a ", ...
+    error (["First input must either be the name of a ", ...
             "package, or a structure giving its description."]);
   endif
 
   if (isempty (outdir))
     outdir = packname;
   elseif (!ischar (outdir))
-    error ("generate_package_html: second input argument must be a string");
+    error ("Second input argument must be a string");
   endif
 
   ## Create output directory if needed
@@ -102,7 +102,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   if (ischar (options))
     options = get_html_options (options);
   elseif (!isstruct (options))
-    error ("generate_package_html: third input argument must be a string or a structure");
+    error ("Third input argument must be a string or a structure");
   endif
 
   ##################################################
@@ -160,7 +160,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
     fid = fopen (fullfile (packdir, overview_filename), "w");
     if (fid < 0)
-      error ("generate_package_html: couldn't open overview file for writing");
+      error ("Couldn't open overview file for writing");
     endif
 
     [header, title, footer] = get_header_title_and_footer ...
@@ -221,7 +221,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       name_fid = fopen (name_filename, "w");
       desc_fid = fopen (desc_filename, "w");
       if (name_fid == -1 || desc_fid == -1)
-        error ("generate_package_html: could not open alphabet database for writing");
+        error ("Could not open alphabet database for writing");
       endif
 
       for k = 1:num_categories
@@ -259,7 +259,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, text);
       fclose (fid);
     else
-      error ("generate_package_html: unable to open file %s.", pkg_list_item_filename);
+      error ("Unable to open file %s.", pkg_list_item_filename);
     endif
   endif
 
@@ -276,7 +276,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       endif
     endfor
     if (isempty (list))
-      error ("generate_package_html: couldn't locate package '%s'", packname);
+      error ("Couldn't locate package '%s'", packname);
     endif
 
     ## Read news
@@ -295,7 +295,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
       fid = fopen (fullfile (packdir, news_filename), "w");
       if (fid < 0)
-        error ("generate_package_html: couldn't open NEWS file for writing");
+        error ("Couldn't open NEWS file for writing");
       endif
 
       ## For the NEWS page, use the header and footer of the overview page
@@ -343,7 +343,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       endif
     endfor
     if (isempty (list))
-      error ("generate_package_html: couldn't locate package '%s'", packname);
+      error ("Couldn't locate package '%s'", packname);
     endif
 
     ## Open output file
@@ -351,7 +351,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
     fid = fopen (fullfile (packdir, index_filename), "w");
     if (fid < 0)
-      error ("generate_package_html: couldn't open index file for writing");
+      error ("Couldn't open index file for writing");
     endif
 
     ## Write output
@@ -501,14 +501,14 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       endif
     endfor
     if (isempty (list))
-      error ("generate_package_html: couldn't locate package '%s'", packname);
+      error ("Couldn't locate package '%s'", packname);
     endif
 
     ## Read license
     filename = fullfile (list.dir, "packinfo", "COPYING");
     fid = fopen (filename, "r");
     if (fid < 0)
-      error ("generate_package_html: couldn't open license for reading");
+      error ("Couldn't open license for reading");
     endif
     copying_contents = char (fread (fid).');
     fclose (fid);
@@ -518,7 +518,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
     fid = fopen (fullfile (packdir, copying_filename), "w");
     if (fid < 0)
-      error ("generate_package_html: couldn't open COPYING file for writing");
+      error ("Couldn't open COPYING file for writing");
     endif
 
     ## For the COPYING page, use the header and footer of the overview page
@@ -547,9 +547,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
                               doc_out_dir,
                               doc_src));
     if (status == 127)
-      error ("program `%s' not found", makeinfo_program ());
+      error ("Program `%s' not found", makeinfo_program ());
     elseif (status)
-      error ("program `%s' returned failure code %i",
+      error ("Program `%s' returned failure code %i",
              makeinfo_program (), status);
     endif
 
@@ -566,7 +566,7 @@ endfunction
 function copy_images (file, doc_root_dir, doc_out_dir)
 
   if ((fid = fopen (file)) < 0)
-    error ("couldn't open %s for reading", file);
+    error ("Couldn't open %s for reading", file);
   endif
   while (! isnumeric (l = fgetl (fid)))
     m = regexp (l, "<img.+src=""([^""]+)"".*>", "tokens");

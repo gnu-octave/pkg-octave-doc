@@ -38,11 +38,11 @@
 function options = get_html_options (project_name)
   ## Check input
   if (nargin == 0)
-    error ("get_html_options: not enough input arguments");
+    error ("Not enough input arguments");
   endif
 
   if (!ischar (project_name))
-    error ("get_html_options: first input argument must be a string");
+    error ("First input argument must be a string");
   endif
 
   ## Generate options depending on project
@@ -173,7 +173,7 @@ function options = get_html_options (project_name)
       options.include_overview = true;
 
     otherwise
-      error ("get_html_options: unknown project name: %s", project_name);
+      error ("Unknown project name: %s", project_name);
   endswitch
 
 endfunction

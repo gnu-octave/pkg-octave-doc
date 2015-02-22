@@ -23,14 +23,14 @@
 function generate_operators (outdir = "htdocs", options = struct ())
   ## Check input
   if (!ischar (outdir))
-    error ("generate_operators: first input argument must be a string");
+    error ("First input argument must be a string");
   endif
 
   ## If options is a string, call get_html_options
   if (ischar (options))
     options = get_html_options (options);
   elseif (!isstruct (options))
-    error ("generate_operators: second input argument must be a string or a structure");
+    error ("Second input argument must be a string or a structure");
   endif
 
   ## Create directories if needed
@@ -46,7 +46,7 @@ function generate_operators (outdir = "htdocs", options = struct ())
 
   fid = fopen (name, "w");
   if (fid < 0)
-    error ("generate_operators: couldn't open file for writing");
+    error ("Couldn't open file for writing");
   endif
 
   fprintf (fid, "%s\n", header);
@@ -107,14 +107,14 @@ function text = strip_defs (text)
     bracket_idx = find (text == "{" | text == "}");
     bracket_idx = bracket_idx (find (bracket_idx > def1, 1));
     if (isempty (space_idx) && isempty (bracket_idx))
-      error ("generate_operators: couldn't parse texinfo");
+      error ("Couldn't parse texinfo");
     endif
     sep_idx = min (space_idx, bracket_idx);
     def_type = text (def1+1:sep_idx-1);
 
     end_idx = strfind (text, sprintf ("@end %s", def_type));
     if (isempty (end_idx))
-      error ("generate_operators: couldn't parse texinfo");
+      error ("Couldn't parse texinfo");
     endif
     endl = endl_idx (find (endl_idx > end_idx, 1));
     if (isempty (endl))

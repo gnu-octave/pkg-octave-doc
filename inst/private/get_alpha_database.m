@@ -19,7 +19,7 @@ function [name_filename, desc_filename] = get_alpha_database (outdir, name, lett
   if (!exist (directory, "dir"))
     [succ, msg] = mkdir (directory);
     if (!succ)
-      error ("get_alpha_database: could not create '%s': %s", directory, msg);
+      error ("Could not create '%s': %s", directory, msg);
     endif
   endif
 

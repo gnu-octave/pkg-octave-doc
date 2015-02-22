@@ -41,7 +41,7 @@ function all_index = txi2index (srcdir)
   endif
 
   if (!ischar (srcdir))
-    error ("txi2index: input argument must be a string");
+    error ("Input argument must be a string");
   endif
 
   file_list = get_txi_files (srcdir);

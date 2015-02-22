@@ -75,7 +75,7 @@ function html_help_text ...
       ## Run makeinfo
       [text, status] = __makeinfo__ (text, "html", seealso);
       if (status != 0)
-        error ("html_help_text: couln't parse file '%s'", name);
+        error ("Couln't parse file '%s'", name);
       endif
 
       ## Extract the body of makeinfo's output
@@ -88,9 +88,9 @@ function html_help_text ...
       text = strrep (text, "&mdash;", "<p class=\"functionfile\">");
 
     case "not found"
-      error ("html_help_text: `%s' not found\n", name);
+      error ("`%s' not found\n", name);
     otherwise
-      error ("html_help_text: internal error: unsupported help text format: '%s'\n", format);
+      error ("Internal error: unsupported help text format: '%s'\n", format);
   endswitch
  
   ## Read 'options' input argument
@@ -159,7 +159,7 @@ function html_help_text ...
   ## Write result to disk
   fid = fopen (outname, "w");
   if (fid < 0)
-    error ("html_help_text: could not open '%s' for writing", outname);
+    error ("Could not open '%s' for writing", outname);
   endif
   fprintf (fid, "%s\n%s\n%s", header, text, footer);
   fclose (fid);

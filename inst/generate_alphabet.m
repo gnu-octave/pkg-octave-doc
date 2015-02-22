@@ -23,22 +23,22 @@
 function generate_alphabet (directory, data_file, root, options = struct ())
   ## Check input
   if (!ischar (directory))
-    error ("generate_alphabet: first input argument must be a string");
+    error ("First input argument must be a string");
   endif
 
   if (!ischar (data_file))
-    error ("generate_alphabet: second input argument must be a string");
+    error ("Second input argument must be a string");
   endif
 
   if (!ischar (root))
-    error ("generate_alphabet: third input argument must be a string");
+    error ("Third input argument must be a string");
   endif
 
   ## If options is a string, call get_html_options
   if (ischar (options))
     options = get_html_options (options);
   elseif (!isstruct (options))
-    error ("generate_alphabet: fourth input argument must be a string or a structure");
+    error ("Fourth input argument must be a string or a structure");
   endif
 
   ## Load data
@@ -93,7 +93,7 @@ function [fid, footer] = new_file (directory, current, options)
   filename = fullfile (directory, sprintf ("%s.html", current));
   fid = fopen (filename, "w");
   if (fid <= 0)
-    error ("generate_alphabet: could not open '%s' for writing", filename);
+    error ("Could not open '%s' for writing", filename);
   endif
 
   options.body_command = 'onload="javascript:fix_top_menu (); javascript:alphabetical_menu ();"';
