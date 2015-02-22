@@ -43,9 +43,12 @@
 ## @end deftypefn
 
 function [header, text, footer] = texi2html (text, options = struct (), root = "")
-  ## If options is a string, call get_html_options
-  if (ischar (options))
+
+  ## Process input argument 'options'
+  if (ischar (options)) || (isstruct (options))
     options = get_html_options (options);
+  else
+    error ("Second input argument must be a string or a structure");
   endif
 
   ## Add easily recognisable text before and after real text

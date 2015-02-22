@@ -35,14 +35,22 @@
 ## @seealso{generate_package_html, html_help_text}
 ## @end deftypefn
 
-function options = get_html_options (project_name)
+function options = get_html_options (argin)
+
   ## Check input
   if (nargin == 0)
     error ("Not enough input arguments");
   endif
 
-  if (!ischar (project_name))
-    error ("First input argument must be a string");
+  if (isstruct (argin))
+    ## For now, leave argin unchanged
+    ## TODO: set default values for missing fields
+    options = argin;
+    return
+  elseif (ischar (argin))
+    project_name = argin;
+  else
+    error ("Input argument must be a string or a structure");
   endif
 
   ## Generate options depending on project

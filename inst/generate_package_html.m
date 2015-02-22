@@ -98,10 +98,10 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
   [local_fundir, fundir] = mk_function_dir (packdir, packname, options);
 
-  ## If options is a string, call get_html_options
-  if (ischar (options))
+  ## Process input argument 'options'
+  if (ischar (options)) || (isstruct (options))
     options = get_html_options (options);
-  elseif (!isstruct (options))
+  else
     error ("Third input argument must be a string or a structure");
   endif
 

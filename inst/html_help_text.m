@@ -49,9 +49,11 @@ function html_help_text ...
   ## Get the help text of the function
   [text, format] = get_help_text (name);
 
-  ## If options is a string, call get_html_options
-  if (ischar (options))
+  ## Process input argument 'options'
+  if (ischar (options)) || (isstruct (options))
     options = get_html_options (options);
+  else
+    error ("Third input argument must be a string or a structure");
   endif
 
   ## Take action depending on help text format

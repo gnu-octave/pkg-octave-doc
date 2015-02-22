@@ -32,10 +32,10 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
     error ("Second input argument must be a string");
   endif
 
-  ## If options is a string, call get_html_options
-  if (ischar (options))
+  ## Process input argument 'options'
+  if (ischar (options)) || (isstruct (options))
     options = get_html_options (options);
-  elseif (!isstruct (options))
+  else
     error ("Third input argument must be a string or a structure");
   endif
 
