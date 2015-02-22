@@ -44,15 +44,25 @@ function options = get_html_options (argin)
   endif
 
   if (isstruct (argin))
-    ## For now, leave argin unchanged
-    ## TODO: set default values for missing fields
-    options = argin;
-    return
+    options = get_html_options_default (argin);
   elseif (ischar (argin))
-    project_name = argin;
+    options = get_html_options_default (struct ());
+    options = get_html_options_project (options, argin);
   else
     error ("Input argument must be a string or a structure");
   endif
+
+endfunction
+
+
+function options = get_html_options_default (options)
+
+  ## TODO: set default values for missing fields
+
+endfunction
+
+
+function options = get_html_options_project (options, project_name)
 
   ## Generate options depending on project
   switch (lower (project_name))
