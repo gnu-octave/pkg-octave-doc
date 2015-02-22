@@ -37,9 +37,10 @@
 
 function options = get_html_options (argin)
 
-  ## Check input
-  if (nargin == 0)
-    error ("Not enough input arguments");
+  ## Check number of input arguments
+  if (nargin != 1)
+    print_usage ();
+    error ("Not enough input arguments: exactly one argument was expected.");
   endif
 
   if (isstruct (argin))

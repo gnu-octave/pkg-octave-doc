@@ -21,6 +21,13 @@
 ## @end deftypefn
 
 function generate_alphabet (directory, data_file, root, options = struct ())
+
+  ## Check number of input arguments
+  if (nargin < 3)
+    print_usage ();
+    error ("Not enough input arguments: at least three arguments were expected.");
+  endif
+
   ## Check input
   if (!ischar (directory))
     error ("First input argument must be a string");

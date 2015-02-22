@@ -34,9 +34,11 @@
 ## @end deftypefn
 
 function result = txi2reference (filename, docstring_handler = @default_docstring_handler)
-  ## Check input
-  if (nargin == 0)
+
+  ## Check number of input arguments
+  if (nargin < 1)
     print_usage ();
+    error ("Not enough input arguments: at least one argument was expected.");
   endif
 
   if (!ischar (filename))

@@ -21,6 +21,7 @@
 ## @end deftypefn
 
 function generate_operators (outdir = "htdocs", options = struct ())
+
   ## Check input
   if (!ischar (outdir))
     error ("First input argument must be a string");

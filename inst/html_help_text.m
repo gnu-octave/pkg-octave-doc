@@ -46,6 +46,12 @@
 function html_help_text ...
   (name, outname, options = struct (), root = "", pkgroot = "", pkgname = "")
 
+  ## Check number of input arguments
+  if (nargin < 2)
+    print_usage ();
+    error ("Not enough input arguments: at least two arguments were expected.");
+  endif
+  
   ## Get the help text of the function
   [text, format] = get_help_text (name);
 

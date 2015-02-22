@@ -44,6 +44,12 @@
 
 function [header, text, footer] = texi2html (text, options = struct (), root = "")
 
+  ## Check number of input arguments
+  if (nargin < 1)
+    print_usage ();
+    error ("Not enough input arguments: at least one argument was expected.");
+  endif
+
   ## Process input argument 'options'
   if (ischar (options)) || (isstruct (options))
     options = get_html_options (options);

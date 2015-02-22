@@ -57,6 +57,7 @@
 ## @end deftypefn
 
 function generate_package_html (name = [], outdir = "htdocs", options = struct ())
+
   ## Check input
   if (isempty (name))
     list = pkg ("list");

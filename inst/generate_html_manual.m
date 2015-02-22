@@ -19,9 +19,11 @@
 ## @end deftypefn
 
 function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
-  ## Check input
-  if (nargin == 0)
+
+  ## Check number of input arguments
+  if (nargin < 1)
     print_usage ();
+    error ("Not enough input arguments: at least one argument was expected.");
   endif
 
   if (!ischar (srcdir))

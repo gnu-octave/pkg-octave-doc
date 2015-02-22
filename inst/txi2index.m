@@ -36,8 +36,11 @@
 ## @end deftypefn
 
 function all_index = txi2index (srcdir)
-  if (nargin == 0)
+
+  ## Check number of input arguments
+  if (nargin != 1)
     print_usage ();
+    error ("Not enough input arguments: exactly one argument was expected");
   endif
 
   if (!ischar (srcdir))
