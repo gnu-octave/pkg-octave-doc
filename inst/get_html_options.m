@@ -57,7 +57,39 @@ endfunction
 
 function options = get_html_options_default (options)
 
-  ## TODO: set default values for missing fields
+  default = struct ();
+
+  ## Create data files for alphabetical function lists ?
+  default.include_alpha = false;
+
+  ## Extract demos ?  (this option is used in html_help_text)
+  default.include_demos = false;
+
+  ## Create overview page ?  (list of functions, sorted by category)
+  default.include_overview = false;
+
+  ## Create short_package_description files ?  (used by packages.php)
+  default.include_package_list_item = false;
+
+  ## Create main package page ?  (index.html)
+  default.include_package_page = false;
+
+  ## Create package licence page ?
+  default.include_package_license = false;
+
+  ## Create package news page ?
+  default.include_package_news = false;
+
+  ## TODO: Warn about unknown options
+  ##  (to be done once all known options are present in default)
+
+  ## Provide default values for missing fields
+  fn = fieldnames (default);
+  for i = 1:(length (fn))
+    if (! isfield (options, fn{i}))
+      options.(fn{i}) = default.(fn{i});
+    endif
+  endfor
 
 endfunction
 

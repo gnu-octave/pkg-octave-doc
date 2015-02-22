@@ -156,7 +156,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Write overview file ##
   #########################
   first_sentences = cell (1, num_categories);
-  if (isfield (options, "include_overview") && options.include_overview)
+  if options.include_overview
     overview_filename = get_overview_filename (options, desc.name);
 
     fid = fopen (fullfile (packdir, overview_filename), "w");
@@ -216,7 +216,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ################################################
   ## Write function data for alphabetical lists ##
   ################################################
-  if (isfield (options, "include_alpha") && options.include_alpha)
+  if options.include_alpha
     for letter = "a":"z"
       [name_filename, desc_filename] = get_alpha_database (outdir, desc.name, letter);
       name_fid = fopen (name_filename, "w");
@@ -247,7 +247,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Write short description for forge overview page ##
   #####################################################
 
-  if (isfield (options, "include_package_list_item") && options.include_package_list_item)
+  if options.include_package_list_item
     pkg_list_item_filename = get_pkg_list_item_filename (desc.name, outdir);
 
     text = strrep (options.package_list_item, "%name", desc.name);
@@ -267,7 +267,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   #####################
   ## Write NEWS file ##
   #####################
-  if (isfield (options, "include_package_news") && options.include_package_news)
+  if options.include_package_news
     ## Get detailed information about the package
     all_list = pkg ("list");
     list = [];
@@ -334,7 +334,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Write index file ##
   ######################
 
-  if (isfield (options, "include_package_page") && options.include_package_page)
+  if options.include_package_page
     ## Get detailed information about the package
     all_list = pkg ("list");
     list = [];
@@ -489,10 +489,10 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fclose (fid);
   endif
 
-  ######################
+  ########################
   ## Write COPYING file ##
-  ######################
-  if (isfield (options, "include_package_license") && options.include_package_license)
+  ########################
+  if options.include_package_license
     ## Get detailed information about the package
     all_list = pkg ("list");
     list = [];

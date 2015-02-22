@@ -106,7 +106,7 @@ function html_help_text ...
     ("function", options, name, root, pkgroot, pkgname);
 
   ## Add demo:// links if requested
-  if (isfield (options, "include_demos") && options.include_demos)
+  if options.include_demos
     ## Determine if we have demos
     [code, idx] = test (name, "grabdemo");
     if (length (idx) > 1)
