@@ -68,6 +68,10 @@ function options = get_html_options_default (options)
   ## Create overview page ?  (list of functions, sorted by category)
   default.include_overview = false;
 
+  ## Filename for overview page (used only if include_overview is true)
+  ## %name can be used to denote the name of the package
+  default.overview_filename = "overview.html";
+  
   ## Create short_package_description files ?  (used by packages.php)
   default.include_package_list_item = false;
 

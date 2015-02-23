@@ -157,7 +157,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   #########################
   first_sentences = cell (1, num_categories);
   if options.include_overview
-    overview_filename = get_overview_filename (options, desc.name);
+  
+    ## Create filename for the overview page
+    overview_filename = options.overview_filename;
+    overview_filename = strrep (overview_filename, "%name", desc.name);
+    overview_filename = strrep (overview_filename, " ", "_");
 
     fid = fopen (fullfile (packdir, overview_filename), "w");
     if (fid < 0)
