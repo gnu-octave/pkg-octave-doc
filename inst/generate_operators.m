@@ -36,7 +36,10 @@ function generate_operators (outdir = "htdocs", options = struct ())
 
   ## Create directories if needed
   if (!exist (outdir, "dir"))
-    mkdir (outdir);
+    [succ, msg] = mkdir (outdir);
+    if (!succ)
+      error ("Unable to create directory %s:\n %s", outdir, msg);
+    endif
   endif
   name = fullfile (outdir, "operators.html");
 

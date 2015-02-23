@@ -229,7 +229,10 @@ function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
 
     ## Save figures
     if (!isempty (get (0, "currentfigure")) && !exist (full_imagedir, "dir"))
-      mkdir (full_imagedir);
+      [succ, msg] = mkdir (full_imagedir);
+      if (!succ)
+        error ("Unable to create directory %s:\n %s", full_imagedir, msg);
+      endif
     endif
 
     images = {};

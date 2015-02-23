@@ -89,12 +89,19 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
   ## Create output directory if needed
   if (!exist (outdir, "dir"))
-    mkdir (outdir);
+    [succ, msg] = mkdir (outdir);
+    if (!succ)
+      error ("Unable to create directory %s:\n %s", outdir, msg);
+    endif
   endif
 
+  ## Create package directory if needed
   packdir = fullfile (outdir, packname);
   if (!exist (packdir, "dir"))
-    mkdir (packdir);
+    [succ, msg] = mkdir (packdir);
+    if (!succ)
+      error ("Unable to create directory %s:\n %s", packdir, msg);
+    endif
   endif
 
   [local_fundir, fundir] = mk_function_dir (packdir, packname, options);
@@ -134,8 +141,16 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     for l = 1:num_functions
       fun = F {l};
       if (fun(1) == "@")
-        at_dir = fileparts (fun);
-        mkdir (fullfile (fundir, at_dir));
+        ## Extract @-directory name from function name
+        at_dir = fullfile (fundir, fileparts (fun));
+        ## Create directory if needed
+        if (!exist (at_dir, "dir"))
+          [succ, msg] = mkdir (at_dir);
+          if (!succ)
+            error ("Unable to create directory %s:\n %s", at_dir, msg);
+          endif
+        endif
+        ## Package root is two level upper in the case of an @-directory
         pkgroot = "../../";
       else
         pkgroot = "../";
@@ -586,7 +601,10 @@ function copy_images (file, doc_root_dir, doc_out_dir)
           if (! isempty (imgdir = fileparts (url)) &&
               ! strcmp (imgdir, "./") &&
               ! exist (imgoutdir = fullfile (doc_out_dir, imgdir), "dir"))
-            mkdir (imgoutdir);
+            [succ, msg] = mkdir (imgoutdir);
+            if (!succ)
+              error ("Unable to create directory %s:\n %s", imgoutdir, msg);
+            endif
           endif
           if (! ([status, msg] = copyfile (fullfile (doc_root_dir, url),
                                            fullfile (doc_out_dir, url))))

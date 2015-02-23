@@ -26,7 +26,10 @@ function [location, full_location] = mk_function_dir (outdir, options)
 
   ## Create output directory if needed
   if (!exist (full_location, "dir"))
-    mkdir (full_location);
+    [succ, msg] = mkdir (full_location);
+    if (!succ)
+      error ("Unable to create directory %s:\n %s", full_location, msg);
+    endif
   endif
 
 endfunction

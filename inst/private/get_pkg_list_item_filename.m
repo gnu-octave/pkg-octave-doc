@@ -21,13 +21,6 @@ function pkg_list_item_filename = get_pkg_list_item_filename (name, outdir)
   filename = "short_package_description";
   ld = fullfile (outdir, name);
 
-  if (!exist (ld, "dir"))
-    [succ, msg] = mkdir (ld);
-    if (!succ)
-      error ("Unable to create directory %s:\n %s", ld, msg);
-    endif
-  endif
-
   pkg_list_item_filename = fullfile (ld, filename);
 
 endfunction

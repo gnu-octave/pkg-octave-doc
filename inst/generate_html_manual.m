@@ -43,12 +43,11 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
 
   ## Create directories
   if (!exist (outdir, "dir"))
-    mkdir (outdir);
+    [succ, msg] = mkdir (outdir);
+    if (!succ)
+      error ("Unable to create directory %s:\n %s", outdir, msg);
+    endif
   endif
-  %outdir = fullfile (outdir, "octave");
-  %if (!exist (outdir, "dir"))
-  %  mkdir (outdir);
-  %endif
 
   %chapter_dir = mk_chapter_dir (outdir, options);
   %mk_function_dir (outdir, options);
