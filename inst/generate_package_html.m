@@ -267,14 +267,15 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   #####################################################
 
   if options.include_package_list_item
-    pkg_list_item_filename = get_pkg_list_item_filename (desc.name, outdir);
+
+    pkg_list_item_filename = options.pkg_list_item_filename;
 
     text = strrep (options.package_list_item, "%name", desc.name);
     text = strrep (text, "%version", desc.version);
     text = strrep (text, "%extension", "tar.gz");
     text = strrep (text, "%shortdescription", desc.description);
 
-    fid = fopen (pkg_list_item_filename, "w");
+    fid = fopen (fullfile (packdir, pkg_list_item_filename), "w");
     if (fid > 0)
       fprintf (fid, text);
       fclose (fid);

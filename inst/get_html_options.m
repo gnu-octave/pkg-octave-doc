@@ -75,6 +75,10 @@ function options = get_html_options_default (options)
   ## Create short_package_description files ?  (used by packages.php)
   default.include_package_list_item = false;
 
+  ## Filename for short_package_description
+  ## (used only if include_package_list_item is true)
+  default.pkg_list_item_filename = "short_package_description";
+
   ## Create main package page ?  (index.html)
   default.include_package_page = false;
 
