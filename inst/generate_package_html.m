@@ -115,6 +115,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   local_fundir = options.function_dir;
   fundir = fullfile (packdir, local_fundir);
 
+
   ## Create function directory if needed
   if (!exist (fundir, "dir"))
     [succ, msg] = mkdir (fundir);
@@ -423,7 +424,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "</td>\n\n");
 
     fprintf (fid, "<td>\n");
-    if (isfield (options, "download_link"))
+    if (! isempty (options.download_link))
       fprintf (fid, "<div class=\"download_package\">\n");
       fprintf (fid, "  <table><tr><td>\n");
       fprintf (fid, "    <img src=\"../download.png\"/>\n");

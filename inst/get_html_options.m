@@ -81,6 +81,10 @@ function options = get_html_options_default (options)
 
   ## Create main package page ?  (index.html)
   default.include_package_page = false;
+  
+  ## Download link to be inserted on the main package page (index.html)
+  ## Leave empty for no download link
+  default.download_link = "";
 
   ## Create package licence page ?
   default.include_package_license = false;
