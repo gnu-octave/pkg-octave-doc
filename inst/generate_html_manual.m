@@ -49,67 +49,6 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
     endif
   endif
 
-  %chapter_dir = mk_chapter_dir (outdir, options);
-  %mk_function_dir (outdir, options);
-  %
-  %ds_handler = @(fun) docstring_handler (fun);
-
-  ## Get file list
-  %file_list = get_txi_files (srcdir);
-  %txi_dir = fileparts (file_list {1});
-  %
-  %texi_header = sprintf ("%s\n", get_texi_conf (srcdir));
-
-  ## Copy images from Octave build
-  %txi_dir = fullfile (srcdir, "doc", "interpreter");
-  %pngs = fullfile (txi_dir, "*.png");
-  %copyfile (pngs, ".");
-
-  ## Set javascript startup
-  %if (!isfield (options, "body_command"))
-  %  if (isfield (options, "manual_body_cmd"))
-  %    options.body_command = options.manual_body_cmd;
-  %  else
-  %    options.body_command = ""; # XXX: do we need this?
-  %  endif
-  %endif
-
-  ## Process each file
-  %for k = 1:length (file_list)
-  %  file = file_list {k};
-  %  [notused, name] = fileparts (file);
-  %
-  %  text = txi2reference (file, ds_handler);
-  %
-  %  text = strcat (texi_header, text);
-  %
-  %  ## Remove numbers from headings as this has been broken since we handle
-  %  ## each chapter as a seperate file
-  %  text = strrep (text, "@chapter", "@unnumbered");
-  %  text = strrep (text, "@appendix", "@unnumbered");
-  %  text = strrep (text, "@section", "@unnumberedsec");
-  %  text = strrep (text, "@subsection", "@unnumberedsubsec");
-  %  text = strrep (text, "@subsubsection", "@unnumberedsubsubsec");
-  %
-  %  ## Make sure any @include's work
-  %  include = "@include ";
-  %  include_with_path = sprintf ("@include %s%s", txi_dir, filesep ());
-  %  text = strrep (text, include, include_with_path);
-  %
-  %  ## Add 'op' index
-  %  text = strcat ("@defindex op\n\n", text);
-  %
-  %  ## Convert to HTML and write to disc
-  %  [header, body, footer] = texi2html (text, options, "../../");
-  %
-  %  fid = fopen (fullfile (chapter_dir, sprintf ("%s.html", name)), "w");
-  %  fprintf (fid, "%s\n%s\n%s\n", header, body, footer);
-  %  fclose (fid);
-  %endfor
-
-  ## Move images into the chapter dir
-  %movefile ("*.png", chapter_dir);
-
   ###################################################
   ##  Generate reference for individual functions  ##
   ###################################################
@@ -133,13 +72,7 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   options.include_package_license = false;
 
   generate_package_html (index, outdir, options);
-  %for k = 1:length (index)
-  %  if (!isempty (index {k}))
-  %    printf ("Chapter: %s\n", index {k}.name); fflush (stdout);
-  %    index {k}.name = ""; # remove the name to avoid  each chapter having its own dir
-  %    generate_package_html (index {k}, outdir, options);
-  %  endif
-  %endfor
+
 endfunction
 
 function retval = docstring_handler (fun)
