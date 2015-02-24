@@ -197,7 +197,6 @@ function options = get_html_options_project (options, project_name)
       options.include_alpha = true;
 
       ## Options for individual function pages
-      options.overview_body_command = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
       options.index_footer = ...
         "<div id=\"sf_logo\">\n\
            <a href=\"http://sourceforge.net\">\
@@ -217,7 +216,7 @@ function options = get_html_options_project (options, project_name)
 
       ## Options for overview page
       options.include_overview = true;
-      options.manual_body_cmd = 'onload="javascript:fix_top_menu (); javascript:manual_menu ();"';
+      options.overview_body_command = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
 
       ## Options for package list page
       options.include_package_list_item = true;
