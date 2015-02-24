@@ -88,6 +88,9 @@ function options = get_html_options_default (options)
   ## Create package news page ?
   default.include_package_news = false;
 
+  ## Name of function directory (subdirectory of package directory)
+  default.function_dir = "function";
+
   ## Style sheet (mandatory if %css is used in the header)
   default.css = "";
 

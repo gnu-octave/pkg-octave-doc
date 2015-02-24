@@ -104,13 +104,23 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
   endif
 
-  [local_fundir, fundir] = mk_function_dir (packdir, packname, options);
-
   ## Process input argument 'options'
   if (ischar (options)) || (isstruct (options))
     options = get_html_options (options);
   else
     error ("Third input argument must be a string or a structure");
+  endif
+
+  ## Function directory
+  local_fundir = options.function_dir;
+  fundir = fullfile (packdir, local_fundir);
+
+  ## Create function directory if needed
+  if (!exist (fundir, "dir"))
+    [succ, msg] = mkdir (fundir);
+    if (!succ)
+      error ("Unable to create directory %s:\n %s", fundir, msg);
+    endif
   endif
 
   ##################################################
