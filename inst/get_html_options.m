@@ -72,6 +72,12 @@ function options = get_html_options_default (options)
   ## %name can be used to denote the name of the package
   default.overview_filename = "overview.html";
   
+  ## Variable values (%title, %body_command...) for the overview page.
+  default.overview_title = "List of Functions for the '%name' package";
+  default.overview_body_command = "";
+  default.overview_header = "";
+  default.overview_footer = "";
+
   ## Create short_package_description files ?  (used by packages.php)
   default.include_package_list_item = false;
 
@@ -81,6 +87,12 @@ function options = get_html_options_default (options)
 
   ## Create main package page ?  (index.html)
   default.include_package_page = false;
+  
+  ## Variable values (%title, %body_command...) for the index page.
+  default.index_title = "The '%name' package";
+  default.index_body_command = "";
+  default.index_header = "";
+  default.index_footer = "";
   
   ## Download link to be inserted on the main package page (index.html)
   ## Leave empty for no download link
@@ -92,9 +104,18 @@ function options = get_html_options_default (options)
   ## Create package news page ?
   default.include_package_news = false;
 
-  ## Name of function directory (subdirectory of package directory)
+  ## Name of function directory (subdirectory of package directory).
+  ## This directory will contain individual function pages.
   default.function_dir = "function";
 
+  ## Variable values (%title, %body_command...) for individual function pages,
+  ## and for special pages too (index, overview...) if the corresponding
+  ## page-specific option is empty.
+  default.title = "%name";
+  default.body_command = "";
+  default.header = "<html><head><title>%title</title><head><body>";
+  default.footer = "</body></html>";
+       
   ## Style sheet (mandatory if %css is used in the header)
   default.css = "";
 
@@ -197,6 +218,7 @@ function options = get_html_options_project (options, project_name)
       options.include_alpha = true;
 
       ## Options for individual function pages
+      options.body_command = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
       options.index_footer = ...
         "<div id=\"sf_logo\">\n\
            <a href=\"http://sourceforge.net\">\
@@ -216,7 +238,7 @@ function options = get_html_options_project (options, project_name)
 
       ## Options for overview page
       options.include_overview = true;
-      options.overview_body_command = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
+      options.overview_body_command = options.body_command;
 
       ## Options for package list page
       options.include_package_list_item = true;

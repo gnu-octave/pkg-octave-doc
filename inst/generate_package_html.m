@@ -128,15 +128,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Generate html pages for individual functions ##
   ##################################################
 
-  ## Set javascript startup
-  if (!isfield (options, "body_command"))
-    if (isfield (options, "overview_body_command"))
-      options.body_command = options.overview_body_command;
-    else
-      options.body_command = "";
-    endif
-  endif
-
   num_categories = length (desc.provides);
   anchors = implemented = cell (1, num_categories);
   for k = 1:num_categories

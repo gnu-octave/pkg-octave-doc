@@ -13,19 +13,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## Author: Julien Bect <bect@bect-laptop>
-## Created: 2014-08-20
-
 function s = get_feature (page_type, feature, options)
 
-  page_specific_feature = [page_type "_" feature];
+  s = "";
 
-  if (isfield (options, page_specific_feature))
-    s = options.(page_specific_feature);
-  elseif (isfield (options, feature))
+  ## Look at page-specific feature value first  
+  if (! strcmp (page_type, "function"))
+    page_specific_feature = [page_type "_" feature];
+    s = options.(page_specific_feature); 
+  endif
+
+  ## If not available, use value from individual function pages
+  if (isempty (s))
     s = options.(feature);
-  else
-    s = feval (['get_default_', feature], page_type);
   endif
 
 endfunction
