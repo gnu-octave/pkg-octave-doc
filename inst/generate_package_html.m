@@ -355,15 +355,13 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Should we include the package doc ? ##
   #########################################
 
-  if (isfield (options, "package_doc"))
-    write_package_documentation = true;
+  write_package_documentation = ~ isempty (options.package_doc);
+  if write_package_documentation
     [~, doc_fn, doc_ext] = fileparts (options.package_doc);
     doc_root_dir = fullfile (list.dir, "doc");
     doc_src = fullfile (doc_root_dir, [doc_fn, doc_ext]);
     doc_subdir = "package_doc";
     doc_out_dir = fullfile (packdir, doc_subdir);
-  else
-    write_package_documentation = false;
   endif
 
   ######################

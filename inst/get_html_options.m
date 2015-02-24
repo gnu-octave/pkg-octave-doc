@@ -98,6 +98,11 @@ function options = get_html_options_default (options)
   ## Style sheet (mandatory if %css is used in the header)
   default.css = "";
 
+  ## Name of package documentation file (user manual). Leave empty if no
+  ## documentation file is to be included. If not empty, the documentation
+  ## file is assumed to be in the 'doc' subdirectory.
+  default.package_doc = "";
+
   ## TODO: Warn about unknown options
   ##  (to be done once all known options are present in default)
 
