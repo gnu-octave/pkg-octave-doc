@@ -20,8 +20,13 @@ function [header, title, footer] = get_header_title_and_footer ...
 
   header = get_feature (page_type, "header", options);
 
-  if (isfield (options, "css"))
-    header = strrep (header, "%css", options.css);
+  ## Handle %css    
+  if (! isempty (strfind (header, "%css")))  
+    if (isempty (options.css))
+      error ("Please provide a non-empty options.css to subtitute for %css.");
+    else
+      header = strrep (header, "%css", options.css);
+    endif
   endif
 
   header = instantiate_template (header, root, pkgroot, pkgname);

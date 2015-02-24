@@ -88,6 +88,9 @@ function options = get_html_options_default (options)
   ## Create package news page ?
   default.include_package_news = false;
 
+  ## Style sheet (mandatory if %css is used in the header)
+  default.css = "";
+
   ## TODO: Warn about unknown options
   ##  (to be done once all known options are present in default)
 

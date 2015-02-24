@@ -161,9 +161,14 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
         html_help_text (fun, outname, options, root, pkgroot, packname);
         implemented {k}{l} = true;
       catch
-        warning ("marking '%s' as not implemented", fun);
-        implemented {k}{l} = false;
-     end_try_catch
+        err = lasterror ();
+        if (strfind (err.message, "not found"))
+          warning ("marking '%s' as not implemented", fun);
+          implemented {k}{l} = false;
+        else
+          rethrow (err);
+        endif
+      end_try_catch
     endfor
   endfor
 
