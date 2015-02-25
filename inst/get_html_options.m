@@ -119,6 +119,9 @@ function options = get_html_options_default (options)
   ## Style sheet (mandatory if %css is used in the header)
   default.css = "";
 
+  ## Encoding
+  default.charset = "utf-8";
+  
   ## Name of package documentation file (user manual). Leave empty if no
   ## documentation file is to be included. If not empty, the documentation
   ## file is assumed to be in the 'doc' subdirectory.
@@ -149,7 +152,7 @@ function options = get_html_options_project (options, project_name)
  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\
 <html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n\
   <head>\n\
-  <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" />\n\
+  <meta http-equiv=\"content-type\" content=\"text/html; charset=%charset\" />\n\
   <meta name=\"date\" content=\"%date\"/>\n\
   <meta name=\"author\" content=\"The Octave-Forge Community\" />\n\
   <meta name=\"description\" content=\"Octave-Forge is a collection of packages\

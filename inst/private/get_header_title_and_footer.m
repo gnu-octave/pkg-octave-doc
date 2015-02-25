@@ -29,6 +29,9 @@ function [header, title, footer] = get_header_title_and_footer ...
     endif
   endif
 
+  ## Handle %charset (encoding)
+  header = strrep (header, "%charset", options.charset);
+  
   header = instantiate_template (header, root, pkgroot, pkgname);
     
   body_command = get_feature (page_type, "body_command", options);

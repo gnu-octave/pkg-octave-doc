@@ -86,6 +86,14 @@ function html_help_text ...
         error ("Couln't parse file '%s'", name);
       endif
 
+      ## Check encoding
+      tmp = regexp (text, "charset\s*=\s*([^\s\"]*)", "tokens");
+      charset = tmp{1}{1};
+      if (! strcmp (options.charset, charset))
+        warning (["makeinfo's output is encoded in %s, but will be " ...
+          "interpreted with options.charset = %s"], charset, options.charset);
+      endif
+
       ## Extract the body of makeinfo's output
       start_idx = strfind (text, start);
       stop_idx = strfind (text, stop);
