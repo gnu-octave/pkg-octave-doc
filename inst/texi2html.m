@@ -66,7 +66,7 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
   if (isfield (options, "seealso"))
     seealso = options.seealso;
   else
-    seealso = @(args) html_see_also_with_prefix (root, args {:});
+    seealso = @(args) html_see_also_with_prefix (root, args{:});
   endif
 
   ## Run makeinfo
@@ -103,7 +103,7 @@ function expanded = html_see_also_with_prefix (prefix, varargin)
   varargin2 (1:2:end) = varargin;
   varargin2 (2:2:end) = varargin;
 
-  list = sprintf (format, varargin2 {:});
+  list = sprintf (format, varargin2{:});
 
   expanded = strcat (header, list, footer);
 endfunction

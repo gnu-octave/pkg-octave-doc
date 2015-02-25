@@ -77,7 +77,7 @@ function html_help_text ...
       if (isfield (options, "seealso"))
         seealso = @(args) options.seealso (root, args);
       else
-        seealso = @(args) html_see_also_with_prefix (root, args {:});
+        seealso = @(args) html_see_also_with_prefix (root, args{:});
       endif
 
       ## Run makeinfo
@@ -148,24 +148,24 @@ function html_help_text ...
         demo_header = sprintf ("<h2>Demonstration %d</h2>\n<div class=\"demo\">\n", demo_num);
         demo_footer = "</div>\n";
 
-        demo_k {1} = "<p>The following code</p>\n";
-        demo_k {2} = sprintf ("<pre class=\"example\">%s</pre>\n", code_k);
+        demo_k{1} = "<p>The following code</p>\n";
+        demo_k{2} = sprintf ("<pre class=\"example\">%s</pre>\n", code_k);
         if (has_text && has_images)
-          demo_k {3} = "<p>Produces the following output</p>\n";
-          demo_k {4} = sprintf ("<pre class=\"example\">%s</pre>\n", output);
-          demo_k {5} = sprintf ("<p>and the following %s</p>\n", ft);
-          demo_k {6} = sprintf ("<p>%s</p>\n", images_in_html (images));
+          demo_k{3} = "<p>Produces the following output</p>\n";
+          demo_k{4} = sprintf ("<pre class=\"example\">%s</pre>\n", output);
+          demo_k{5} = sprintf ("<p>and the following %s</p>\n", ft);
+          demo_k{6} = sprintf ("<p>%s</p>\n", images_in_html (images));
         elseif (has_text) # no images
-          demo_k {3} = "<p>Produces the following output</p>\n";
-          demo_k {4} = sprintf ("<pre class=\"example\">%s</pre>\n", output);
+          demo_k{3} = "<p>Produces the following output</p>\n";
+          demo_k{4} = sprintf ("<pre class=\"example\">%s</pre>\n", output);
         elseif (has_images) # no text
-          demo_k {3} = sprintf ("<p>Produces the following %s</p>\n", ft);
-          demo_k {6} = sprintf ("<p>%s</p>\n", images_in_html (images));
+          demo_k{3} = sprintf ("<p>Produces the following %s</p>\n", ft);
+          demo_k{6} = sprintf ("<p>%s</p>\n", images_in_html (images));
         else # neither text nor images
-          demo_k {3} = sprintf ("<p>gives an example of how '%s' is used.</p>\n", name);
+          demo_k{3} = sprintf ("<p>gives an example of how '%s' is used.</p>\n", name);
         endif
 
-        demo_text = strcat (demo_text, demo_header, demo_k {:}, demo_footer);
+        demo_text = strcat (demo_text, demo_header, demo_k{:}, demo_footer);
       endfor
 
       text = strcat (text, demo_text);
@@ -192,7 +192,7 @@ function expanded = html_see_also_with_prefix (prefix, root, varargin)
   varargin2 (1:2:end) = varargin;
   varargin2 (2:2:end) = varargin;
 
-  list = sprintf (format, varargin2 {:});
+  list = sprintf (format, varargin2{:});
 
   expanded = strcat (header, list, footer);
 endfunction
@@ -251,7 +251,7 @@ function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
       full_filename = fullfile (full_imagedir, name);
       filename = fullfile (imagedir, name);
       print (fig, full_filename);
-      images {end+1} = filename;
+      images{end+1} = filename;
       close (fig);
     endwhile
 
@@ -269,6 +269,6 @@ function text = images_in_html (images)
   header = "<table class=\"images\">\n<tr>\n";
   footer = "</tr></table>\n";
   headers = sprintf ("<th class=\"images\">Figure %d</th>\n", 1:numel (images));
-  ims = sprintf ("<td class=\"images\"><img src=\"%s\" class=\"demo\"/></td>\n", images {:});
+  ims = sprintf ("<td class=\"images\"><img src=\"%s\" class=\"demo\"/></td>\n", images{:});
   text = strcat (header, headers, "</tr><tr>\n", ims, footer);
 endfunction

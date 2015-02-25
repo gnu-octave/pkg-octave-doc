@@ -67,7 +67,7 @@ endfunction
 
 function write_list (list, fid, write_anchors)
   for k = 1:length (list)
-    elem = list {k};
+    elem = list{k};
     [text, format] = get_help_text (elem);
     if (strcmp (format, "texinfo"))
       text = strip_defs (text);

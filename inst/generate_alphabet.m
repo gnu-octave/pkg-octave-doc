@@ -61,25 +61,25 @@ function generate_alphabet (directory, data_file, root, options = struct ())
   ## Iterate over each function
   ## First we find the first function that starts with 'a'
   for a = 1:length (data)
-    if (ldata {a}(1) >= "a")
+    if (ldata{a}(1) >= "a")
       break;
     endif
   endfor
 
   ## Then we iterate over each function until we get something that doesn't start with 'z'
-  current = data {a}(1);
+  current = data{a}(1);
   [fid, footer] = new_file (directory, current, options);
   for idx = a:length (data)
     ## Are we still working on the same file
-    if (ldata {idx}(1) != current)
+    if (ldata{idx}(1) != current)
       fprintf (fid, "</div\n%s", footer);
       fclose (fid);
-      current = ldata {idx}(1);
+      current = ldata{idx}(1);
       [fid, footer] = new_file (directory, current, options);
     endif
 
     ## Write the actual function to the file
-    fun = data {idx};
+    fun = data{idx};
     fprintf (fid, "<div class=\"func\"><b><a href=\"%s/function/%s.html\">%s</a></b></div>\n",
              root, fun, fun);
     try

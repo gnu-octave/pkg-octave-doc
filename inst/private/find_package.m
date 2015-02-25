@@ -22,10 +22,10 @@ function [package, found] = find_package (name)
   l = pkg ("list");
 
   for k = 1:length (l)
-    d = l {k}.dir;
+    d = l{k}.dir;
     idx = strfind (p, d);
     if (numel (idx) == 1 && idx == 1)
-      package = l {k}.name;
+      package = l{k}.name;
       break;
     endif
   endfor

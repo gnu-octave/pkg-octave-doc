@@ -62,7 +62,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   if (isempty (name))
     list = pkg ("list");
     for k = 1:length (list)
-      generate_package_html (list {k}.name, outdir, options);
+      generate_package_html (list{k}.name, outdir, options);
     endfor
     return;
   elseif (isstruct (name))
@@ -75,7 +75,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   elseif (ischar (name))
     packname = name;
     pkg ("load", name);
-    desc = pkg ("describe", name) {1};
+    desc = (pkg ("describe", name)){1};
   else
     error (["First input must either be the name of a ", ...
             "package, or a structure giving its description."]);
@@ -131,17 +131,17 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   num_categories = length (desc.provides);
   anchors = implemented = cell (1, num_categories);
   for k = 1:num_categories
-    F = desc.provides {k}.functions;
-    category = desc.provides {k}.category;
+    F = desc.provides{k}.functions;
+    category = desc.provides{k}.category;
 
     ## Create a valid anchor name by keeping only alphabetical characters
-    anchors {k} = regexprep (category, "[^a-zA-Z]", "_");
+    anchors{k} = regexprep (category, "[^a-zA-Z]", "_");
 
     ## For each function in category
     num_functions = length (F);
-    implemented {k} = cell (1, num_functions);
+    implemented{k} = cell (1, num_functions);
     for l = 1:num_functions
-      fun = F {l};
+      fun = F{l};
       if (fun(1) == "@")
         ## Extract @-directory name from function name
         at_dir = fullfile (fundir, fileparts (fun));
@@ -161,12 +161,12 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       outname = fullfile (fundir, sprintf ("%s.html", fun));
       try
         html_help_text (fun, outname, options, root, pkgroot, packname);
-        implemented {k}{l} = true;
+        implemented{k}{l} = true;
       catch
         err = lasterror ();
         if (strfind (err.message, "not found"))
           warning ("marking '%s' as not implemented", fun);
-          implemented {k}{l} = false;
+          implemented{k}{l} = false;
         else
           rethrow (err);
         endif
@@ -202,32 +202,32 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
     fprintf (fid, "<p>Select category:  <select name=\"cat\" onchange=\"location = this.options[this.selectedIndex].value;\">\n");
     for k = 1:num_categories
-      category = desc.provides {k}.category;
-      fprintf (fid, "    <option value=\"#%s\">%s</option>\n", anchors {k}, category);
+      category = desc.provides{k}.category;
+      fprintf (fid, "    <option value=\"#%s\">%s</option>\n", anchors{k}, category);
     endfor
     fprintf (fid, "  </select></p>\n\n");
 
     ## Generate function list by category
     for k = 1:num_categories
-      F = desc.provides {k}.functions;
-      category = desc.provides {k}.category;
+      F = desc.provides{k}.functions;
+      category = desc.provides{k}.category;
       fprintf (fid, "  <h3 class=\"category\"><a name=\"%s\">%s</a></h3>\n\n",
-               anchors {k}, category);
+               anchors{k}, category);
 
-      first_sentences {k} = cell (1, length (F));
+      first_sentences{k} = cell (1, length (F));
 
       ## For each function in category
       for l = 1:length (F)
-        fun = F {l};
-        if (implemented {k}{l})
-          first_sentences {k}{l} = get_first_help_sentence (fun, 200);
-          first_sentences {k}{l} = strrep (first_sentences {k}{l}, "\n", " ");
+        fun = F{l};
+        if (implemented{k}{l})
+          first_sentences{k}{l} = get_first_help_sentence (fun, 200);
+          first_sentences{k}{l} = strrep (first_sentences{k}{l}, "\n", " ");
 
           link = sprintf ("%s/%s.html", local_fundir, fun);
           fprintf (fid, "    <div class=\"func\"><b><a href=\"%s\">%s</a></b></div>\n",
                    link, fun);
           fprintf (fid, "    <div class=\"ftext\">%s</div>\n\n", ...
-                   first_sentences {k}{l});
+                   first_sentences{k}{l});
         else
           fprintf (fid, "    <div class=\"func\"><b>%s</b></div>\n", fun);
           fprintf (fid, "    <div class=\"ftext\">Not implemented.</div>\n\n");
@@ -252,11 +252,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       endif
 
       for k = 1:num_categories
-        F = desc.provides {k}.functions;
+        F = desc.provides{k}.functions;
         for l = 1:length (F)
-          fun = F {l};
-          if (implemented {k}{l} && lower (fun (1)) == letter)
-            fs = first_sentences {k}{l};
+          fun = F{l};
+          if (implemented{k}{l} && lower (fun (1)) == letter)
+            fs = first_sentences{k}{l};
 
             fprintf (name_fid, "%s\n", fun);
             fprintf (desc_fid, "%s\n", fs);
@@ -299,8 +299,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     all_list = pkg ("list");
     list = [];
     for k = 1:length (all_list)
-      if (strcmp (all_list {k}.name, packname))
-        list = all_list {k};
+      if (strcmp (all_list{k}.name, packname))
+        list = all_list{k};
       endif
     endfor
     if (isempty (list))
@@ -364,8 +364,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     all_list = pkg ("list");
     list = [];
     for k = 1:length (all_list)
-      if (strcmp (all_list {k}.name, packname))
-        list = all_list {k};
+      if (strcmp (all_list{k}.name, packname))
+        list = all_list{k};
       endif
     endfor
     if (isempty (list))
@@ -475,10 +475,10 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     if (isfield (list, "depends"))
       fprintf (fid, "    <tr><td>Dependencies: </td><td>\n");
       for k = 1:length (list.depends)
-        p = list.depends {k}.package;
-        if (isfield (list.depends {k}, "operator") && isfield (list.depends {k}, "version"))
-          o = list.depends {k}.operator;
-          v = list.depends {k}.version;
+        p = list.depends{k}.package;
+        if (isfield (list.depends{k}, "operator") && isfield (list.depends{k}, "version"))
+          o = list.depends{k}.operator;
+          v = list.depends{k}.version;
           vt = sprintf ("(%s %s) ", o, v);
         else
           vt = "";
@@ -522,8 +522,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     all_list = pkg ("list");
     list = [];
     for k = 1:length (all_list)
-      if (strcmp (all_list {k}.name, packname))
-        list = all_list {k};
+      if (strcmp (all_list{k}.name, packname))
+        list = all_list{k};
       endif
     endfor
     if (isempty (list))

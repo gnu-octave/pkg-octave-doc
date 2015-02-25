@@ -48,7 +48,7 @@ function file_list = get_txi_files (srcdir)
 
     ## Add to the file list
     if (~ isempty (f)) && (~ any (strcmpi (f, ignore_list)))
-      file_list {end+1} = fullfile (txi_dir, [f ".txi"]);
+      file_list{end+1} = fullfile (txi_dir, [f ".txi"]);
     endif
 
   endwhile

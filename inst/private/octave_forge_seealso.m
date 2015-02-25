@@ -26,7 +26,7 @@ function expanded = octave_forge_seealso (root, arg)
 
   help_list = "";
   for k = 1:length (arg)
-    f = arg {k};
+    f = arg{k};
     if (any (strcmp (f, keywords)))
       elem = sprintf (kw_format, f, f);
     else

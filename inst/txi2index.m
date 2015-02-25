@@ -85,20 +85,20 @@ function all_index = txi2index (srcdir)
         index.name = strtrim (line (length (APPENDIX)+1:end));
       elseif (strncmpi (SECTION, line, length (SECTION)))
         section = strtrim (line (length (SECTION)+1:end));
-        if (idx == 0 || !isempty (index.provides {idx}.functions))
+        if (idx == 0 || !isempty (index.provides{idx}.functions))
           idx ++;
         endif
 
-        index.provides {idx} = struct ();
-        index.provides {idx}.category = section;
-        index.provides {idx}.functions = {};
+        index.provides{idx} = struct ();
+        index.provides{idx}.category = section;
+        index.provides{idx}.functions = {};
       elseif (strncmpi (DOCSTRING, line, length (DOCSTRING)))
         if (idx == 0)
           idx ++;
 
-          index.provides {idx} = struct ();
-          index.provides {idx}.category = default_section;
-          index.provides {idx}.functions = {};
+          index.provides{idx} = struct ();
+          index.provides{idx}.category = default_section;
+          index.provides{idx}.functions = {};
         endif
 
         start = find (line == "(", 1);
@@ -109,20 +109,20 @@ function all_index = txi2index (srcdir)
         endif
 
         fun = strtrim (line (start+1:stop-1));
-        index.provides {idx}.functions {end+1} = fun;
+        index.provides{idx}.functions{end+1} = fun;
         txi_has_contents = true;
       endif
     endwhile
     fclose (fid);
 
-    if (idx > 0 && isempty (index.provides {idx}.functions))
+    if (idx > 0 && isempty (index.provides{idx}.functions))
       index.provides = index.provides (1:idx-1);
     endif
 
     if (txi_has_contents)
-      all_index {k} = index;
+      all_index{k} = index;
     else
-      all_index {k} = [];
+      all_index{k} = [];
     endif
   endfor
 endfunction
