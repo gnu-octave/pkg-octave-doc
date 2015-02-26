@@ -1,5 +1,5 @@
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
-## Copyright (C) 2014 Julien Bect <julien.bect@supelec.fr>
+## Copyright (C) 2014 Julien Bect <jbect@users.sourceforge.net>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
