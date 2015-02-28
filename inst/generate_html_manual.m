@@ -66,11 +66,13 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
     endif
   endfor
 
-  ## Generate the documentation
+  ## Disable options that are specific to packages
   options.include_package_list_item = false;
   options.include_package_page = false;
   options.include_package_license = false;
+  options.include_package_news = false;
 
+  ## Generate the documentation  
   generate_package_html (index, outdir, options);
 
 endfunction
