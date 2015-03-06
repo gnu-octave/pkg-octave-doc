@@ -58,7 +58,7 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   index = struct ();
   index.provides = {};
   index.name = "octave";
-  index.description = "GNU Octave comes with a large set of general-prupose functions that are listed below. This is the core set of functions that is available without any packages installed.";
+  index.description = "GNU Octave comes with a large set of general-purpose functions that are listed below. This is the core set of functions that is available without any packages installed.";
   for k = 1:length (indices)
     if (!isempty (indices{k}))
       ikp = indices{k}.provides;
