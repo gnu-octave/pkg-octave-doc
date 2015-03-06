@@ -88,10 +88,12 @@ function html_help_text ...
 
       ## Check encoding
       tmp = regexp (text, "charset\s*=\s*([^\s\"]*)", "tokens");
-      charset = tmp{1}{1};
-      if (! strcmp (options.charset, charset))
-        warning (["makeinfo's output is encoded in %s, but will be " ...
-          "interpreted with options.charset = %s"], charset, options.charset);
+      if (! isempty (tmp))
+        charset = tmp{1}{1};
+        if (! strcmp (options.charset, charset))
+          warning (["makeinfo's output is encoded in %s, but will be " ...
+            "interpreted with options.charset = %s"], charset, options.charset);
+        endif
       endif
 
       ## Extract the body of makeinfo's output
