@@ -80,6 +80,11 @@ function html_help_text ...
         seealso = @(args) html_see_also_with_prefix (root, args{:});
       endif
 
+      ## Prevent empty <pre> </pre> blocks
+      ## (see https://savannah.gnu.org/bugs/?44451)
+      text = regexprep (text, '([\r\n|\n])\s*@group', '$1@group');
+      text = regexprep (text, '([\r\n|\n])\s*@end', '$1@end');
+      
       ## Run makeinfo
       [text, status] = __makeinfo__ (text, "html", seealso);
       if (status != 0)
@@ -93,7 +98,7 @@ function html_help_text ...
         if (! strcmp (options.charset, charset))
           warning (["makeinfo's output is encoded in %s, but will be " ...
             "interpreted with options.charset = %s"], charset, options.charset);
-        endif
+        endif 
       endif
 
       ## Extract the body of makeinfo's output
