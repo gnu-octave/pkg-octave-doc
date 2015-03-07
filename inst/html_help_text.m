@@ -51,7 +51,7 @@ function html_help_text ...
     print_usage ();
     error ("Not enough input arguments: at least two arguments were expected.");
   endif
-  
+
   ## Get the help text of the function
   [text, format] = get_help_text (name);
 
@@ -84,7 +84,7 @@ function html_help_text ...
       ## (see https://savannah.gnu.org/bugs/?44451)
       text = regexprep (text, '([\r\n|\n])\s*@group', '$1@group');
       text = regexprep (text, '([\r\n|\n])\s*@end', '$1@end');
-      
+
       ## Run makeinfo
       [text, status] = __makeinfo__ (text, "html", seealso);
       if (status != 0)
@@ -98,7 +98,7 @@ function html_help_text ...
         if (! strcmp (options.charset, charset))
           warning (["makeinfo's output is encoded in %s, but will be " ...
             "interpreted with options.charset = %s"], charset, options.charset);
-        endif 
+        endif
       endif
 
       ## Extract the body of makeinfo's output
@@ -115,7 +115,7 @@ function html_help_text ...
     otherwise
       error ("Internal error: unsupported help text format: '%s'\n", format);
   endswitch
- 
+
   ## Read 'options' input argument
   [header, title, footer] = get_header_title_and_footer ...
     ("function", options, name, root, pkgroot, pkgname);
