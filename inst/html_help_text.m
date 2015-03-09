@@ -82,8 +82,13 @@ function html_help_text ...
 
       ## Prevent empty <pre> </pre> blocks
       ## (see https://savannah.gnu.org/bugs/?44451)
-      text = regexprep (text, '([\r\n|\n])\s*@group', '$1@group');
-      text = regexprep (text, '([\r\n|\n])\s*@end', '$1@end');
+      text = regexprep (text, '([\r\n|\n])[ \t]*@group', '$1@group');
+      text = regexprep (text, '([\r\n|\n])[ \t]*@end', '$1@end');
+
+      ## Remove one leading white space.  Assuming that all non-empty
+      ## lines start with "## ", this prevents one extra white space
+      ## from showing up in example blocks.
+      text = regexprep (text, '([\r\n|\n])[ \t]', '$1');
 
       ## Run makeinfo
       [text, status] = __makeinfo__ (text, "html", seealso);
