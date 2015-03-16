@@ -1,10 +1,10 @@
 generate_html >> Generate HTML web page from help texts
-Single function functions
+Main functions
  html_help_text
-Package functions
  generate_package_html
- get_html_options
  generate_html_manual
+ generate_operators
+ get_html_options
 Utility Functions
  txi2index
  txi2reference
