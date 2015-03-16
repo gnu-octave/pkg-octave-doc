@@ -16,6 +16,8 @@
 
 ## -*- texinfo -*-
 ## @deftypefn {Function File} generate_html_manual (@var{srcdir}, @var{outdir})
+## Generate @t{HTML} documentation for the core functions provided by Octave.
+## @seealso{generate_package_html}
 ## @end deftypefn
 
 function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
