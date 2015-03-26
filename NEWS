@@ -1,13 +1,44 @@
 Summary of important user-visible changes for generate_html 0.1.7:
 ------------------------------------------------------------------
 
+ ** Bug fixes
+
+    o Omit the "News" link if there is no NEWS file, instead of generating an
+      error (the NEWS file is optional, according to the manual)
+
+    o Fix broken links on the NEWS, COPYING and overview pages (the link that
+      was supposed to point to the index.html of the package)
+
+    o Protect symbols <, > and & by replacing them with the corresponding HTML
+      entity (&lt;, &gt; and &amp;) everywhere it makes sense
+
+    o get_txi_files.m: Update the list of ignored *.texi files
+
+    o generate_package_html.m: Let email addresses appear if they exist in
+      DESCRIPTION (they were previously hidden because of the < > delimiters)
+
+    o generate_package_html.m: Fix anchor names
+
+    o html_help_text.m: Hide figures only if gnuplot is in use (see bug #33180)
+
+    o html_help_text.m: Prevent empty <pre> </pre> blocks (bug #44451)
+
+ ** New features
+
+    o Introduce a new %charset variable for header template, which defaults to
+      utf-8 (instead of the hard-coded iso-8859-1 that was previously in use)
+
  ** Documentation
 
-    ** Add generate_operators to the INDEX
+    o Add generate_operators to the INDEX
 
-    ** Provide minimal (one-line) help text for generate_html_manual
+    o Provide minimal (one-line) help text for generate_html_manual
 
- ** Remove obsolete function generate_alphabet.
+ ** Cleanup
+
+    o Remove obsolete function generate_alphabet
+
+    o Remove unused "docbrowser" style
 
 Summary of important user-visible changes for generate_html 0.1.6:
 ------------------------------------------------------------------
