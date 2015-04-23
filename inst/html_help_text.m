@@ -107,10 +107,11 @@ function html_help_text ...
       endif
 
       ## Extract the body of makeinfo's output
-      start_idx = strfind (text, start);
-      stop_idx = strfind (text, stop);
-      header = text (1:start_idx - 1);
-      text = text (start_idx + length (start):stop_idx - 1);
+      p_start = sprintf ('\\s*(<p>)+\\s*%s\\s*(</p>)+\\s*', start);
+      p_stop = sprintf ('\\s*(<p>)+\\s*%s\\s*(</p>)+\\s*', stop);
+      [i1, i2] = regexp (text, p_start);
+      i3 = regexp (text, p_stop);
+      text = text((i2 + 1):(i3 - 1));
 
       ## Hack around 'makeinfo' bug that forgets to put <p>'s before function declarations
       text = strrep (text, "&mdash;", "<p class=\"functionfile\">");

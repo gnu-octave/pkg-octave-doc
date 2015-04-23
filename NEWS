@@ -1,3 +1,11 @@
+Summary of important user-visible changes for generate_html 0.1.8:
+------------------------------------------------------------------
+
+ ** Bug fixes
+
+    o html_help_text.m, texi2html.m: Fix a bug that was the cause of unmatched
+      </p> tags in the HTML output.
+
 Summary of important user-visible changes for generate_html 0.1.7:
 ------------------------------------------------------------------
 

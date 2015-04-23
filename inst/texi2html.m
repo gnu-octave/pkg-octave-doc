@@ -1,4 +1,5 @@
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
+## Copyright (C) 2015 Julien Bect <jbect@users.sourceforge.net>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -77,12 +78,12 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
     warning ("texi2html: couldn't parse texinfo: \n%s", txi_out); # XXX: make this an error
   endif
 
-  ## Split text into header, body, and footer using the text we added above
-  start_idx = strfind (text, start);
-  stop_idx = strfind (text, stop);
-  header = text (1:start_idx - 1);
-  footer = text (stop_idx + length (stop):end);
-  text = text (start_idx + length (start):stop_idx - 1);
+  ## Extract the body of makeinfo's output
+  p_start = sprintf ('\\s*(<p>)+\\s*%s\\s*(</p>)+\\s*', start);
+  p_stop = sprintf ('\\s*(<p>)+\\s*%s\\s*(</p>)+\\s*', stop);
+  [i1, i2] = regexp (text, p_start);
+  i3 = regexp (text, p_stop);
+  text = text((i2 + 1):(i3 - 1));
 
   ## Hack around 'makeinfo' bug that forgets to put <p>'s before function declarations
   text = strrep (text, "&mdash;", "<p class=\"functionfile\">");
