@@ -113,9 +113,18 @@ function options = get_html_options_default (options)
   ## page-specific option is empty.
   default.title = "%name";
   default.body_command = "";
-  default.header = "<html><head><title>%title</title><head><body>";
-  default.footer = "</body></html>";
-       
+  default.header = "\
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\
+ \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n\
+<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n\
+<head>\n\
+  <meta http-equiv=\"content-type\" content=\"text/html; charset=%charset\" />\n\
+  <meta name=\"date\" content=\"%date\" />\n\
+  <title>%title</title>\n\
+</head>\n\
+<body>";
+  default.footer = "</body>\n</html>";
+
   ## Style sheet (mandatory if %css is used in the header)
   default.css = "";
 

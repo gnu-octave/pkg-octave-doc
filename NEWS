@@ -6,6 +6,9 @@ Summary of important user-visible changes for generate_html 0.1.8:
     o html_help_text.m, texi2html.m: Fix a bug that was the cause of unmatched
       </p> tags in the HTML output.
 
+    o inst/get_html_options.m: Fix default header. Now accepted as valid XHTML
+      1.0 Transitional (0 error, 0 warning) by W3C's markup validation service.
+
 Summary of important user-visible changes for generate_html 0.1.7:
 ------------------------------------------------------------------
 
