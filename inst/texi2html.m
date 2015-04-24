@@ -79,8 +79,8 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
   endif
 
   ## Extract the body of makeinfo's output
-  p_start = sprintf ('\\s*(<p>)+\\s*%s\\s*(</p>)+\\s*', start);
-  p_stop = sprintf ('\\s*(<p>)+\\s*%s\\s*(</p>)+\\s*', stop);
+  p_start = sprintf ('\\s*(<p>)?\\s*%s\\s*(</p>)?\\s*', start);
+  p_stop = sprintf ('\\s*(<p>)?\\s*%s\\s*(</p>)?\\s*', stop);
   [i1, i2] = regexp (text, p_start);
   i3 = regexp (text, p_stop);
   text = text((i2 + 1):(i3 - 1));
