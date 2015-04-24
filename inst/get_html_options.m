@@ -206,7 +206,7 @@ function options = get_html_options_project (options, project_name)
 <div id=\"left-menu\">\n\
   <h3>Navigation</h3>\n\
   <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootoperators.html\">Operators and Keywords</a></p>\n\
-  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootfunction_list.html\">Function List:</a>\n\
+  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootfunction_list.html\">Function List:</a></p>\n\
   <ul class=\"left-menu-list\">\n\
     <li class=\"left-menu-list\">\n\
       <a  class=\"left-menu-link\" href=\"%rootoctave/overview.html\">&#187; Octave core</a>\n\
@@ -218,7 +218,6 @@ function options = get_html_options_project (options, project_name)
       <a  class=\"left-menu-link\" href=\"%rootfunctions_by_alpha.php\">&#187; alphabetical</a>\n\
     </li>\n\
   </ul>\n\
-  </p>\n\
   <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootdoxygen/html\">C++ API</a></p>\n\
 </div>\n\
 <div id=\"doccontent\">\n";
