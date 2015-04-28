@@ -62,17 +62,11 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
   start = "###### OCTAVE START ######";
   stop  = "###### OCTAVE STOP ######";
   text = sprintf ("%s\n%s\n%s\n", start, text, stop);
-
-  ## Handle @seealso
-  if (isfield (options, "seealso"))
-    seealso = options.seealso;
-  else
-    seealso = @(args) html_see_also_with_prefix (root, args{:});
-  endif
-
+  
   ## Run makeinfo
   orig_text = text;
-  [text, status] = __makeinfo__ (text, "html", seealso);
+  [text, status] = __makeinfo__ (text, ...
+    "html", @(x) options.seealso (root, x{:}));
   if (status != 0)
     txi_out = orig_text (1:min (100, length (orig_text)));
     warning ("texi2html: couldn't parse texinfo: \n%s", txi_out); # XXX: make this an error
@@ -94,19 +88,3 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
     ("function", options, :, root);
 
 endfunction
-
-function expanded = html_see_also_with_prefix (prefix, varargin)
-  header = "@html\n<div class=\"seealso\">\n<b>See also</b>: ";
-  footer = "\n</div>\n@end html\n";
-
-  format = sprintf (" <a href=\"%s%%s.html\">%%s</a> ", prefix);
-
-  varargin2 = cell (1, 2*length (varargin));
-  varargin2 (1:2:end) = varargin;
-  varargin2 (2:2:end) = varargin;
-
-  list = sprintf (format, varargin2{:});
-
-  expanded = strcat (header, list, footer);
-endfunction
-

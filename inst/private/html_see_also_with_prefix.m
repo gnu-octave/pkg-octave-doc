@@ -1,5 +1,4 @@
-## Copyright (C) 2009 Soren Hauberg <soren@hauberg.org>
-## Copyright (C) 2015 Julien Bect <jbect@users.sourceforge.net>
+## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -15,26 +14,17 @@
 ## along with this program; see the file COPYING.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-function expanded = octave_forge_seealso (root, varargin)
+function expanded = html_see_also_with_prefix (prefix, varargin)
   header = "@html\n<div class=\"seealso\">\n<b>See also</b>: ";
   footer = "\n</div>\n@end html\n";
 
-  ## XXX: Deal properly with the root directory
-  format = sprintf (" <a href=\"%sfind_function.php?fun=%%s\">%%s</a> ", root);
-  kw_format = sprintf (" <a href=\"%soperators.html#%%s\">%%s</a> ", root);
+  format = sprintf (" <a href=\"%s%%s.html\">%%s</a> ", prefix);
 
-  keywords = __keywords__ ();
+  varargin2 = cell (1, 2*length (varargin));
+  varargin2 (1:2:end) = varargin;
+  varargin2 (2:2:end) = varargin;
 
-  help_list = "";
-  for k = 1:length (varargin)
-    f = varargin{k};
-    if (any (strcmp (f, keywords)))
-      elem = sprintf (kw_format, f, f);
-    else
-      elem = sprintf (format, f, f);
-    endif
-    help_list = strcat (help_list, elem);
-  endfor
+  list = sprintf (format, varargin2{:});
 
-  expanded = strcat (header, help_list, footer);
+  expanded = strcat (header, list, footer);
 endfunction

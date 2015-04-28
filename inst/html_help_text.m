@@ -73,13 +73,6 @@ function html_help_text ...
       stop  = "###### OCTAVE STOP ######";
       text = sprintf ("%s\n%s\n%s\n", start, text, stop);
 
-      ## Handle @seealso
-      if (isfield (options, "seealso"))
-        seealso = @(args) options.seealso (root, args);
-      else
-        seealso = @(args) html_see_also_with_prefix (root, args{:});
-      endif
-
       ## Prevent empty <pre> </pre> blocks
       ## (see https://savannah.gnu.org/bugs/?44451)
       text = regexprep (text, '([\r\n|\n])[ \t]*@group', '$1@group');
@@ -91,7 +84,8 @@ function html_help_text ...
       text = regexprep (text, '([\r\n|\n])[ \t]', '$1');
 
       ## Run makeinfo
-      [text, status] = __makeinfo__ (text, "html", seealso);
+      [text, status] = __makeinfo__ (text, ...
+        "html", @(x) options.seealso (root, x{:}));
       if (status != 0)
         error ("Couln't parse file '%s'", name);
       endif
@@ -194,21 +188,6 @@ function html_help_text ...
   fprintf (fid, "%s\n%s\n%s", header, text, footer);
   fclose (fid);
 
-endfunction
-
-function expanded = html_see_also_with_prefix (prefix, root, varargin)
-  header = "@html\n<div class=\"seealso\">\n<b>See also</b>: ";
-  footer = "\n</div>\n@end html\n";
-
-  format = sprintf (" <a href=\"%s%%s.html\">%%s</a> ", prefix);
-
-  varargin2 = cell (1, 2*length (varargin));
-  varargin2 (1:2:end) = varargin;
-  varargin2 (2:2:end) = varargin;
-
-  list = sprintf (format, varargin2{:});
-
-  expanded = strcat (header, list, footer);
 endfunction
 
 function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)

@@ -108,6 +108,9 @@ function options = get_html_options_default (options)
   ## This directory will contain individual function pages.
   default.function_dir = "function";
 
+  ## Handle to a function for processing "see also" links
+  options.seealso = @html_see_also_with_prefix;
+
   ## Variable values (%title, %body_command...) for individual function pages,
   ## and for special pages too (index, overview...) if the corresponding
   ## page-specific option is empty.
