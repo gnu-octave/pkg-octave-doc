@@ -62,14 +62,34 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
   start = "###### OCTAVE START ######";
   stop  = "###### OCTAVE STOP ######";
   text = sprintf ("%s\n%s\n%s\n", start, text, stop);
-  
+
+  ## Prevent empty <pre> </pre> blocks
+  ## (see https://savannah.gnu.org/bugs/?44451)
+  text = regexprep (text, '([\r\n|\n])[ \t]*@group', '$1@group');
+  text = regexprep (text, '([\r\n|\n])[ \t]*@end', '$1@end');
+
+  ## Remove one leading white space.  Assuming that all non-empty
+  ## lines start with "## ", this prevents one extra white space
+  ## from showing up in example blocks.
+  text = regexprep (text, '([\r\n|\n])[ \t]', '$1');
+
   ## Run makeinfo
   orig_text = text;
   [text, status] = __makeinfo__ (text, ...
     "html", @(x) options.seealso (root, x{:}));
   if (status != 0)
-    txi_out = orig_text (1:min (100, length (orig_text)));
-    warning ("texi2html: couldn't parse texinfo: \n%s", txi_out); # XXX: make this an error
+    error ("__makeinfo__ returned with error code %d\n. Couldn't parse\
+      texinfo:\n%s", status, orig_text (1:min (200, length (orig_text))));
+  endif
+
+  ## Check encoding
+  tmp = regexp (text, "charset\s*=\s*([^\s\"]*)", "tokens");
+  if (! isempty (tmp))
+    charset = tmp{1}{1};
+    if (! strcmp (options.charset, charset))
+      warning (["makeinfo's output is encoded in %s, but will be " ...
+        "interpreted with options.charset = %s"], charset, options.charset);
+    endif
   endif
 
   ## Extract the body of makeinfo's output
@@ -85,6 +105,6 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
 
   ## Read 'options' input argument
   [header, title, footer] = get_header_title_and_footer ...
-    ("function", options, :, root);
+    ("function", options, "", root);
 
 endfunction

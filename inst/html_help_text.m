@@ -66,51 +66,8 @@ function html_help_text ...
   switch (lower (format))
     case "plain text"
       text = sprintf ("<pre>%s</pre>\n", text);
-
     case "texinfo"
-      ## Add easily recognisable text before and after real text
-      start = "###### OCTAVE START ######";
-      stop  = "###### OCTAVE STOP ######";
-      text = sprintf ("%s\n%s\n%s\n", start, text, stop);
-
-      ## Prevent empty <pre> </pre> blocks
-      ## (see https://savannah.gnu.org/bugs/?44451)
-      text = regexprep (text, '([\r\n|\n])[ \t]*@group', '$1@group');
-      text = regexprep (text, '([\r\n|\n])[ \t]*@end', '$1@end');
-
-      ## Remove one leading white space.  Assuming that all non-empty
-      ## lines start with "## ", this prevents one extra white space
-      ## from showing up in example blocks.
-      text = regexprep (text, '([\r\n|\n])[ \t]', '$1');
-
-      ## Run makeinfo
-      [text, status] = __makeinfo__ (text, ...
-        "html", @(x) options.seealso (root, x{:}));
-      if (status != 0)
-        error ("Couln't parse file '%s'", name);
-      endif
-
-      ## Check encoding
-      tmp = regexp (text, "charset\s*=\s*([^\s\"]*)", "tokens");
-      if (! isempty (tmp))
-        charset = tmp{1}{1};
-        if (! strcmp (options.charset, charset))
-          warning (["makeinfo's output is encoded in %s, but will be " ...
-            "interpreted with options.charset = %s"], charset, options.charset);
-        endif
-      endif
-
-      ## Extract the body of makeinfo's output
-      p_start = sprintf ('\\s*(<p>)?\\s*%s\\s*(</p>)?\\s*', start);
-      p_stop = sprintf ('\\s*(<p>)?\\s*%s\\s*(</p>)?\\s*', stop);
-      [i1, i2] = regexp (text, p_start);
-      i3 = regexp (text, p_stop);
-      text = text((i2 + 1):(i3 - 1));
-
-      ## Insert class="functionfile" attribute (hack for TexInfo < 5)
-      text = regexprep (text, '&mdash;\s*(Function.*?)\s*<br>', ...
-        '<p class="functionfile">$1</p>');
-
+      [~, text] = texi2html (text, options, root);
     case "not found"
       error ("`%s' not found\n", name);
     otherwise
