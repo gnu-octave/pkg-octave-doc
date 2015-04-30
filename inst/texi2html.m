@@ -98,13 +98,48 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
   [i1, i2] = regexp (text, p_start);
   i3 = regexp (text, p_stop);
   text = text((i2 + 1):(i3 - 1));
-
-  ## Insert class="functionfile" attribute (hack for TexInfo < 5)
-  text = regexprep (text, '&mdash;\s*(Function.*?)\s*<br>', ...
-    '<p class="functionfile">$1</p>');
+  
+  ## Insert class="deftypefn" attribute
+  text = insert_deftypefn_class_attribute (text);
 
   ## Read 'options' input argument
   [header, title, footer] = get_header_title_and_footer ...
     ("function", options, "", root);
 
+endfunction
+
+
+function text = insert_deftypefn_class_attribute (text)
+
+  ## @deftypefn pattern for TexInfo 4.x
+  p1 = '&mdash;\s*(Function.*?)\s*<br>';
+  
+  if ~ isempty (regexp (text, p1, 'once'))  ## TexInfo 4.x
+
+    ## <div class="defun">
+    ## &mdash; Function File: ... <br>
+    ## &mdash; Function File: ... <br>
+    ## <blockquote> ... </blockquote>
+    ## </div>
+
+    p2 = sprintf (['\\s*<div\\s*(class="[a-z]*")?>\\s*' ...
+      '((%s\\s*)+)<blockquote>(.*?)\\s*</blockquote>\\s*</div>\\s*'], p1);
+    text = regexprep (text, p2, '<dl>\n$2<dd>$5\n</dd></dl>');
+    text = regexprep (text, p1, '<dt class="deftypefn">$1</dt>');
+    
+  else  ## TexInfo 5.x
+
+    ## <dl>
+    ## <dt><a name="index-plot"></a>Function File: ... </dt>
+    ## <dt><a name="index-plot-1"></a>Function File: ... </dt>
+    ## <dd> ... </dd>
+    ## </dl>
+
+    ## @deftypefn pattern for TexInfo 5.x
+    p1 = '<dt>\s*((<a.*?</a>)?\s*Function.*?)\s*<br>';
+
+    text = regexprep (text, p1, '<dt class="deftypefn">$1</dt>');
+
+  endif
+  
 endfunction
