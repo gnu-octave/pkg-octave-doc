@@ -6,10 +6,16 @@ Summary of important user-visible changes for generate_html 0.1.8:
     o html_help_text.m, texi2html.m: Fix a bug that was the cause of unmatched
       </p> tags in the HTML output.
 
-    o inst/get_html_options.m: Fix default header. Now accepted as valid XHTML
-      1.0 Transitional (0 error, 0 warning) by W3C's markup validation service.
+    o get_html_options.m: Fix default header (add !DOCTYPE, charset, etc.)
+      and Octave Forge header (unordered <ul> </ul> lists are not allowed to be
+      nested in <p> </p> blocks).
 
-    o inst/get_html_options.m: Fix Octave Forge header.
+** Other changes
+
+    o html_help_text.m: Now entirely based on texi2html.m
+
+    o texi2html.m: Use <dt class="deftypefn"> </dt> blocks both with TexInfo 4.x
+      and with TexInfo 5.x.
 
 Summary of important user-visible changes for generate_html 0.1.7:
 ------------------------------------------------------------------
