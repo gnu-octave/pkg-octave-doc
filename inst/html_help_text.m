@@ -194,6 +194,9 @@ function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
       endif
     endif
 
+    ## For @class methods: Clean up fileprefix
+    fileprefix = strrep (fileprefix, filesep (), '_');
+
     images = {};
     while (!isempty (get (0, "currentfigure")))
       fig = gcf ();
