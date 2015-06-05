@@ -71,7 +71,8 @@ function html_help_text ...
     case "not found"
       error ("`%s' not found\n", name);
     otherwise
-      error ("Internal error: unsupported help text format: '%s'\n", format);
+      error ("Internal error: unsupported help text format '%s' for '%s'",
+             format, name);
   endswitch
 
   ## Read 'options' input argument
