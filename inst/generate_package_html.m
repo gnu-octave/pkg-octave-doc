@@ -417,14 +417,14 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     if (! isempty (options.download_link))
       fprintf (fid, "<div class=\"download_package\">\n");
       fprintf (fid, "  <table><tr><td>\n");
-      fprintf (fid, "    <img src=\"../download.png\"/>\n");
+      fprintf (fid, "    <img src=\"../download.png\" alt=\"Package download icon\"/>\n");
       fprintf (fid, "  </td><td>\n");
       link = strrep (options.download_link, "%name", desc.name);
       link = strrep (link, "%version", desc.version);
       fprintf (fid, "    <a href=\"%s\"\n", link);
       fprintf (fid, "     class=\"download_link\">\n");
       fprintf (fid, "      Download Package\n");
-      fprintf (fid, "    </a><br>\n");
+      fprintf (fid, "    </a><br />\n");
       fprintf (fid, "    <a href=\"http://sourceforge.net/projects/octave/files/\"");
       fprintf (fid, " class=\"older_versions_download\">(older versions)</a>\n");
       fprintf (fid, "  </td></tr></table>\n");
@@ -434,7 +434,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "<tr><td>\n");
     fprintf (fid, "<div class=\"package_function_reference\">\n");
     fprintf (fid, "  <table><tr><td>\n");
-    fprintf (fid, "    <img src=\"../doc.png\"/>\n");
+    fprintf (fid, "    <img src=\"../doc.png\" alt=\"Function reference icon\"/>\n");
     fprintf (fid, "  </td><td>\n");
     fprintf (fid, "    <a href=\"%s\" class=\"function_reference_link\">\n", ...
              overview_filename);
@@ -443,7 +443,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "  </td></tr>\n");
     if (write_package_documentation)
       fprintf (fid, "  <tr><td>\n");
-      fprintf (fid, "    <img src=\"../manual.png\"/>\n");
+      fprintf (fid, "    <img src=\"../manual.png\" alt=\"Package doc icon\"/>\n");
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", ...
                fullfile (doc_subdir, "index.html"));
@@ -453,9 +453,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
     if (write_package_news)
       fprintf (fid, "  <tr><td>\n");
-      fprintf (fid, "    <img src=\"../news.png\"/>\n");
+      fprintf (fid, "    <img src=\"../news.png\" alt=\"Package news icon\"/>\n");
       fprintf (fid, "  </td><td>\n");
-      fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");
+      fprintf (fid, "    <a href=\"NEWS.html\">\n");
       fprintf (fid, "      NEWS\n");
       fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td></tr>\n");

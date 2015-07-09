@@ -1,7 +1,13 @@
 Summary of important user-visible changes for generate_html 0.1.9:
 ------------------------------------------------------------------
 
- ** Better-looking "News" and "Package documentation" links.
+ ** Bug fixes
+
+    o Add missing "alt" attribute to <img> tags in index.html.
+
+ ** Other changes
+
+    o Better-looking "News" and "Package documentation" links.
 
 
 Summary of important user-visible changes for generate_html 0.1.8:
