@@ -1,3 +1,9 @@
+Summary of important user-visible changes for generate_html 0.1.9:
+------------------------------------------------------------------
+
+ ** Better-looking "News" and "Package documentation" links.
+
+
 Summary of important user-visible changes for generate_html 0.1.8:
 ------------------------------------------------------------------
 
@@ -16,6 +22,7 @@ Summary of important user-visible changes for generate_html 0.1.8:
 
     o texi2html.m: Use <dt class="deftypefn"> </dt> blocks both with TexInfo 4.x
       and with TexInfo 5.x.
+
 
 Summary of important user-visible changes for generate_html 0.1.7:
 ------------------------------------------------------------------
@@ -59,6 +66,7 @@ Summary of important user-visible changes for generate_html 0.1.7:
 
     o Remove unused "docbrowser" style
 
+
 Summary of important user-visible changes for generate_html 0.1.6:
 ------------------------------------------------------------------
 
@@ -75,10 +83,12 @@ Summary of important user-visible changes for generate_html 0.1.6:
     the code page of Octave Forge website.  It previously pointed to the
     SVN repository in Sourceforge which has been retired.
 
+
 Summary of important user-visible changes for generate_html 0.1.5:
 ------------------------------------------------------------------
 
  ** Updated link for the Octave Forge SVN repository.
+
 
 Summary of important user-visible changes for generate_html 0.1.4:
 ------------------------------------------------------------------

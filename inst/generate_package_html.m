@@ -1,5 +1,6 @@
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ## Copyright (C) 2014, 2015 Julien Bect <jbect@users.sourceforge.net>
+## Copyright (C) 2015 Oliver Heimlich <oheim@posteo.de>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -435,32 +436,32 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "  <table><tr><td>\n");
     fprintf (fid, "    <img src=\"../doc.png\"/>\n");
     fprintf (fid, "  </td><td>\n");
-    fprintf (fid, "    <a href=\"%s\" class=\"function_reference_link\">\n", overview_filename);
+    fprintf (fid, "    <a href=\"%s\" class=\"function_reference_link\">\n", ...
+             overview_filename);
     fprintf (fid, "      Function Reference\n");
     fprintf (fid, "    </a>\n");
-    fprintf (fid, "  </td></tr></table>\n");
-    fprintf (fid, "</div>\n");
+    fprintf (fid, "  </td></tr>\n");
+    if (write_package_documentation)
+      fprintf (fid, "  <tr><td>\n");
+      fprintf (fid, "    <img src=\"../manual.png\"/>\n");
+      fprintf (fid, "  </td><td>\n");
+      fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", ...
+               fullfile (doc_subdir, "index.html"));
+      fprintf (fid, "      Package Documentation\n");
+      fprintf (fid, "    </a>\n");
+      fprintf (fid, "  </td></tr>\n");
+    endif
     if (write_package_news)
-      fprintf (fid, "<div class=\"news_file\">\n");
-      fprintf (fid, "  <table><tr><td>\n");
+      fprintf (fid, "  <tr><td>\n");
+      fprintf (fid, "    <img src=\"../news.png\"/>\n");
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");
       fprintf (fid, "      NEWS\n");
       fprintf (fid, "    </a>\n");
-      fprintf (fid, "  </td></tr></table>\n");
-      fprintf (fid, "</div>\n");
+      fprintf (fid, "  </td></tr>\n");
     endif
-    if (write_package_documentation)
-      fprintf (fid, "<div class=\"package_doc\">\n");
-      fprintf (fid, "  <table><tr><td>\n");
-      fprintf (fid, "  </td><td>\n");
-      fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n",
-               fullfile (doc_subdir, "index.html"));
-      fprintf (fid, "      Package Documentation\n");
-      fprintf (fid, "    </a>\n");
-      fprintf (fid, "  </td></tr></table>\n");
-      fprintf (fid, "</div>\n");
-    endif
+    fprintf (fid, "  </table>\n");
+    fprintf (fid, "</div>\n");
     fprintf (fid, "</td></tr>\n");
     fprintf (fid, "</table>\n\n");
 
