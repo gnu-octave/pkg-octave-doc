@@ -1,7 +1,7 @@
 Name: generate_html
 Version: 0.1.8
 Date: 2015-05-02
-Author: Søren Hauberg <soren@hauberg.org>
+Author: Søren Hauberg <soren@hauberg.org> and others
 Maintainer: Octave-Forge community <maintainers@octave.org>
 Title: Generate HTML web page from help texts
 Description: This package provides functions for generating HTML pages that
