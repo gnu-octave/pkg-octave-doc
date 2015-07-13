@@ -295,7 +295,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   #####################
   ## Write NEWS file ##
   #####################
-  if options.include_package_news
+  if (! options.include_package_news)
+    write_package_news = false;
+  else
     ## Get detailed information about the package
     all_list = pkg ("list");
     list = [];

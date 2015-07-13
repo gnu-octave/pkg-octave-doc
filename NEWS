@@ -7,6 +7,8 @@ Summary of important user-visible changes for generate_html 0.1.9:
 
     o Fix crash for demos in @class methods (bug #44972).
 
+    o Fix crash when options.include_package_news is false.
+
  ** Other changes
 
     o Better-looking "News" and "Package documentation" links (patch #8698).
