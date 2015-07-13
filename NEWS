@@ -9,6 +9,10 @@ Summary of important user-visible changes for generate_html 0.1.9:
 
     o Fix crash when options.include_package_news is false.
 
+    o texi2html: Fix a bug that caused tex2html to output an empty page with
+      TexInfo 4.x when there is only one @deftypefn and no following
+      @deftypefnx (bug #45530).
+
  ** Other changes
 
     o Better-looking "News" and "Package documentation" links (patch #8698).
