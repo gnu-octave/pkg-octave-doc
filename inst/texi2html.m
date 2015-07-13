@@ -122,9 +122,9 @@ function text = insert_deftypefn_class_attribute (text)
     ## <blockquote> ... </blockquote>
     ## </div>
 
-    p2 = sprintf (['\\s*<div\\s*(class="[a-z]*")?>\\s*' ...
+    p2 = sprintf (['\\s*<div\\s*(?:class="[a-z]*")?>\\s*' ...
       '((?:%s\\s*)+)<blockquote>(.*?)\\s*</blockquote>\\s*</div>\\s*'], p1);
-    text = regexprep (text, p2, '<dl>\n$2<dd>$4\n</dd></dl>');
+    text = regexprep (text, p2, '<dl>\n$1<dd>$3\n</dd></dl>');
     text = regexprep (text, p1, '<dt class="deftypefn">$1</dt>');
     
   else  ## TexInfo 5.x
