@@ -497,8 +497,12 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "</td></tr>\n");
     endif
 
+    if (isfield (list, "systemrequirements"))
+      fprintf (fid, "    <tr><td>Runtime system dependencies:</td><td>%s</td></tr>\n", list.systemrequirements);
+    endif
+
     if (isfield (list, "buildrequires"))
-      fprintf (fid, "    <tr><td>Build Dependencies:</td><td>%s</td></tr>\n", list.buildrequires);
+      fprintf (fid, "    <tr><td>Build dependencies:</td><td>%s</td></tr>\n", list.buildrequires);
     endif
 
     ## if the package does not specify, then it is not autoloaded. Also, sometimes

@@ -17,6 +17,9 @@ Summary of important user-visible changes for generate_html 0.1.9:
 
     o Better-looking "News" and "Package documentation" links (patch #8698).
 
+    o Improve dependencies display: also display system requirements
+      (bug #45499).
+
 
 Summary of important user-visible changes for generate_html 0.1.8:
 ------------------------------------------------------------------
