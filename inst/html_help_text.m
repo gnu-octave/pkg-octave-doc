@@ -96,7 +96,8 @@ function html_help_text ...
         ## Run demo
         code_k = code (idx (k):idx (k+1)-1);
         try
-          [output, images] = get_output (code_k, imagedir, full_imagedir, name);
+          [output, images] = get_output (k, ...
+            code_k, imagedir, full_imagedir, name);
         catch
           lasterr ()
           continue;
@@ -148,7 +149,10 @@ function html_help_text ...
 
 endfunction
 
-function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
+
+function [text, images] = get_output (demo_num, ...
+  code, imagedir, full_imagedir, fileprefix)
+  
   ## Clear everything
   close all
   diary_file = "__diary__.txt";
@@ -198,17 +202,12 @@ function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
     fileprefix = strrep (fileprefix, filesep (), '_');
 
     images = {};
+    r = demo_num * 100;
     while (!isempty (get (0, "currentfigure")))
+      r = r + 1;
       fig = gcf ();
-      r = 0;
-      while 1
-        name = sprintf ("%s_%03d.png", fileprefix, r);
-        full_filename = fullfile (full_imagedir, name);
-        if (!exist (full_filename, "file"))
-          break;
-        endif
-        r = r + 1;
-      endwhile
+      name = sprintf ("%s_%d.png", fileprefix, r);
+      full_filename = fullfile (full_imagedir, name);
       filename = fullfile (imagedir, name);
       print (fig, full_filename);
       images{end+1} = filename;
