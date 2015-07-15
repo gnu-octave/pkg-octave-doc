@@ -587,7 +587,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
 
     ## Read image references from generated files and copy images
-    filelist = glob (fullfile (doc_out_dir, "*"));
+    filelist = glob (fullfile (doc_out_dir, "*.html"));
     for id = 1 : numel (filelist)
       copy_images (filelist{id}, doc_root_dir, doc_out_dir);
     endfor

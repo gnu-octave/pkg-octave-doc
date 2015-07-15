@@ -3,22 +3,28 @@ Summary of important user-visible changes for generate_html 0.1.9:
 
  ** Bug fixes
 
-    o Add missing "alt" attribute to <img> tags in index.html.
+    o generate_package_html: Add missing "alt" attribute to <img> tags in
+      index.html.
 
-    o Fix crash for demos in @class methods (bug #44972).
+    o html_help_text: Fix crash for demos in @class methods (bug #44972).
 
-    o Fix crash when options.include_package_news is false.
+    o generate_package_html: Fix crash when options.include_package_news is
+      false.
 
     o texi2html: Fix a bug that caused tex2html to output an empty page with
       TexInfo 4.x when there is only one @deftypefn and no following
       @deftypefnx (bug #45530).
 
+    o generate_package_html: Fix a bug that prevented generate_package_html from
+      being run twice when package_doc contains images (bug #45111).
+
  ** Other changes
 
-    o Better-looking "News" and "Package documentation" links (patch #8698).
+    o generate_package_html: Better-looking "News" and "Package documentation"
+      links (patch #8698).
 
-    o Improve dependencies display: also display system requirements
-      (bug #45499).
+    o generate_package_html: Improve dependencies display: also display system
+      requirements (bug #45499).
 
 
 Summary of important user-visible changes for generate_html 0.1.8:
