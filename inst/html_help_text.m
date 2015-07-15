@@ -200,9 +200,15 @@ function [text, images] = get_output (code, imagedir, full_imagedir, fileprefix)
     images = {};
     while (!isempty (get (0, "currentfigure")))
       fig = gcf ();
-      r = round (1000*rand ());
-      name = sprintf ("%s_%d.png", fileprefix, r);
-      full_filename = fullfile (full_imagedir, name);
+      r = 0;
+      while 1
+        name = sprintf ("%s_%03d.png", fileprefix, r);
+        full_filename = fullfile (full_imagedir, name);
+        if (!exist (full_filename, "file"))
+          break;
+        endif
+        r = r + 1;
+      endwhile
       filename = fullfile (imagedir, name);
       print (fig, full_filename);
       images{end+1} = filename;
