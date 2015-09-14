@@ -602,9 +602,9 @@ function copy_images (file, doc_root_dir, doc_out_dir)
     error ("Couldn't open %s for reading", file);
   endif
   while (! isnumeric (l = fgetl (fid)))
-    m = regexp (l, "<img.+src=""([^""]+)"".*>", "tokens");
-    if (! isempty (m))
-      url = m{1}{1};
+    m = regexp (l, "<(?:img.+?src|object.+?data)=""([^""]+)"".*?>", "tokens");
+    for i = 1 : numel (m)
+      url = m{i}{1};
       ## exclude external links
       if (isempty (strfind (url, "//")))
         if (! isempty (strfind (url, "..")))
@@ -625,7 +625,7 @@ function copy_images (file, doc_root_dir, doc_out_dir)
           endif
         endif
       endif
-    endif
+    endfor
   endwhile
   fclose (fid);
 
