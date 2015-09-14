@@ -78,6 +78,12 @@ function options = get_html_options_default (options)
   default.overview_header = "";
   default.overview_footer = "";
 
+  ## Variable values (%title, %body_command...) for the news page.
+  default.news_title = "Recent changes for the '%name' package";
+  default.news_body_command = "";
+  default.news_header = "";
+  default.news_footer = "";
+
   ## Create short_package_description files ?  (used by packages.php)
   default.include_package_list_item = false;
 
