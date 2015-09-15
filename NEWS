@@ -1,3 +1,19 @@
+Summary of important user-visible changes for generate_html 0.1.10:
+-------------------------------------------------------------------
+
+ ** Bug fixes
+
+    o generate_package_html: Fixed title of news page.
+
+    o generate_package_html: Support multiple image references per line (to copy
+      images into the output directory).
+
+ ** Other changes
+
+    o generate_package_html: Package documentation may use vector graphics (svg
+      images, bug #45628).
+
+
 Summary of important user-visible changes for generate_html 0.1.9:
 ------------------------------------------------------------------
 
