@@ -456,7 +456,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "  <tr><td>\n");
       fprintf (fid, "    <img src=\"../news.png\" alt=\"Package news icon\"/>\n");
       fprintf (fid, "  </td><td>\n");
-      fprintf (fid, "    <a href=\"NEWS.html\">\n");
+      fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");
       fprintf (fid, "      NEWS\n");
       fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td></tr>\n");
