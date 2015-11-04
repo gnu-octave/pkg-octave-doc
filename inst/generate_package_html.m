@@ -277,11 +277,13 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   if options.include_package_list_item
 
     pkg_list_item_filename = options.pkg_list_item_filename;
+    ## Extract first sentence for a short description, remove period at the end
+    shortdescription = regexprep (desc.description, '\.($| .*)', '');
 
     text = strrep (options.package_list_item, "%name", desc.name);
     text = strrep (text, "%version", desc.version);
     text = strrep (text, "%extension", "tar.gz");
-    text = strrep (text, "%shortdescription", desc.description);
+    text = strrep (text, "%shortdescription", shortdescription);
 
     fid = fopen (fullfile (packdir, pkg_list_item_filename), "w");
     if (fid > 0)

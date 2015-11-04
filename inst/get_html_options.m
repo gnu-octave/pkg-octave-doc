@@ -263,15 +263,12 @@ function options = get_html_options_project (options, project_name)
       ## Options for package list page
       options.include_package_list_item = true;
       options.package_list_item = ...
-"<div class=\"package\" id=\"%name\">\n\
-<table class=\"package\"><tr>\n\
-<td><b><a href=\"javascript:unfold('%name');\" class=\"package_head_link\">\n\
-<img src=\"show.png\" id=\"%name_im\" alt=\"show/hide\" style=\"padding-right: 0.5em; border: none;\"/> %name </a></b></td>\n\
-<td style=\"text-align: right;\">&raquo; <a href=\"./%name/index.html\" class=\"package_link\">details</a> |\n\
-<a class=\"package_link\" href=\"http://downloads.sourceforge.net/octave/%name-%version.%extension?download\">download</a></td>\n\
-</tr></table>\n\
-<p id=\"%name_detailed\" style=\"display: none;\"> %shortdescription </p>\n\
-</div>\n";
+"<h3 class=\"package_name\" id=\"%name\">%name</h3>\n\
+<p class=\"package_desc\">%shortdescription</p>\n\
+<p>\n\
+<a class=\"package_link\" href=\"./%name/index.html\">details</a>\n\
+<a class=\"download_link\" href=\"http://downloads.sourceforge.net/octave/%name-%version.%extension?download\">download</a>\n\
+</p>\n";
 
       ## Options for index package
       options.index_title = "The '%name' Package";
