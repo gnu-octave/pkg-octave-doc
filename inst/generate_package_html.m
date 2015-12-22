@@ -555,9 +555,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       error ("Couldn't open COPYING file for writing");
     endif
 
-    ## For the COPYING page, use the header and footer of the overview page
     [header, title, footer] = get_header_title_and_footer ...
-      ("overview", options, desc.name, "../", "", packname);
+      ("copying", options, desc.name, "../", "", packname);
 
     ## Write output
     fprintf (fid, "%s\n", header);
