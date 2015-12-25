@@ -269,7 +269,7 @@ function options = get_html_options_project (options, project_name)
       ## Options for package list page
       options.include_package_list_item = true;
       options.package_list_item = ...
-"<h3 class=\"package_name\" id=\"%name\">%name</h3>\n\
+"<h3 class=\"package_name\" id=\"%name\"><a class=\"package_name\" href=\"./%name/index.html\">%name</a></h3>\n\
 <p class=\"package_desc\">%shortdescription</p>\n\
 <p>\n\
 <a class=\"package_link\" href=\"./%name/index.html\">details</a>\n\
