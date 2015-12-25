@@ -10,6 +10,10 @@ Summary of important user-visible changes for generate_html 0.1.10:
 
  ** Other changes
 
+    o generate_package_html: Short description has been updated for redesign of
+      Octave-Forge package overview page (patch #8787).  Short description is
+      made of the first sentence from the full package desription.
+
     o generate_package_html: Package documentation may use vector graphics (svg
       images, bug #45628).
 
