@@ -506,16 +506,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "    <tr><td>Build dependencies:</td><td>%s</td></tr>\n", list.buildrequires);
     endif
 
-    ## if the package does not specify, then it is not autoloaded. Also, sometimes
-    ## the value is 1 (true) but other times the value is a string
-    if (isfield (list, "autoload") && (list.autoload == 1 ||
-                                       any (strcmpi ({"yes", "on", "true"}, list.autoload))))
-      a = "Yes";
-    else
-      a = "No";
-    endif
-    fprintf (fid, "    <tr><td>Autoload:</td><td>%s</td></tr>\n", a);
-
     fprintf (fid, "  </table>\n\n");
 
     fprintf (fid, "\n%s\n", footer);
