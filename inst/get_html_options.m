@@ -109,6 +109,7 @@ function options = get_html_options_default (options)
   ## Download link to be inserted on the main package page (index.html)
   ## Leave empty for no download link
   default.download_link = "";
+  default.older_versions_download = "";
 
   ## Create package licence page ?
   default.include_package_license = false;
@@ -284,6 +285,7 @@ function options = get_html_options_project (options, project_name)
       ## Options for index package
       options.index_title = "The '%name' Package";
       options.download_link = "http://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
+      options.older_versions_download = "http://sourceforge.net/projects/octave/files/";
       options.include_package_page = true;
       options.include_package_license = true;
       options.include_package_news = true;
