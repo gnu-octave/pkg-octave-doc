@@ -514,6 +514,15 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td></tr>\n");
     endif
+    if (length(insert_char_entities (list.url))>0)
+      fprintf (fid, "  <tr><td>\n");
+      fprintf (fid, "    <img src=\"../news.png\" alt=\"Package news icon\"/>\n");
+      fprintf (fid, "  </td><td>\n");
+      fprintf (fid, "    <a href=\"%s\" class=\"news_file\">\n",insert_char_entities (list.url));
+      fprintf (fid, "      Additional documentation\n");
+      fprintf (fid, "    </a>\n");
+      fprintf (fid, "  </td></tr>\n");
+    endif
     fprintf (fid, "  </table>\n");
     fprintf (fid, "</div>\n");
     fprintf (fid, "</td></tr>\n");
