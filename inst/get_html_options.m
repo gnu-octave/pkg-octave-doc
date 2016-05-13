@@ -150,6 +150,7 @@ function options = get_html_options_default (options)
   ## documentation file is to be included. If not empty, the documentation
   ## file is assumed to be in the 'doc' subdirectory.
   default.package_doc = "";
+  default.package_doc_options = "";
 
   ## TODO: Warn about unknown options
   ##  (to be done once all known options are present in default)
