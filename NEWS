@@ -8,7 +8,7 @@ Summary of important user-visible changes for generate_html x.y.z:
       with that information).  The main reason is that Octave has
       removed support for autoload of packages.
 
-      This field could had been used for only two purposes:
+      This field had been used for only two purposes:
 
         1) decide where to add the -auto or -noauto options during pkg
           install.  However, since the value is not reliable, it's better
@@ -19,7 +19,7 @@ Summary of important user-visible changes for generate_html x.y.z:
           install time so it's pretty useless for this too.
 
       In addition, autoload packages are a bad idea and there are no Octave
-      Forge that autoload anymore.
+      Forge packages that autoload anymore.
 
 
 Summary of important user-visible changes for generate_html 0.1.10:
