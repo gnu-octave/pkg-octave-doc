@@ -48,31 +48,11 @@
 ##
 ## If you want to include prepared package documentation in html format,
 ## you have to set @var{options}.package_doc manually with the filename
-## of its texinfo source, which must be in the packages "doc" directory.
+## of its texinfo source, which must be in the package "doc" directory.
 ## Contained images are automatically copied if they are at the paths
-## specified in the texinfo source relative to the packages "doc"
-## directory.
-##
-## This example code also generates a tutorial.html using internally the command:
-## @code{makeinfo --html -o package_doc tutorial.texi}
-##
-## @example
-## options = get_html_options ("octave-forge");
-## options.package_doc = 'tutorial.texi'; # or whatever it is called
-## generate_package_html ("image", "image_html", options);
-## @end example
-## 
-## By other side
-## @example
-## options = get_html_options ("octave-forge");
-## options.package_doc = 'tutorial.texi';
-## options.package_doc_options = '--no-split --css-ref=tutorial.css';
-## generate_package_html ("image", "image_html", options);
-## @end example
-##
-## This example code also generates a tutorial.html using internally the command:
-## @code{makeinfo --html -o package_doc tutorial.texi --no-split --css-ref=tutorial.css}
-##
+## specified in the texinfo source relative to the package "doc" directory.
+## Additional arguments can be passed to makeinfo using the optional
+## field @var{options}.package_doc_options.
 ##
 ## It should be noted that the function only works for installed packages.
 ## @seealso{get_html_options}
@@ -201,7 +181,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   #########################
   first_sentences = cell (1, num_categories);
   if options.include_overview
-  
+
     ## Create filename for the overview page
     overview_filename = options.overview_filename;
     overview_filename = strrep (overview_filename, "%name", desc.name);
@@ -367,38 +347,32 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
   endif
 
-  #########################################
-  ## Should we include the package doc ? ##
-  #########################################
+  #################################
+  ## Write package documentation ##
+  #################################
 
+  # Is there a package documentation to be included ?
   write_package_documentation = ~ isempty (options.package_doc);
+
   if write_package_documentation
+
     [~, doc_fn, doc_ext] = fileparts (options.package_doc);
     doc_root_dir = fullfile (list.dir, "doc");
     doc_src = fullfile (doc_root_dir, [doc_fn, doc_ext]);
     doc_subdir = "package_doc";
     doc_out_dir = fullfile (packdir, doc_subdir);
-  endif
 
+    system (sprintf ('mkdir -p %s', doc_out_dir));
 
-  #################################
-  ## Write package documentation ##
-  #################################
-  if (write_package_documentation)
+    ## Create makeinfo command
+    makeinfo_cmd = sprintf ("%s --html -o %s %s", makeinfo_program (),
+                            doc_out_dir, doc_src);
+    if (! isempty (options.package_doc_options))
+      makeinfo_cmd = [makeinfo_cmd, ' ', options.package_doc_options];
+    endif
 
-	system(sprintf('mkdir -p %s',doc_out_dir));
-
-    ## Convert texinfo source
-	COMMAND=sprintf ("%s --html -o %s %s",  makeinfo_program (),
-                                               doc_out_dir,
-                                               doc_src);
-
-	if(length(options.package_doc_options)>0)
-    	COMMAND=[COMMAND,' ',options.package_doc_options];
-	end
-	disp(COMMAND);
-
-	status = system (COMMAND);
+    ## Convert texinfo to HTML using makeinfo
+    status = system (makeinfo_cmd);
     if (status == 127)
       error ("Program `%s' not found", makeinfo_program ());
     elseif (status)
@@ -406,30 +380,29 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
              makeinfo_program (), status);
     endif
 
-	## search the name of html index file.
-    ## If exist index.html then this it.
-    ## else if exist a filename (html) with the same name that source (texinfo) this it.
-    ## else choose as index file the first html file found.
-	package_doc_index='index.html';
-	if(exist (fullfile(doc_out_dir,package_doc_index),"file")==0)
-      html_filenames_temp= glob (fullfile (doc_out_dir, "*.html"));
-      if (numel(html_filenames_temp)> 0)
-        [~, doc_fn, doc_ext] = fileparts (doc_src);
-        html_with_same_name_of_texi=fullfile(doc_out_dir,[doc_fn,'.html']);
-        if( exist(html_with_same_name_of_texi,"file")==0 )
+    ## Search the name of the main HTML index file.
+    package_doc_index = 'index.html';
+    if (! exist (fullfile (doc_out_dir, package_doc_index), "file"))
+      ## Look for an HTML file with the same name as the texinfo source file
+      [~, doc_fn, doc_ext] = fileparts (doc_src);
+      package_doc_index = [doc_fn, '.html'];
+      if (! exist (fullfile (doc_out_dir, package_doc_index), "file"))
+        ## If there is only one file, no hesitation
+        html_fn_list = glob (fullfile (doc_out_dir, "*.html"));
+        if (length (html_fn_list) == 1)
           [~, doc_fn, doc_ext] = fileparts (html_filenames_temp{1});
+          package_doc_index = [doc_fn, doc_ext];
         else
-		  [~, doc_fn, doc_ext] = fileparts (html_with_same_name_of_texi);
+          error ('Unable to determine the root of the HTML manual.');
         endif
-        package_doc_index=[doc_fn, doc_ext];
       endif
-	endif
+    endif
 
     ## Read image and css references from generated files and copy images
     filelist = glob (fullfile (doc_out_dir, "*.html"));
     for id = 1 : numel (filelist)
       copy_images (filelist{id}, doc_root_dir, doc_out_dir);
-      copy_csss (filelist{id}, doc_root_dir, doc_out_dir);
+      copy_css (filelist{id}, doc_root_dir, doc_out_dir);
     endfor
 
   endif
@@ -524,7 +497,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "    <img src=\"../manual.png\" alt=\"Package doc icon\"/>\n");
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", ...
-               fullfile (doc_subdir,package_doc_index));
+               fullfile (doc_subdir, package_doc_index));
       fprintf (fid, "      Package Documentation\n");
       fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td></tr>\n");
@@ -674,7 +647,7 @@ function copy_images (file, doc_root_dir, doc_out_dir)
 endfunction
 
 
-function copy_csss (file, doc_root_dir, doc_out_dir)
+function copy_css (file, doc_root_dir, doc_out_dir)
 
   if ((fid = fopen (file)) < 0)
     error ("Couldn't open %s for reading", file);
