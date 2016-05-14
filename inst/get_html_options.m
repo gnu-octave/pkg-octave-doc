@@ -285,6 +285,12 @@ function options = get_html_options_project (options, project_name)
       options.include_package_news = true;
       options.index_body_command = "onload=\"javascript:fix_top_menu ();\"";
 
+      ## Package doc
+      options.package_doc = "";
+      options.package_doc_options = [ ...
+        "--set-customization-variable 'TOP_NODE_UP_URL ../index.html' " ...
+        "--css-ref=""https://www.gnu.org/software/octave/doc/interpreter/octave.css"""];
+
     case "octave"
       options.header = "__HEADER__(`%title')";
       options.footer = "__OCTAVE_TRAILER__";
