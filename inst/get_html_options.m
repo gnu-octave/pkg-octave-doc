@@ -1,5 +1,5 @@
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
-## Copyright (C) 2014, 2015 Julien Bect <jbect@users.sourceforge.net>
+## Copyright (C) 2014-2016 Julien Bect <jbect@users.sourceforge.net>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -244,15 +244,19 @@ function options = get_html_options_project (options, project_name)
       ## Options for alphabetical lists
       options.include_alpha = true;
 
+      ## SF logo
+      sf_logo = [ ...
+        "<div id=\"sf_logo\">\n" ...
+        "  <a href=\"http://sourceforge.net\">\n" ...
+        "    <img src=\"http://sourceforge.net/sflogo.php?group_id=2888&amp;type=1\"\n" ...
+        "     width=\"88\" height=\"31\" style=\"border: 0;\" alt=\"SourceForge.net Logo\" />\n" ...
+        "  </a>\n" ...
+        "</div>\n"];
+      
       ## Options for individual function pages
       options.body_command = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
-      options.index_footer = ...
-        "<div id=\"sf_logo\">\n\
-           <a href=\"http://sourceforge.net\">\
-           <img src=\"http://sourceforge.net/sflogo.php?group_id=2888&amp;type=1\"\
-            width=\"88\" height=\"31\" style=\"border: 0;\" alt=\"SourceForge.net Logo\"/>\
-           </a>\n\
-         </div>\n</div>\n</body>\n</html>\n";
+      options.index_footer = [sf_logo "</div>\n</body>\n</html>\n"];
+
       options.overview_footer = [ ...
         "<p>Package: <a href=\"index.html\">%package</a></p>\n" ...
         options.index_footer];
@@ -289,7 +293,8 @@ function options = get_html_options_project (options, project_name)
       options.package_doc = "";
       options.package_doc_options = [ ...
         "--set-customization-variable 'TOP_NODE_UP_URL ../index.html' " ...
-        "--css-ref=""https://www.gnu.org/software/octave/doc/interpreter/octave.css"""];
+        "--css-ref=""https://www.gnu.org/software/octave/doc/interpreter/octave.css"" " ...
+        "--set-customization-variable 'PRE_BODY_CLOSE " sf_logo "'"];
 
     case "octave"
       options.header = "__HEADER__(`%title')";
