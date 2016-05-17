@@ -48,10 +48,11 @@
 ##
 ## If you want to include prepared package documentation in html format,
 ## you have to set @var{options}.package_doc manually with the filename
-## of its texinfo source, which must be in the packages "doc" directory.
+## of its texinfo source, which must be in the package "doc" directory.
 ## Contained images are automatically copied if they are at the paths
-## specified in the texinfo source relative to the packages "doc"
-## directory.
+## specified in the texinfo source relative to the package "doc" directory.
+## Additional arguments can be passed to makeinfo using the optional
+## field @var{options}.package_doc_options.
 ##
 ## It should be noted that the function only works for installed packages.
 ## @seealso{get_html_options}
@@ -180,7 +181,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   #########################
   first_sentences = cell (1, num_categories);
   if options.include_overview
-  
+
     ## Create filename for the overview page
     overview_filename = options.overview_filename;
     overview_filename = strrep (overview_filename, "%name", desc.name);
@@ -346,17 +347,64 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
   endif
 
-  #########################################
-  ## Should we include the package doc ? ##
-  #########################################
+  #################################
+  ## Write package documentation ##
+  #################################
 
+  # Is there a package documentation to be included ?
   write_package_documentation = ~ isempty (options.package_doc);
+
   if write_package_documentation
+
     [~, doc_fn, doc_ext] = fileparts (options.package_doc);
     doc_root_dir = fullfile (list.dir, "doc");
     doc_src = fullfile (doc_root_dir, [doc_fn, doc_ext]);
     doc_subdir = "package_doc";
     doc_out_dir = fullfile (packdir, doc_subdir);
+
+    system (sprintf ('mkdir -p %s', doc_out_dir));
+
+    ## Create makeinfo command
+    makeinfo_cmd = sprintf ("%s --html -o %s %s", makeinfo_program (),
+                            doc_out_dir, doc_src);
+    if (! isempty (options.package_doc_options))
+      makeinfo_cmd = [makeinfo_cmd, ' ', options.package_doc_options];
+    endif
+
+    ## Convert texinfo to HTML using makeinfo
+    status = system (makeinfo_cmd);
+    if (status == 127)
+      error ("Program `%s' not found", makeinfo_program ());
+    elseif (status)
+      error ("Program `%s' returned failure code %i",
+             makeinfo_program (), status);
+    endif
+
+    ## Search the name of the main HTML index file.
+    package_doc_index = 'index.html';
+    if (! exist (fullfile (doc_out_dir, package_doc_index), "file"))
+      ## Look for an HTML file with the same name as the texinfo source file
+      [~, doc_fn, doc_ext] = fileparts (doc_src);
+      package_doc_index = [doc_fn, '.html'];
+      if (! exist (fullfile (doc_out_dir, package_doc_index), "file"))
+        ## If there is only one file, no hesitation
+        html_fn_list = glob (fullfile (doc_out_dir, "*.html"));
+        if (length (html_fn_list) == 1)
+          [~, doc_fn, doc_ext] = fileparts (html_filenames_temp{1});
+          package_doc_index = [doc_fn, doc_ext];
+        else
+          error ('Unable to determine the root of the HTML manual.');
+        endif
+      endif
+    endif
+
+    ## Read image and css references from generated files and copy images
+    filelist = glob (fullfile (doc_out_dir, "*.html"));
+    for id = 1 : numel (filelist)
+      copy_images (filelist{id}, doc_root_dir, doc_out_dir);
+      copy_css (filelist{id}, doc_root_dir, doc_out_dir);
+    endfor
+
   endif
 
   ######################
@@ -449,7 +497,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "    <img src=\"../manual.png\" alt=\"Package doc icon\"/>\n");
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", ...
-               fullfile (doc_subdir, "index.html"));
+               fullfile (doc_subdir, package_doc_index));
       fprintf (fid, "      Package Documentation\n");
       fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td></tr>\n");
@@ -559,30 +607,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fclose (fid);
   endif
 
-  #################################
-  ## Write package documentation ##
-  #################################
-  if (write_package_documentation)
 
-    ## Convert texinfo source
-    status = system (sprintf ("%s --html -o %s %s",
-                              makeinfo_program (),
-                              doc_out_dir,
-                              doc_src));
-    if (status == 127)
-      error ("Program `%s' not found", makeinfo_program ());
-    elseif (status)
-      error ("Program `%s' returned failure code %i",
-             makeinfo_program (), status);
-    endif
-
-    ## Read image references from generated files and copy images
-    filelist = glob (fullfile (doc_out_dir, "*.html"));
-    for id = 1 : numel (filelist)
-      copy_images (filelist{id}, doc_root_dir, doc_out_dir);
-    endfor
-
-  endif
 
 endfunction
 
@@ -612,6 +637,42 @@ function copy_images (file, doc_root_dir, doc_out_dir)
           if (! ([status, msg] = copyfile (fullfile (doc_root_dir, url),
                                            fullfile (doc_out_dir, url))))
             warning ("could not copy image file %s: %s", url, msg);
+          endif
+        endif
+      endif
+    endfor
+  endwhile
+  fclose (fid);
+
+endfunction
+
+
+function copy_css (file, doc_root_dir, doc_out_dir)
+
+  if ((fid = fopen (file)) < 0)
+    error ("Couldn't open %s for reading", file);
+  endif
+  while (! isnumeric (l = fgetl (fid)))
+    m = regexp (l, "<(?:link rel=\"stylesheet\".+?href|object.+?data)=""([^""]+)"".*?>", "tokens");
+    for i = 1 : numel (m)
+      url = m{i}{1};
+      ## exclude external links
+      if (isempty (strfind (url, "//")))
+        if (! isempty (strfind (url, "..")))
+          warning ("not copying css %s because path contains '..'",
+                   url);
+        else
+          if (! isempty (imgdir = fileparts (url)) &&
+              ! strcmp (imgdir, "./") &&
+              ! exist (imgoutdir = fullfile (doc_out_dir, imgdir), "dir"))
+            [succ, msg] = mkdir (imgoutdir);
+            if (!succ)
+              error ("Unable to create directory %s:\n %s", imgoutdir, msg);
+            endif
+          endif
+          if (! ([status, msg] = copyfile (fullfile (doc_root_dir, url),
+                                           fullfile (doc_out_dir, url))))
+            warning ("could not copy css file %s: %s", url, msg);
           endif
         endif
       endif
