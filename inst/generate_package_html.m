@@ -1,5 +1,5 @@
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
-## Copyright (C) 2014, 2015 Julien Bect <jbect@users.sourceforge.net>
+## Copyright (C) 2014-2016 Julien Bect <jbect@users.sourceforge.net>
 ## Copyright (C) 2015 Oliver Heimlich <oheim@posteo.de>
 ##
 ## This program is free software; you can redistribute it and/or modify it
