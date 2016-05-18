@@ -1,6 +1,7 @@
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ## Copyright (C) 2014-2016 Julien Bect <jbect@users.sourceforge.net>
 ## Copyright (C) 2015 Oliver Heimlich <oheim@posteo.de>
+## Copyright (C) 2016 Fernando Pujaico Rivera <fernando.pujaico.rivera@gmail.com>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
