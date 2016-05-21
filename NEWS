@@ -1,30 +1,23 @@
-Summary of important user-visible changes for generate_html x.y.z:
+Summary of important user-visible changes for generate_html 0.1.11:
 -------------------------------------------------------------------
 
- ** Other changes
+ ** Content of autoload field not shown anymore
 
     o generate_package_html: index.html no longer displays autoload
       information (and there is no other place in the generated HTML
-      with that information).  The main reason is that Octave has
-      removed support for autoload of packages.
+      with that information).  The main reasons for this change are:
 
-      This field had been used for only two purposes:
+       1) there are no Octave Forge packages that autoload anymore,
 
-        1) decide where to add the -auto or -noauto options during pkg
-          install.  However, since the value is not reliable, it's better
-          to specify the desired option instead.
+       2) support for autoload of packages will be completely removed
+          in Octave 4.2.x.
 
-        2) decide in advance whether a package needs to be loaded or not.
-          However, this is just the default option which is changed at
-          install time so it's pretty useless for this too.
-
-      In addition, autoload packages are a bad idea and there are no Octave
-      Forge packages that autoload anymore.
-
+ ** New option for generate_package_html
+ 
     o generate_package_html, get_html_options: Add new field
       'package_doc_options' to the option structure (patch #9002).
       This field makes it possible to pass options to makeinfo when
-      building the documentation.
+      building the package documentation.
 
 
 Summary of important user-visible changes for generate_html 0.1.10:
