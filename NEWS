@@ -21,6 +21,11 @@ Summary of important user-visible changes for generate_html x.y.z:
       In addition, autoload packages are a bad idea and there are no Octave
       Forge packages that autoload anymore.
 
+    o generate_package_html, get_html_options: Add new field
+      'package_doc_options' to the option structure (patch #9002).
+      This field makes it possible to pass options to makeinfo when
+      building the documentation.
+
 
 Summary of important user-visible changes for generate_html 0.1.10:
 -------------------------------------------------------------------
