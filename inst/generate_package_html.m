@@ -478,8 +478,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "      Download Package\n");
       fprintf (fid, "    </a><br />\n");
       if (! isempty (options.older_versions_download))
-        fprintf (fid, "    <a href=\"%s\"",options.older_versions_download);
-        fprintf (fid, " class=\"older_versions_download\">(older versions)</a>\n");
+        fprintf (fid, "    <a href=\"%s\"\n", options.older_versions_download);
+        fprintf (fid, "     class=\"older_versions_download\">(older versions)</a>\n");
       end
       fprintf (fid, "  </td></tr></table>\n");
       fprintf (fid, "</div>\n");
