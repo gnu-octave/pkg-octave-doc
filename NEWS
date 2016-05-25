@@ -1,3 +1,15 @@
+Summary of important user-visible changes for generate_html x.y.zz:
+-------------------------------------------------------------------
+
+ ** New option for generate_package_html
+ 
+    o generate_package_html, get_html_options: Add new field
+      'older_versions_download' to the option structure (patch #8984).
+      This field makes it possible for packages to customize (or
+      suppress) the "older versions" download link, which is actually
+      Octave Forge-specific.
+
+
 Summary of important user-visible changes for generate_html 0.1.11:
 -------------------------------------------------------------------
 
