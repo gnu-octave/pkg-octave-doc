@@ -1,5 +1,6 @@
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ## Copyright (C) 2014-2016 Julien Bect <jbect@users.sourceforge.net>
+## Copyright (C) 2016 Fernando Pujaico Rivera <fernando.pujaico.rivera@gmail.com>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -109,6 +110,7 @@ function options = get_html_options_default (options)
   ## Download link to be inserted on the main package page (index.html)
   ## Leave empty for no download link
   default.download_link = "";
+  default.older_versions_download = "";
 
   ## Create package licence page ?
   default.include_package_license = false;
@@ -284,6 +286,7 @@ function options = get_html_options_project (options, project_name)
       ## Options for index package
       options.index_title = "The '%name' Package";
       options.download_link = "http://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
+      options.older_versions_download = "http://sourceforge.net/projects/octave/files/";
       options.include_package_page = true;
       options.include_package_license = true;
       options.include_package_news = true;
