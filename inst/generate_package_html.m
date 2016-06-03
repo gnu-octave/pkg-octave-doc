@@ -635,7 +635,8 @@ function copy_files (filetype, file, doc_root_dir, doc_out_dir)
         url = m{i}{1};
         ## exclude external links
         if (isempty (strfind (url, "//")))
-          if (! isempty (strfind (url, "..")))
+          if (strcmp (filetype, {"image"})
+              && ! isempty (strfind (url, "..")))
             warning ("not copying %s %s because path contains '..'",
                      filetype, url);
           else
