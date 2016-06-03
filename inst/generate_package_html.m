@@ -402,8 +402,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     ## Read image and css references from generated files and copy images
     filelist = glob (fullfile (doc_out_dir, "*.html"));
     for id = 1 : numel (filelist)
-      copy_images (filelist{id}, doc_root_dir, doc_out_dir);
-      copy_css (filelist{id}, doc_root_dir, doc_out_dir);
+      copy_files ("image", filelist{id}, doc_root_dir, doc_out_dir);
+      copy_files ("css", filelist{id}, doc_root_dir, doc_out_dir);
     endfor
 
   endif
@@ -614,20 +614,29 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
 endfunction
 
-function copy_images (file, doc_root_dir, doc_out_dir)
+function copy_files (filetype, file, doc_root_dir, doc_out_dir)
+
+  switch filetype
+    case "image"
+      pattern = "<(?:img.+?src|object.+?data)=""([^""]+)"".*?>";
+    case "css"
+      pattern = "<(?:link rel=\"stylesheet\".+?href|object.+?data)=""([^""]+)"".*?>";
+    otherwise
+      error ("copy_files: invalid file type");
+  endswitch
 
   if ((fid = fopen (file)) < 0)
     error ("Couldn't open %s for reading", file);
   endif
   while (! isnumeric (l = fgetl (fid)))
-    m = regexp (l, "<(?:img.+?src|object.+?data)=""([^""]+)"".*?>", "tokens");
+    m = regexp (l, pattern, "tokens");
     for i = 1 : numel (m)
       url = m{i}{1};
       ## exclude external links
       if (isempty (strfind (url, "//")))
         if (! isempty (strfind (url, "..")))
-          warning ("not copying image %s because path contains '..'",
-                   url);
+          warning ("not copying %s %s because path contains '..'",
+                   filetype, url);
         else
           if (! isempty (imgdir = fileparts (url)) &&
               ! strcmp (imgdir, "./") &&
@@ -639,43 +648,7 @@ function copy_images (file, doc_root_dir, doc_out_dir)
           endif
           if (! ([status, msg] = copyfile (fullfile (doc_root_dir, url),
                                            fullfile (doc_out_dir, url))))
-            warning ("could not copy image file %s: %s", url, msg);
-          endif
-        endif
-      endif
-    endfor
-  endwhile
-  fclose (fid);
-
-endfunction
-
-
-function copy_css (file, doc_root_dir, doc_out_dir)
-
-  if ((fid = fopen (file)) < 0)
-    error ("Couldn't open %s for reading", file);
-  endif
-  while (! isnumeric (l = fgetl (fid)))
-    m = regexp (l, "<(?:link rel=\"stylesheet\".+?href|object.+?data)=""([^""]+)"".*?>", "tokens");
-    for i = 1 : numel (m)
-      url = m{i}{1};
-      ## exclude external links
-      if (isempty (strfind (url, "//")))
-        if (! isempty (strfind (url, "..")))
-          warning ("not copying css %s because path contains '..'",
-                   url);
-        else
-          if (! isempty (imgdir = fileparts (url)) &&
-              ! strcmp (imgdir, "./") &&
-              ! exist (imgoutdir = fullfile (doc_out_dir, imgdir), "dir"))
-            [succ, msg] = mkdir (imgoutdir);
-            if (!succ)
-              error ("Unable to create directory %s:\n %s", imgoutdir, msg);
-            endif
-          endif
-          if (! ([status, msg] = copyfile (fullfile (doc_root_dir, url),
-                                           fullfile (doc_out_dir, url))))
-            warning ("could not copy css file %s: %s", url, msg);
+            warning ("could not copy %s file %s: %s", filetype, url, msg);
           endif
         endif
       endif
