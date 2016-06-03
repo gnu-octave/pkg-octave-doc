@@ -648,7 +648,10 @@ function copy_files (filetype, file, doc_root_dir, doc_out_dir)
                 error ("Unable to create directory %s:\n %s", imgoutdir, msg);
               endif
             endif
-            if (! ([status, msg] = copyfile (fullfile (doc_root_dir, url),
+            if (isempty (glob (src = fullfile (doc_root_dir, url))))
+              warning ("%s file %s not present, not copied",
+                       filetype, url);
+            elseif (! ([status, msg] = copyfile (src,
                                              fullfile (doc_out_dir, url))))
               warning ("could not copy %s file %s: %s", filetype, url, msg);
             endif
