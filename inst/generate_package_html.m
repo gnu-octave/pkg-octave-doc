@@ -516,9 +516,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
     if (! isempty (list.url))
       fprintf (fid, "  <tr><td>\n");
-      fprintf (fid, "    <img src=\"../news.png\" alt=\"Package news icon\"/>\n");
+      fprintf (fid, "    <img src=\"../homepage.png\" alt=\"Package homepage icon\"/>\n");
       fprintf (fid, "  </td><td>\n");
-      fprintf (fid, "    <a href=\"%s\" class=\"news_file\">\n", insert_char_entities (list.url));
+      fprintf (fid, "    <a href=\"%s\" class=\"homepage_link\">\n", insert_char_entities (list.url));
       fprintf (fid, "      Homepage\n");
       fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td></tr>\n");
