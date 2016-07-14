@@ -514,7 +514,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td></tr>\n");
     endif
-    if (! isempty (list.url))
+    if (isfield (list, "url")) && (! isempty (list.url))
       index_write_homepage_links (fid, list.url);
     endif
     fprintf (fid, "  </table>\n");
