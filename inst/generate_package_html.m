@@ -467,14 +467,15 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
     fprintf (fid, "<td>\n");
     if (! isempty (options.download_link))
-      fprintf (fid, "<div class=\"download_package\">\n");
-      fprintf (fid, "  <table><tr><td>\n");
-      fprintf (fid, "    <img src=\"../download.png\" alt=\"Package download icon\"/>\n");
-      fprintf (fid, "  </td><td>\n");
       link = strrep (options.download_link, "%name", desc.name);
       link = strrep (link, "%version", desc.version);
-      fprintf (fid, "    <a href=\"%s\"\n", link);
-      fprintf (fid, "     class=\"download_link\">\n");
+      fprintf (fid, "<div class=\"download_package\">\n");
+      fprintf (fid, "  <table><tr><td>\n");
+      fprintf (fid, "    <a href=\"%s\" class=\"download_link\">\n", link);
+      fprintf (fid, "      <img src=\"../download.png\" alt=\"Package download icon\"/>\n");
+      fprintf (fid, "    </a>\n");
+      fprintf (fid, "  </td><td>\n");
+      fprintf (fid, "    <a href=\"%s\" class=\"download_link\">\n", link);
       fprintf (fid, "      Download Package\n");
       fprintf (fid, "    </a><br />\n");
       if (! isempty (options.older_versions_download))
@@ -488,26 +489,31 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "<tr><td>\n");
     fprintf (fid, "<div class=\"package_function_reference\">\n");
     fprintf (fid, "  <table><tr><td>\n");
-    fprintf (fid, "    <img src=\"../doc.png\" alt=\"Function reference icon\"/>\n");
+    fprintf (fid, "    <a href=\"%s\" class=\"function_reference_link\">\n", overview_filename);    
+    fprintf (fid, "      <img src=\"../doc.png\" alt=\"Function reference icon\"/>\n");
+    fprintf (fid, "    </a>\n");
     fprintf (fid, "  </td><td>\n");
-    fprintf (fid, "    <a href=\"%s\" class=\"function_reference_link\">\n", ...
-             overview_filename);
+    fprintf (fid, "    <a href=\"%s\" class=\"function_reference_link\">\n", overview_filename);
     fprintf (fid, "      Function Reference\n");
     fprintf (fid, "    </a>\n");
     fprintf (fid, "  </td></tr>\n");
     if (write_package_documentation)
+      link = fullfile (doc_subdir, package_doc_index);
       fprintf (fid, "  <tr><td>\n");
-      fprintf (fid, "    <img src=\"../manual.png\" alt=\"Package doc icon\"/>\n");
+      fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", link);      
+      fprintf (fid, "      <img src=\"../manual.png\" alt=\"Package doc icon\"/>\n");
+      fprintf (fid, "    </a>\n");      
       fprintf (fid, "  </td><td>\n");
-      fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", ...
-               fullfile (doc_subdir, package_doc_index));
+      fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", link);
       fprintf (fid, "      Package Documentation\n");
       fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td></tr>\n");
     endif
     if (write_package_news)
       fprintf (fid, "  <tr><td>\n");
-      fprintf (fid, "    <img src=\"../news.png\" alt=\"Package news icon\"/>\n");
+      fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");      
+      fprintf (fid, "      <img src=\"../news.png\" alt=\"Package news icon\"/>\n");
+      fprintf (fid, "    </a>\n");      
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");
       fprintf (fid, "      NEWS\n");

@@ -24,19 +24,24 @@ L = length (C);
 
 for k = 1:L
 
-  fprintf (fid, "  <tr><td>\n");
-  fprintf (fid, "    <img src=\"../homepage.png\" alt=\"Package homepage icon\"/>\n");
-  fprintf (fid, "  </td><td>\n");
-  fprintf (fid, "    <a href=\"%s\" class=\"homepage_link\">\n", C{k});
+  fprintf (fid, "  <tr>\n");
+  fprintf (fid, "    <td>\n");
+  fprintf (fid, "      <a href=\"%s\" class=\"homepage_link\">\n", C{k});  
+  fprintf (fid, "        <img src=\"../homepage.png\" alt=\"Package homepage icon\"/>\n");
+  fprintf (fid, "      </a>\n");
+  fprintf (fid, "    </td>\n");
+  fprintf (fid, "    <td>\n");  
+  fprintf (fid, "      <a href=\"%s\" class=\"homepage_link\">\n", C{k});
 
   if L == 1
-    fprintf (fid, "      Homepage\n");
+    fprintf (fid, "        Homepage\n");
   else
-    fprintf (fid, "      Homepage #%d\n", k);
+    fprintf (fid, "        Homepage #%d\n", k);
   endif
 
-  fprintf (fid, "    </a>\n");
-  fprintf (fid, "  </td></tr>\n");
+  fprintf (fid, "      </a>\n");
+  fprintf (fid, "    </td>\n");
+  fprintf (fid, "  </tr>\n");  
 
   endfor
 
