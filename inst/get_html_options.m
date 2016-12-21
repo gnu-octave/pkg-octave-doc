@@ -215,7 +215,7 @@ function options = get_html_options_project (options, project_name)
  <a href=\"%rootbugs.html\" class=\"menu\">Bugs</a> &middot;\n\
  <a href=\"%rootarchive.html\" class=\"menu\">Mailing Lists</a> &middot;\n\
  <a href=\"%rootlinks.html\" class=\"menu\">Links</a> &middot;\n\
- <a href=\"http://octave.sourceforge.net/code.html\" class=\"menu\">Code</a>\n\
+ <a href=\"https://octave.sourceforge.io/code.html\" class=\"menu\">Code</a>\n\
 \n\
         </td>\n\
       </tr>\n\
@@ -249,8 +249,8 @@ function options = get_html_options_project (options, project_name)
       ## SF logo
       sf_logo = [ ...
         "<div id=\"sf_logo\">\n" ...
-        "  <a href=\"http://sourceforge.net\">\n" ...
-        "    <img src=\"http://sourceforge.net/sflogo.php?group_id=2888&amp;type=1\"\n" ...
+        "  <a href=\"https://sourceforge.net\">\n" ...
+        "    <img src=\"https://sourceforge.net/sflogo.php?group_id=2888&amp;type=1\"\n" ...
         "     width=\"88\" height=\"31\" style=\"border: 0;\" alt=\"SourceForge.net Logo\" />\n" ...
         "  </a>\n" ...
         "</div>\n"];
@@ -280,13 +280,13 @@ function options = get_html_options_project (options, project_name)
 <p class=\"package_desc\">%shortdescription</p>\n\
 <p>\n\
 <a class=\"package_link\" href=\"./%name/index.html\">details</a>\n\
-<a class=\"download_link\" href=\"http://downloads.sourceforge.net/octave/%name-%version.%extension?download\">download</a>\n\
+<a class=\"download_link\" href=\"https://downloads.sourceforge.net/octave/%name-%version.%extension?download\">download</a>\n\
 </p>\n";
 
       ## Options for index package
       options.index_title = "The '%name' Package";
-      options.download_link = "http://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
-      options.older_versions_download = "http://sourceforge.net/projects/octave/files/";
+      options.download_link = "https://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
+      options.older_versions_download = "https://sourceforge.net/projects/octave/files/";
       options.include_package_page = true;
       options.include_package_license = true;
       options.include_package_news = true;
