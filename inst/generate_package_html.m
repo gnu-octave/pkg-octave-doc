@@ -223,7 +223,18 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       for l = 1:length (F)
         fun = F{l};
         if (implemented{k}{l})
-          first_sentences{k}{l} = get_first_help_sentence (fun, 200);
+          try
+            ## This will raise an error if the function is undocumented:
+            first_sentences{k}{l} = get_first_help_sentence (fun, 200);
+          catch
+            err = lasterror ();
+            if ~ isempty (strfind (err.message, 'not documented'))
+              warning (sprintf ("%s is undocumented", fun));
+              first_sentences{k}{l} = "Not documented";
+            else
+              rethrow (err);
+            endif
+          end_try_catch
           first_sentences{k}{l} = strrep (first_sentences{k}{l}, "\n", " ");
 
           link = sprintf ("%s/%s.html", local_fundir, fun);
