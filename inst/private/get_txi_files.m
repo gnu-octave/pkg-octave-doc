@@ -24,7 +24,8 @@ function file_list = get_txi_files (srcdir)
   pat = '^@include\s*(?<filename>\S*?)\.texi\s*$';
 
   ## List of *.texi files to be ignored
-  ignore_list = {"macros", "version"};
+  ## Note: version.texi was renamed to version-octave.texi between 4.0 and 4.2
+  ignore_list = {"macros", "version", "version-octave"};
 
   ## Open octave.texi for reading
   [fid, errmsg] = fopen (octave_texi, "rt");
