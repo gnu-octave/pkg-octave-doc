@@ -68,6 +68,8 @@ function html_help_text ...
       text = sprintf ("<pre>%s</pre>\n", text);
     case "texinfo"
       [~, text] = texi2html (text, options, root);
+    case "not documented"
+      text = sprintf ("<pre>Not documented</pre>\n");
     case "not found"
       error ("`%s' not found\n", name);
     otherwise
