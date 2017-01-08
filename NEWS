@@ -1,8 +1,29 @@
+Summary of important user-visible changes for generate_html 0.1.13:
+-------------------------------------------------------------------
+
+ ** Changes to the package index page
+
+    o generate_package_html: Make icons clickable.
+
+ ** Change URLs
+
+    o get_html_options: Use the new https URLs for the octave-forge
+      (default) style.
+
+ * Bug fixes
+
+    o html_help_text, generate_package_html: Handle undocumented
+      functions.
+
+    o generate_html_manual (get_txi_files): Ignore
+      version-octave.texi, which was previously named version.texi.
+
+
 Summary of important user-visible changes for generate_html 0.1.12:
 -------------------------------------------------------------------
 
  ** New option for generate_package_html
- 
+
     o generate_package_html, get_html_options: Add new field
       'older_versions_download' to the option structure.
       This field makes it possible for packages to customize (or
