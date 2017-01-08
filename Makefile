@@ -1,3 +1,4 @@
+## Copyright 2017 Julien Bect <jbect@users.sourceforge.net>
 ## Copyright 2015-2016 Carnë Draug
 ## Copyright 2015-2016 Oliver Heimlich
 ##
@@ -14,6 +15,12 @@ RELEASE_DIR     := $(TARGET_DIR)/$(PACKAGE)-$(VERSION)
 RELEASE_TARBALL := $(TARGET_DIR)/$(PACKAGE)-$(VERSION).tar.gz
 HTML_DIR        := $(TARGET_DIR)/$(PACKAGE)-html
 HTML_TARBALL    := $(TARGET_DIR)/$(PACKAGE)-html.tar.gz
+
+HG_ID   := $(shell hg id --id | sed -e 's/+//')
+HG_DATE := $(shell hg log --rev $(HG_ID) --template {date\|isodate})
+
+# Follows the recommendations of https://reproducible-builds.org/docs/archives
+REPRO_TAR_OPTS = --mtime="$(HG_DATE)" --sort=name --owner=root --group=root --numeric-owner
 
 M_SOURCES   := $(wildcard inst/*.m) $(patsubst %.in,%,$(wildcard src/*.m.in))
 PKG_ADD     := $(shell grep -Pho '(?<=(//|\#\#) PKG_ADD: ).*' $(M_SOURCES))
@@ -35,7 +42,7 @@ help:
 	@echo "   clean   - Remove releases, html documentation"
 
 %.tar.gz: %
-	tar -c -f - --posix -C "$(TARGET_DIR)/" "$(notdir $<)" | gzip -9n > "$@"
+	tar -c -f - $(REPRO_TAR_OPTS) -C "$(TARGET_DIR)/" "$(notdir $<)" | gzip -9n > "$@"
 
 $(RELEASE_DIR): .hg/dirstate
 	@echo "Creating package version $(VERSION) release ..."
