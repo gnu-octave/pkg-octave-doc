@@ -45,7 +45,11 @@ function file_list = get_txi_files (srcdir)
 
     ## Pattern matching
     s = regexp (line, pat, "names");
-    f = s(1).filename;
+    if (isempty (s))
+      f = {};
+    else
+      f = s(1).filename;
+    endif
 
     ## Add to the file list
     if (~ isempty (f)) && (~ any (strcmpi (f, ignore_list)))
