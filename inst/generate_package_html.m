@@ -253,34 +253,114 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fclose (fid);
   endif
 
-  ################################################
-  ## Write function data for alphabetical lists ##
-  ################################################
-  if options.include_alpha
+################################################
+## Write function data for alphabetical lists ##
+################################################
+
+  if (options.include_alpha)
+
+    ## hash name information first, so we needn't go through all names
+    ## for each letter
+    name_hashes = struct ();
+    nfcns = zeros (num_categories, 1); # for generating numeric
+                                       # indices later
+    for k = 1:num_categories
+      F = desc.provides{k}.functions;
+      if (k < num_categories)
+        nfcns(k + 1) = numel (F);
+      endif
+      for l = 1:numel (F)
+        if (implemented{k}{l})
+          fun = F{l};
+          if (any (fun == "."))
+            ## namespaced function
+            initial = lower (fun(1));
+            [nsp, fcn] = strsplit (fun, "."){:};
+            name_hashes.(["nsp_", initial]).(nsp).(fcn) = [k, l];
+          elseif (fun(1) == "@")
+            ## class method
+            initial = lower (fun(2));
+            [class, method] = strsplit (fun, "/"){:};
+            name_hashes.(["class_", initial]).(class).(method) = [k, l];
+          else
+            ## normal function
+            initial = lower (fun(1));
+            name_hashes.(["fun_", initial]).(fun) = [k, l];
+          endif
+        endif
+      endfor
+    endfor
+    cum_nfcns = cumsum (nfcns);
+
+    ## directory for function information
+    assert_dir (directory = fullfile (outdir, desc.name));
+    ## subdirectory for class information
+    assert_dir (classes_dir = fullfile (directory, "classes"));
+    ## subdirectory for namespace information
+    assert_dir (nsps_dir = fullfile (directory, "namespaces"));
+
+    ## flatten by concatenating all categories
+    f_s_linear = horzcat (first_sentences{:});
+
+    ## FIXME: Do the php scripts really need, for functions, a file
+    ## for each letter, even if the file is empty? Otherwise loop over
+    ## fieldnames.
     for letter = "a":"z"
-      [name_filename, desc_filename] = get_alpha_database (outdir, desc.name, letter);
-      name_fid = fopen (name_filename, "w");
-      desc_fid = fopen (desc_filename, "w");
-      if (name_fid == -1 || desc_fid == -1)
-        error ("Could not open alphabet database for writing");
+
+      ## function names
+      name_fn = fullfile (directory, ["function_names_", letter]);
+      desc_fn = fullfile (directory, ["function_descriptions_", letter]);
+      if (isfield (name_hashes, ["fun_", letter]))
+        [funs, idx] = sort (fieldnames (name_hashes.(["fun_", letter])));
+        pos = vertcat (struct2cell (name_hashes.(["fun_", letter])){idx});
+        ## linear positions of functions in 'first_sentences'
+        lpos = cum_nfcns(pos(:, 1)) + pos(:, 2);
+        fileprintf (name_fn, "%s\n", funs{:});
+        fileprintf (desc_fn, "%s\n", f_s_linear{lpos});
+      else
+        ## create empty files
+        fileprintf (name_fn, "");
+        fileprintf (desc_fn, "");
       endif
 
-      for k = 1:num_categories
-        F = desc.provides{k}.functions;
-        for l = 1:length (F)
-          fun = F{l};
-          if (implemented{k}{l} && lower (fun (1)) == letter)
-            fs = first_sentences{k}{l};
-
-            fprintf (name_fid, "%s\n", fun);
-            fprintf (desc_fid, "%s\n", fs);
-          endif
+      ## class names
+      if (isfield (name_hashes, ["class_", letter]))
+        assert_dir (name_cl = fullfile (classes_dir,
+                                        ["class_names_", letter]));
+        classes = sort (fieldnames (name_hashes.(["class_", letter])));
+        for cid = 1:numel (classes)
+          assert_dir (classdir = fullfile (name_cl, classes{cid}));
+          mthds = fieldnames (name_hashes.(["class_", letter]). ...
+                                          (classes{cid}));
+          for mid = 1:numel (mthds)
+            mthd_fn = fullfile (classdir, mthds{mid});
+            pos = name_hashes.(["class_", letter]). ...
+                              (classes{cid}).(mthds{mid});
+            fileprintf (mthd_fn, [first_sentences{pos(1)}{pos(2)}, "\n"]);
+          endfor
         endfor
-      endfor
+      endif
 
-      fclose (name_fid);
-      fclose (desc_fid);
+      ## namespaces
+      if (isfield (name_hashes, ["nsp_", letter]))
+        assert_dir (name_nsp = fullfile (nsps_dir,
+                                        ["namespace_names_", letter]));
+        nsps = sort (fieldnames (name_hashes.(["nsp_", letter])));
+        for nid = 1:numel (nsps)
+          assert_dir (nspdir = fullfile (name_nsp, nsps{nid}));
+          fcns = fieldnames (name_hashes.(["nsp_", letter]). ...
+                                          (nsps{nid}));
+          for fid = 1:numel (fcns)
+            fcn_fn = fullfile (nspdir, fcns{fid});
+            pos = name_hashes.(["nsp_", letter]). ...
+                              (nsps{nid}).(fcns{fid});
+            fileprintf (fcn_fn, [first_sentences{pos(1)}{pos(2)}, "\n"]);
+          endfor
+        endfor
+      endif
+
     endfor
+
   endif
 
   #####################################################
@@ -682,4 +762,26 @@ function copy_files (filetype, file, doc_root_dir, doc_out_dir)
     fclose (fid);
   end_unwind_protect
 
+endfunction
+
+function assert_dir (directory)
+  if (! exist (directory, "dir"))
+    [succ, msg] = mkdir (directory);
+    if (!succ)
+      error ("Could not create '%s': %s", directory, msg);
+    endif
+  endif
+endfunction
+
+function fileprintf (path, varargin)
+  unwind_protect
+    if (([fid, msg] = fopen (path, "w")) == -1)
+      error ("Could not open alphabet database for writing");
+    endif
+    fprintf (fid, varargin{:});
+  unwind_protect_cleanup
+    if (fid != -1)
+      fclose (fid);
+    endif
+  end_unwind_protect
 endfunction
