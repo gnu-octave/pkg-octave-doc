@@ -774,14 +774,12 @@ function assert_dir (directory)
 endfunction
 
 function fileprintf (path, varargin)
+  if (([fid, msg] = fopen (path, "w")) == -1)
+    error ("Could not open alphabet database for writing");
+  endif
   unwind_protect
-    if (([fid, msg] = fopen (path, "w")) == -1)
-      error ("Could not open alphabet database for writing");
-    endif
     fprintf (fid, varargin{:});
   unwind_protect_cleanup
-    if (fid != -1)
-      fclose (fid);
-    endif
+    fclose (fid);
   end_unwind_protect
 endfunction
