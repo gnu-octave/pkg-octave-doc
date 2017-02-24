@@ -9,4 +9,6 @@ Utility Functions
  txi2index
  txi2reference
  texi2html
-
+Website access
+ urlview
+ check_duplicates
