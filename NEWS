@@ -1,3 +1,9 @@
+ ** New function `check_duplicates' checks for duplicate symbols by
+    querying a server at Octave Forge.
+
+ ** New function `urlview' asynchroneously starts a browser for an
+    url, supports sending parameters with POST and GET methods.
+
  ** Vectorize generation of alphabetic function database.
 
  ** Make alphabetic databases for class methods and namespaced
