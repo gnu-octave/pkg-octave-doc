@@ -20,7 +20,15 @@ HG_ID   := $(shell hg id --id | sed -e 's/+//')
 HG_DATE := $(shell hg log --rev $(HG_ID) --template {date\|isodate})
 
 # Follows the recommendations of https://reproducible-builds.org/docs/archives
-REPRO_TAR_OPTS = --mtime="$(HG_DATE)" --sort=name --owner=root --group=root --numeric-owner
+define create_tarball
+$(shell cd $(dir $(1)) \
+    && find $(notdir $(1)) -print0 \
+    | LC_ALL=C sort -z \
+    | tar c --mtime="$(HG_DATE)" \
+            --owner=root --group=root --numeric-owner \
+            --no-recursion --null -T - -f - \
+    | gzip -9n > "$(2)")
+endef
 
 M_SOURCES   := $(wildcard inst/*.m) $(patsubst %.in,%,$(wildcard src/*.m.in))
 PKG_ADD     := $(shell grep -Pho '(?<=(//|\#\#) PKG_ADD: ).*' $(M_SOURCES))
@@ -42,7 +50,7 @@ help:
 	@echo "   clean   - Remove releases, html documentation"
 
 %.tar.gz: %
-	tar -c -f - $(REPRO_TAR_OPTS) -C "$(TARGET_DIR)/" "$(notdir $<)" | gzip -9n > "$@"
+	$(call create_tarball,$*,${CURDIR}/$@)
 
 $(RELEASE_DIR): .hg/dirstate
 	@echo "Creating package version $(VERSION) release ..."
