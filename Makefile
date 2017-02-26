@@ -35,6 +35,8 @@ PKG_ADD     := $(shell grep -Pho '(?<=(//|\#\#) PKG_ADD: ).*' $(M_SOURCES))
 
 OCTAVE ?= octave --no-window-system --silent
 
+FIX_PERMISSIONS ?= chmod -R a+rX,u+w,go-w,ug-s
+
 .PHONY: help dist html release install all check run clean
 
 help:
@@ -56,7 +58,7 @@ $(RELEASE_DIR): .hg/dirstate
 	@echo "Creating package version $(VERSION) release ..."
 	-$(RM) -r "$@"
 	hg archive --exclude ".hg*" --exclude "Makefile" --type files "$@"
-	chmod -R a+rX,u+w,go-w "$@"
+	${FIX_PERMISSIONS} "$@"
 
 $(HTML_DIR): install
 	@echo "Generating HTML documentation. This may take a while ..."
@@ -65,7 +67,7 @@ $(HTML_DIR): install
 	  --eval "pkg load generate_html; " \
 	  --eval "pkg load $(PACKAGE);" \
 	  --eval 'generate_package_html ("${PACKAGE}", "$@", "octave-forge");'
-	chmod -R a+rX,u+w,go-w $@
+	${FIX_PERMISSIONS} $@
 
 dist: $(RELEASE_TARBALL)
 html: $(HTML_TARBALL)
