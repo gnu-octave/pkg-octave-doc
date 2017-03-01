@@ -1,5 +1,5 @@
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
-## Copyright (C) 2014, 2015 Julien Bect <jbect@users.sourceforge.net>
+## Copyright (C) 2014, 2015, 2017 Julien Bect <jbect@users.sourceforge.net>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -54,5 +54,8 @@ function s = instantiate_template (s, root, pkgroot, pkgname)
   s = strrep (s, "%pkgroot", pkgroot);
   s = strrep (s, "%package", pkgname);
   s = strrep (s, "%date", date ());
+
+  gh = ver ('generate_html');
+  s = strrep (s, "%ghv", gh.Version);
 
 endfunction

@@ -1,5 +1,5 @@
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
-## Copyright (C) 2014-2016 Julien Bect <jbect@users.sourceforge.net>
+## Copyright (C) 2014-2017 Julien Bect <jbect@users.sourceforge.net>
 ## Copyright (C) 2016 Fernando Pujaico Rivera <fernando.pujaico.rivera@gmail.com>
 ##
 ## This program is free software; you can redistribute it and/or modify it
@@ -137,6 +137,7 @@ function options = get_html_options_default (options)
 <head>\n\
   <meta http-equiv=\"content-type\" content=\"text/html; charset=%charset\" />\n\
   <meta name=\"date\" content=\"%date\" />\n\
+  <meta name=\"generator\" content=\"generate_html %ghv\" />\n\
   <title>%title</title>\n\
 </head>\n\
 <body>";
@@ -181,6 +182,7 @@ function options = get_html_options_project (options, project_name)
   <head>\n\
   <meta http-equiv=\"content-type\" content=\"text/html; charset=%charset\" />\n\
   <meta name=\"date\" content=\"%date\"/>\n\
+  <meta name=\"generator\" content=\"generate_html %ghv\" />\n\
   <meta name=\"author\" content=\"The Octave-Forge Community\" />\n\
   <meta name=\"description\" content=\"Octave-Forge is a collection of packages\
    providing extra functionality for GNU Octave.\" />\n\
