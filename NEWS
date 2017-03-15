@@ -1,3 +1,6 @@
+ ** Page margins of Octave Forge additional package documentation are
+    now configurable with the Octave Forge stylesheet.
+
 Summary of important user-visible changes for generate_html 0.2.0:
 -------------------------------------------------------------------
 
