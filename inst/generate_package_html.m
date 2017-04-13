@@ -710,7 +710,14 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fclose (fid);
   endif
 
-
+  ########################
+  ## Copy website files ##
+  ########################
+  if (! isempty (options.website_files))
+    copyfile (fullfile (fileparts (mfilename ("fullpath")),
+                        options.website_files, "*"),
+              outdir, "f");
+  endif
 
 endfunction
 

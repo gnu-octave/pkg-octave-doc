@@ -155,6 +155,9 @@ function options = get_html_options_default (options)
   default.package_doc = "";
   default.package_doc_options = "";
 
+  ## Name of directory with project website files.
+  default.website_files = "";
+
   ## TODO: Warn about unknown options
   ##  (to be done once all known options are present in default)
 
@@ -303,6 +306,9 @@ function options = get_html_options_project (options, project_name)
         "<div id=\"packagedoccontent\">\n" "' " ...
         "--set-customization-variable 'PRE_BODY_CLOSE " ...
         sf_logo "</div>\n'"];
+
+      ## Name of directory with project website files.
+      options.website_files = "of-website-files";
 
     case "octave"
       options.header = "__HEADER__(`%title')";
