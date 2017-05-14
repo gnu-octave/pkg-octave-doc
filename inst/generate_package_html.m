@@ -2,6 +2,7 @@
 ## Copyright (C) 2014-2016 Julien Bect <jbect@users.sourceforge.net>
 ## Copyright (C) 2015 Oliver Heimlich <oheim@posteo.de>
 ## Copyright (C) 2016 Fernando Pujaico Rivera <fernando.pujaico.rivera@gmail.com>
+## Copyright (C) 2017 Olaf Till <i7tiol@t-online.de>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -86,26 +87,15 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
   if (isempty (outdir))
     outdir = packname;
-  elseif (!ischar (outdir))
+  elseif (! ischar (outdir))
     error ("Second input argument must be a string");
   endif
 
   ## Create output directory if needed
-  if (!exist (outdir, "dir"))
-    [succ, msg] = mkdir (outdir);
-    if (!succ)
-      error ("Unable to create directory %s:\n %s", outdir, msg);
-    endif
-  endif
+  assert_dir (outdir);
 
   ## Create package directory if needed
-  packdir = fullfile (outdir, packname);
-  if (!exist (packdir, "dir"))
-    [succ, msg] = mkdir (packdir);
-    if (!succ)
-      error ("Unable to create directory %s:\n %s", packdir, msg);
-    endif
-  endif
+  assert_dir (packdir = fullfile (outdir, packname));
 
   ## Process input argument 'options'
   if (ischar (options)) || (isstruct (options))
@@ -114,18 +104,16 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     error ("Third input argument must be a string or a structure");
   endif
 
+  ## Initialize getopt.
+  getopt (options, desc);
+
   ## Function directory
-  local_fundir = options.function_dir;
+  local_fundir = getopt ("function_dir");
   fundir = fullfile (packdir, local_fundir);
 
 
   ## Create function directory if needed
-  if (!exist (fundir, "dir"))
-    [succ, msg] = mkdir (fundir);
-    if (!succ)
-      error ("Unable to create directory %s:\n %s", fundir, msg);
-    endif
-  endif
+  assert_dir (fundir);
 
   ##################################################
   ## Generate html pages for individual functions ##
@@ -149,21 +137,16 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
         ## Extract @-directory name from function name
         at_dir = fullfile (fundir, fileparts (fun));
         ## Create directory if needed
-        if (!exist (at_dir, "dir"))
-          [succ, msg] = mkdir (at_dir);
-          if (!succ)
-            error ("Unable to create directory %s:\n %s", at_dir, msg);
-          endif
-        endif
+        assert_dir (at_dir);
         ## Package root is two level upper in the case of an @-directory
-        pkgroot = "../../";
+        pkgroot = "../..";
       else
-        pkgroot = "../";
+        pkgroot = "..";
       endif
-      root = ["../" pkgroot];
       outname = fullfile (fundir, sprintf ("%s.html", fun));
       try
-        html_help_text (fun, outname, options, root, pkgroot, packname);
+        __html_help_text__ (outname, struct ("pkgroot", pkgroot,
+                                             "name", fun));
         implemented{k}{l} = true;
       catch
         err = lasterror ();
@@ -181,11 +164,10 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Write overview file ##
   #########################
   first_sentences = cell (1, num_categories);
-  if options.include_overview
+  if (getopt ("include_overview"))
 
     ## Create filename for the overview page
-    overview_filename = options.overview_filename;
-    overview_filename = strrep (overview_filename, "%name", desc.name);
+    overview_filename = getopt ("overview_filename");
     overview_filename = strrep (overview_filename, " ", "_");
 
     fid = fopen (fullfile (packdir, overview_filename), "w");
@@ -193,8 +175,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       error ("Couldn't open overview file for writing");
     endif
 
-    [header, title, footer] = get_header_title_and_footer ...
-      ("overview", options, desc.name, "../", "", packname);
+    vpars = struct ("name", packname,
+                    "pkgroot", "");
+    header = getopt ("overview_header", vpars);
+    title  = getopt ("overview_title",  vpars);
+    footer = getopt ("overview_footer", vpars);
 
     fprintf (fid, "%s\n", header);
     fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
@@ -257,7 +242,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 ## Write function data for alphabetical lists ##
 ################################################
 
-  if (options.include_alpha)
+  if (getopt ("include_alpha"))
 
     ## hash name information first, so we needn't go through all names
     ## for each letter
@@ -367,16 +352,14 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Write short description for forge overview page ##
   #####################################################
 
-  if options.include_package_list_item
+  if (getopt ("include_package_list_item"))
 
-    pkg_list_item_filename = options.pkg_list_item_filename;
+    pkg_list_item_filename = getopt ("pkg_list_item_filename");
     ## Extract first sentence for a short description, remove period at the end
     shortdescription = regexprep (desc.description, '\.($| .*)', '');
 
-    text = strrep (options.package_list_item, "%name", desc.name);
-    text = strrep (text, "%version", desc.version);
-    text = strrep (text, "%extension", "tar.gz");
-    text = strrep (text, "%shortdescription", shortdescription);
+    vpars = struct ("name", desc.name);
+    text = getopt ("package_list_item", vpars);
 
     fid = fopen (fullfile (packdir, pkg_list_item_filename), "w");
     if (fid > 0)
@@ -390,7 +373,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   #####################
   ## Write NEWS file ##
   #####################
-  if (! options.include_package_news)
+  if (! getopt ("include_package_news"))
     write_package_news = false;
   else
     ## Get detailed information about the package
@@ -424,8 +407,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
         error ("Couldn't open NEWS file for writing");
       endif
 
-      [header, title, footer] = get_header_title_and_footer ...
-        ("news", options, desc.name, "../", "", packname);
+      vpars = struct ("name", desc.name,
+                      "pkgroot", "");
+      header = getopt ("news_header", vpars);
+      title  = getopt ("news_title",  vpars);
+      footer = getopt ("news_footer", vpars);
 
       ## Write output
       fprintf (fid, "%s\n", header);
@@ -444,11 +430,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   #################################
 
   # Is there a package documentation to be included ?
-  write_package_documentation = ~ isempty (options.package_doc);
+  write_package_documentation = ! isempty (getopt ("package_doc"));
 
-  if write_package_documentation
+  if (write_package_documentation)
 
-    [~, doc_fn, doc_ext] = fileparts (options.package_doc);
+    [~, doc_fn, doc_ext] = fileparts (getopt ("package_doc"));
     doc_root_dir = fullfile (list.dir, "doc");
     doc_src = fullfile (doc_root_dir, [doc_fn, doc_ext]);
     doc_subdir = "package_doc";
@@ -459,8 +445,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     ## Create makeinfo command
     makeinfo_cmd = sprintf ("%s --html -o %s %s", makeinfo_program (),
                             doc_out_dir, doc_src);
-    if (! isempty (options.package_doc_options))
-      makeinfo_cmd = [makeinfo_cmd, ' ', options.package_doc_options];
+    if (! isempty (package_doc_options = getopt ("package_doc_options")))
+      makeinfo_cmd = [makeinfo_cmd, ' ', package_doc_options];
     endif
 
     ## Convert texinfo to HTML using makeinfo
@@ -503,7 +489,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Write index file ##
   ######################
 
-  if options.include_package_page
+  if (getopt ("include_package_page"))
     ## Get detailed information about the package
     all_list = pkg ("list");
     list = [];
@@ -525,8 +511,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
 
     ## Write output
-    [header, title, footer] = get_header_title_and_footer ...
-      ("index", options, desc.name, "../", "", packname);
+    vpars = struct ("name", desc.name,
+                    "pkgroot", "");
+    header = getopt ("index_header", vpars);
+    title  = getopt ("index_title",  vpars);
+    footer = getopt ("index_footer", vpars);
 
     fprintf (fid, "%s\n", header);
     fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
@@ -557,9 +546,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "</td>\n\n");
 
     fprintf (fid, "<td>\n");
-    if (! isempty (options.download_link))
-      link = strrep (options.download_link, "%name", desc.name);
-      link = strrep (link, "%version", desc.version);
+    vpars = struct ("name", desc.name);
+    if (! isempty (link = getopt ("download_link", vpars)))
       fprintf (fid, "<div class=\"download_package\">\n");
       fprintf (fid, "  <table><tr><td>\n");
       fprintf (fid, "    <a href=\"%s\" class=\"download_link\">\n", link);
@@ -569,8 +557,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "    <a href=\"%s\" class=\"download_link\">\n", link);
       fprintf (fid, "      Download Package\n");
       fprintf (fid, "    </a><br />\n");
-      if (! isempty (options.older_versions_download))
-        fprintf (fid, "    <a href=\"%s\"\n", options.older_versions_download);
+      if (! isempty (older_versions_download = ...
+                     getopt ("older_versions_download")))
+        fprintf (fid, "    <a href=\"%s\"\n", older_versions_download);
         fprintf (fid, "     class=\"older_versions_download\">(older versions)</a>\n");
       end
       fprintf (fid, "  </td></tr></table>\n");
@@ -666,7 +655,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ########################
   ## Write COPYING file ##
   ########################
-  if options.include_package_license
+  if (getopt ("include_package_license"))
     ## Get detailed information about the package
     all_list = pkg ("list");
     list = [];
@@ -696,8 +685,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       error ("Couldn't open COPYING file for writing");
     endif
 
-    [header, title, footer] = get_header_title_and_footer ...
-      ("copying", options, desc.name, "../", "", packname);
+    vpars = struct ("name", desc.name,
+                    "pkgroot", "");
+    header = getopt ("copying_header", vpars);
+    title  = getopt ("copying_title",  vpars);
+    footer = getopt ("copying_footer", vpars);
 
     ## Write output
     fprintf (fid, "%s\n", header);
@@ -713,9 +705,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ########################
   ## Copy website files ##
   ########################
-  if (! isempty (options.website_files))
+  if (! isempty (website_files = getopt ("website_files")))
     copyfile (fullfile (fileparts (mfilename ("fullpath")),
-                        options.website_files, "*"),
+                        website_files, "*"),
               outdir, "f");
   endif
 
@@ -774,7 +766,7 @@ endfunction
 function assert_dir (directory)
   if (! exist (directory, "dir"))
     [succ, msg] = mkdir (directory);
-    if (!succ)
+    if (! succ)
       error ("Could not create '%s': %s", directory, msg);
     endif
   endif

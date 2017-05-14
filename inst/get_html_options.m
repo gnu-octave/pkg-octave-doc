@@ -1,6 +1,7 @@
 ## Copyright (C) 2008 Soren Hauberg <soren@hauberg.org>
 ## Copyright (C) 2014-2017 Julien Bect <jbect@users.sourceforge.net>
 ## Copyright (C) 2016 Fernando Pujaico Rivera <fernando.pujaico.rivera@gmail.com>
+## Copyright (C) 2017 Olaf Till <i7tiol@t-online.de>
 ##
 ## This program is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -38,6 +39,28 @@
 
 function options = get_html_options (argin)
 
+  ## If option strings need parameterization, specify them as
+  ## anonymous functions: @ (opts, pars, vpars) ... . The 3 arguments
+  ## will be structures with parameter names as field names. 'opts'
+  ## will contain parameters set as fields of the 'options' structure
+  ## itself (e.g. 'charset'). 'pars' will contain all other parameters
+  ## except the variable parameters. 'vpars' will contain the variable
+  ## parameters, which currently are: 'name', 'pkgroot', 'root' (the
+  ## latter is redundant and always 'fullfile ("..", pkgroot)').
+  ##
+  ## Within the generate_html package, option values are requested by
+  ## the private 'getopt()' function, which performs parameterization
+  ## of options.
+  ##
+  ## Even within this function, options potentially accepting
+  ## parameters, like the options 'title' and 'body_command', must be
+  ## accessed with 'getopt (, vpars)', i.e. 'getopt ("title", vpars)'
+  ## instead of just 'opts.title'.
+  ##
+  ## This organization avoids the use of replacement strings and
+  ## enables realizing the effect of an option by looking at this file
+  ## only.
+
   ## Check number of input arguments
   if (nargin != 1)
     print_usage ();
@@ -73,23 +96,37 @@ function options = get_html_options_default (options)
   ## %name can be used to denote the name of the package
   default.overview_filename = "overview.html";
   
-  ## Variable values (%title, %body_command...) for the overview page.
-  default.overview_title = "List of Functions for the '%name' package";
-  default.overview_body_command = "";
-  default.overview_header = "";
-  default.overview_footer = "";
+  ## Overview page.
+  default.overview_title = @ (opts, pars, vpars) ...
+    sprintf ("List of Functions for the '%s' package", pars.package);
+  default.overview_body_command = @ (opts, pars, vpars) ...
+                                    getopt ("body_command", vpars);
+  default.overview_header = @ (opts, pars, vpars) ...
+                              getopt ("header", vpars);
+  default.overview_footer = @ (opts, pars, vpars) ...
+                              getopt ("footer", vpars);
 
-  ## Variable values (%title, %body_command...) for the news page.
-  default.news_title = "Recent changes for the '%name' package";
-  default.news_body_command = "";
-  default.news_header = "";
-  default.news_footer = "";
+  ## News page.
+  default.news_title = ...
+  @ (opts, pars, vpars) sprintf ("Recent changes for the '%s' package",
+                                 pars.package);
+  default.news_body_command = @ (opts, pars, vpars) ...
+                                getopt ("body_command", vpars);
+  default.news_header = @ (opts, pars, vpars) ...
+                          getopt ("header", vpars);
+  default.news_footer = @ (opts, pars, vpars) ...
+                          getopt ("footer", vpars);
 
-  ## Variable values (%title, %body_command...) for the copying page.
-  default.copying_title = "Copying conditions for the '%name' package";
-  default.copying_body_command = "";
-  default.copying_header = "";
-  default.copying_footer = "";
+  ## Copying page.
+  default.copying_title = ...
+  @ (opts, pars, vpars) sprintf ("Copying conditions for the '%s' package",
+                                 pars.package);
+  default.copying_body_command = @ (opts, pars, vpars) ...
+                                   getopt ("body_command", vpars);;
+  default.copying_header = @ (opts, pars, vpars) ...
+                             getopt ("header", vpars);
+  default.copying_footer = @ (opts, pars, vpars) ...
+                             getopt ("footer", vpars);
 
   ## Create short_package_description files ?  (used by packages.php)
   default.include_package_list_item = false;
@@ -101,11 +138,15 @@ function options = get_html_options_default (options)
   ## Create main package page ?  (index.html)
   default.include_package_page = false;
   
-  ## Variable values (%title, %body_command...) for the index page.
-  default.index_title = "The '%name' package";
-  default.index_body_command = "";
-  default.index_header = "";
-  default.index_footer = "";
+  ## Index page.
+  default.index_title = ...
+  @ (opts, pars, vpars) sprintf ("The '%s' package", pars.package);
+  default.index_body_command = @ (opts, pars, vpars) ...
+                                 getopt ("body_command", vpars);;
+  default.index_header = @ (opts, pars, vpars) ...
+                           getopt ("header", vpars);
+  default.index_footer = @ (opts, pars, vpars) ...
+                           getopt ("footer", vpars);
   
   ## Download link to be inserted on the main package page (index.html)
   ## Leave empty for no download link
@@ -123,28 +164,33 @@ function options = get_html_options_default (options)
   default.function_dir = "function";
 
   ## Handle to a function for processing "see also" links
-  options.seealso = @html_see_also_with_prefix;
+  default.seealso = @ (opts, pars, vpars) @html_see_also_with_prefix;
 
   ## Variable values (%title, %body_command...) for individual function pages,
   ## and for special pages too (index, overview...) if the corresponding
   ## page-specific option is empty.
-  default.title = "%name";
+  default.title = @ (opts, pars, vpars) sprintf ("%s", vpars.name);
   default.body_command = "";
-  default.header = "\
+  default.header = @ (opts, pars, vpars) sprintf ("\
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\
  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n\
 <html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n\
 <head>\n\
-  <meta http-equiv=\"content-type\" content=\"text/html; charset=%charset\" />\n\
-  <meta name=\"date\" content=\"%date\" />\n\
-  <meta name=\"generator\" content=\"generate_html %ghv\" />\n\
-  <title>%title</title>\n\
+  <meta http-equiv=\"content-type\" content=\"text/html; charset=%s\" />\n\
+  <meta name=\"date\" content=\"%s\" />\n\
+  <meta name=\"generator\" content=\"generate_html %s\" />\n\
+  <title>%s</title>\n\
 </head>\n\
-<body>";
+<body>",
+                                           opts.charset, pars.date,
+                                           pars.ghv,
+                                           getopt ("title", vpars));
   default.footer = "</body>\n</html>";
 
-  ## Style sheet (mandatory if %css is used in the header)
-  default.css = "";
+  ## Style sheet (mandatory if style sheet is accessed in the
+  ## header). Set to struct() by default to throw an error if used
+  ## in strings without explicitly having set it.
+  default.css = struct ();
 
   ## Encoding
   default.charset = "utf-8";
@@ -157,6 +203,8 @@ function options = get_html_options_default (options)
 
   ## Name of directory with project website files.
   default.website_files = "";
+
+  default.extension = "tar.gz";
 
   ## TODO: Warn about unknown options
   ##  (to be done once all known options are present in default)
@@ -177,32 +225,43 @@ function options = get_html_options_project (options, project_name)
   ## Generate options depending on project
   switch (lower (project_name))
     case "octave-forge"
-      ## Basic HTML header
-      options.header = "\
+      ## HTML header template. Can be used with different "...title"
+      ## and "...body_command" options. These are indicated in the
+      ## fields "title_option" and "body_command_option",
+      ## respectively, of 'vpars'.
+      options.__header__ = @ (opts, pars, vpars) ["\
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n\
  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n\
 <html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n\
   <head>\n\
-  <meta http-equiv=\"content-type\" content=\"text/html; charset=%charset\" />\n\
-  <meta name=\"date\" content=\"%date\"/>\n\
-  <meta name=\"generator\" content=\"generate_html %ghv\" />\n\
+  <meta http-equiv=\"content-type\" content=\"text/html; charset=" ...
+  opts.charset "\" />\n\
+  <meta name=\"date\" content=\"" pars.date "\"/>\n\
+  <meta name=\"generator\" content=\"generate_html " pars.ghv "\" />\n\
   <meta name=\"author\" content=\"The Octave-Forge Community\" />\n\
   <meta name=\"description\" content=\"Octave-Forge is a collection of packages\
    providing extra functionality for GNU Octave.\" />\n\
   <meta name=\"keywords\" lang=\"en\" content=\"Octave-Forge, Octave, extra packages\" />\n\
-  <title>%title</title>\n\
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"%root%css\" />\n\
-  <script src=\"%rootfixed.js\" type=\"text/javascript\"></script>\n\
-  <script src=\"%rootjavascript.js\" type=\"text/javascript\"></script>\n\
-  <link rel=\"shortcut icon\" href=\"%rootfavicon.ico\" />\n\
+  <title>" getopt(vpars.title_option, vpars) "</title>\n\
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"" ...
+  fullfile(vpars.root, opts.css) "\" />\n\
+  <script src=\"" ...
+  fullfile(vpars.root, "fixed.js") "\" type=\"text/javascript\"></script>\n\
+  <script src=\"" ...
+  fullfile(vpars.root, "javascript.js") ...
+  "\" type=\"text/javascript\"></script>\n\
+  <link rel=\"shortcut icon\" href=\"" ...
+  fullfile(vpars.root, "favicon.ico") "\" />\n\
   </head>\n\
-  <body %body_command>\n\
+  <body " getopt(vpars.body_command_option, vpars) "\
+>\n\
   <div id=\"top-menu\" class=\"menu\">\n\
    <table class=\"menu\">\n\
       <tr>\n\
         <td style=\"width: 90px;\" class=\"menu\" rowspan=\"2\">\n\
           <a name=\"top\">\n\
-          <img src=\"%rootoct.png\" alt=\"Octave logo\" />\n\
+          <img src=\"" ...
+          fullfile(vpars.root, "oct.png") "\" alt=\"Octave logo\" />\n\
           </a>\n\
         </td>\n\
         <td class=\"menu\" style=\"padding-top: 0.9em;\">\n\
@@ -212,14 +271,22 @@ function options = get_html_options_project (options, project_name)
       <tr>\n\
         <td class=\"menu\">\n\
 \n\
- <a href=\"%rootindex.html\" class=\"menu\">Home</a> &middot;\n\
- <a href=\"%rootpackages.php\" class=\"menu\">Packages</a> &middot;\n\
- <a href=\"%rootdevelopers.html\" class=\"menu\">Developers</a> &middot;\n\
- <a href=\"%rootdocs.html\" class=\"menu\">Documentation</a> &middot;\n\
- <a href=\"%rootFAQ.html\" class=\"menu\">FAQ</a> &middot;\n\
- <a href=\"%rootbugs.html\" class=\"menu\">Bugs</a> &middot;\n\
- <a href=\"%rootarchive.html\" class=\"menu\">Mailing Lists</a> &middot;\n\
- <a href=\"%rootlinks.html\" class=\"menu\">Links</a> &middot;\n\
+ <a href=\"" ...
+ fullfile(vpars.root, "index.html") "\" class=\"menu\">Home</a> &middot;\n\
+ <a href=\"" ...
+ fullfile(vpars.root, "packages.php") "\" class=\"menu\">Packages</a> &middot;\n\
+ <a href=\"" ...
+ fullfile(vpars.root, "developers.html") "\" class=\"menu\">Developers</a> &middot;\n\
+ <a href=\"" ...
+ fullfile(vpars.root, "docs.html") "\" class=\"menu\">Documentation</a> &middot;\n\
+ <a href=\"" ...
+ fullfile(vpars.root, "FAQ.html") "\" class=\"menu\">FAQ</a> &middot;\n\
+ <a href=\"" ...
+ fullfile(vpars.root, "bugs.html") "\" class=\"menu\">Bugs</a> &middot;\n\
+ <a href=\"" ...
+ fullfile(vpars.root, "archive.html") "\" class=\"menu\">Mailing Lists</a> &middot;\n\
+ <a href=\"" ...
+ fullfile(vpars.root, "links.html") "\" class=\"menu\">Links</a> &middot;\n\
  <a href=\"https://octave.sourceforge.io/code.html\" class=\"menu\">Code</a>\n\
 \n\
         </td>\n\
@@ -228,22 +295,38 @@ function options = get_html_options_project (options, project_name)
   </div>\n\
 <div id=\"left-menu\">\n\
   <h3>Navigation</h3>\n\
-  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootoperators.html\">Operators and Keywords</a></p>\n\
-  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootfunction_list.html\">Function List:</a></p>\n\
+  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"" ...
+  fullfile(vpars.root, "operators.html") "\">Operators and Keywords</a></p>\n\
+  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"" ...
+  fullfile(vpars.root, "function_list.html") "\">Function List:</a></p>\n\
   <ul class=\"left-menu-list\">\n\
     <li class=\"left-menu-list\">\n\
-      <a  class=\"left-menu-link\" href=\"%rootoctave/overview.html\">&#187; Octave core</a>\n\
+      <a  class=\"left-menu-link\" href=\"" ...
+      fullfile(vpars.root, "octave/overview.html") ...
+      "\">&#187; Octave core</a>\n\
     </li>\n\
     <li class=\"left-menu-list\">\n\
-      <a  class=\"left-menu-link\" href=\"%rootfunctions_by_package.php\">&#187; by package</a>\n\
+      <a  class=\"left-menu-link\" href=\"" ...
+      fullfile(vpars.root, "functions_by_package.php") ...
+      "\">&#187; by package</a>\n\
     </li>\n\
     <li class=\"left-menu-list\">\n\
-      <a  class=\"left-menu-link\" href=\"%rootfunctions_by_alpha.php\">&#187; alphabetical</a>\n\
+      <a  class=\"left-menu-link\" href=\"" ...
+      fullfile(vpars.root, "functions_by_alpha.php") ...
+      "\">&#187; alphabetical</a>\n\
     </li>\n\
   </ul>\n\
-  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"%rootdoxygen/html\">C++ API</a></p>\n\
+  <p class=\"left-menu\"><a class=\"left-menu-link\" href=\"" ...
+  fullfile(vpars.root, "doxygen/html") "\">C++ API</a></p>\n\
 </div>\n\
-<div id=\"doccontent\">\n";
+<div id=\"doccontent\">\n"];
+
+      options.header = ...
+      @ (opts, pars, vpars) ...
+        getopt ("__header__",
+                setfield ...
+                  (setfield (vpars, "body_command_option", "body_command"),
+                   "title_option", "title"));
 
       ## CSS
       options.css = "octave-forge.css";
@@ -262,40 +345,81 @@ function options = get_html_options_project (options, project_name)
       
       ## Options for individual function pages
       options.body_command = 'onload="javascript:fix_top_menu (); javascript:show_left_menu ();"';
-      options.index_footer = [sf_logo "</div>\n</body>\n</html>\n"];
 
-      options.overview_footer = [ ...
-        "<p>Package: <a href=\"index.html\">%package</a></p>\n" ...
-        options.index_footer];
-      options.footer = [ ...
-        "<p>Package: <a href=\"%pkgrootindex.html\">%package</a></p>\n" ...
-        options.index_footer];
-      options.title = "Function Reference: %name";
+      options.footer = @ (opts, pars, vpars) sprintf ( ...
+        "<p>Package: <a href=\"%s\">%s</a></p>\n%s",
+        fullfile (vpars.pkgroot, "index.html"),
+        pars.package,
+        getopt ("index_footer", vpars));
+      options.title = @ (opts, pars, vpars) ...
+                        sprintf ("Function Reference: %s", vpars.name);
       options.include_demos = true;
-      options.seealso = @octave_forge_seealso;
+      options.seealso = @ (opts, pars, vpars) @octave_forge_seealso;
 
       ## Options for overview page
       options.include_overview = true;
-      options.overview_body_command = options.body_command;
+      options.overview_header = ...
+      @ (opts, pars, vpars) ...
+        getopt ("__header__",
+                setfield ...
+                  (setfield (vpars, "body_command_option",
+                             "overview_body_command"),
+                   "title_option", "overview_title"));
+      options.overview_footer = @ (opts, pars, vpars) sprintf ( ...
+        "<p>Package: <a href=\"index.html\">%s</a></p>\n%s",
+        pars.package, getopt ("index_footer", vpars));
+
+      ## Options for the news page.
+      options.news_header = ...
+      @ (opts, pars, vpars) ...
+        getopt ("__header__",
+                setfield ...
+                  (setfield (vpars, "body_command_option",
+                             "news_body_command"),
+                   "title_option", "news_title"));
+
+      ## Options for the copying page.
+      options.copying_header = ...
+      @ (opts, pars, vpars) ...
+        getopt ("__header__",
+                setfield ...
+                  (setfield (vpars, "body_command_option",
+                             "copying_body_command"),
+                   "title_option", "copying_title"));
 
       ## Options for package list page
       options.include_package_list_item = true;
-      options.package_list_item = ...
-"<h3 class=\"package_name\" id=\"%name\"><a class=\"package_name\" href=\"./%name/index.html\">%name</a></h3>\n\
-<p class=\"package_desc\">%shortdescription</p>\n\
+      options.package_list_item = @ (opts, pars, vpars) [ ...
+"<h3 class=\"package_name\" id=\"" ...
+pars.package "\"><a class=\"package_name\" href=\"./" ...
+fullfile(pars.package, "index.html") "\">" pars.package "</a></h3>\n\
+<p class=\"package_desc\">" pars.shortdescription "</p>\n\
 <p>\n\
-<a class=\"package_link\" href=\"./%name/index.html\">details</a>\n\
-<a class=\"download_link\" href=\"https://downloads.sourceforge.net/octave/%name-%version.%extension?download\">download</a>\n\
-</p>\n";
+<a class=\"package_link\" href=\"./" pars.package "/index.html\">details</a>\n\
+<a class=\"download_link\" \
+href=\"https://downloads.sourceforge.net/octave/" ...
+pars.package "-" pars.version "." opts.extension "?download\">download</a>\n\
+</p>\n"];
 
       ## Options for index package
-      options.index_title = "The '%name' Package";
-      options.download_link = "https://downloads.sourceforge.net/octave/%name-%version.tar.gz?download";
+      options.index_title = @ (opts, pars, vpars) ...
+                              sprintf ("The '%s' Package", pars.package);
+      options.download_link = @ (opts, pars, vpars) [ ...
+      "https://downloads.sourceforge.net/octave/" pars.package "-" ...
+      pars.version "." opts.extension "?download"];
       options.older_versions_download = "https://sourceforge.net/projects/octave/files/";
       options.include_package_page = true;
       options.include_package_license = true;
       options.include_package_news = true;
       options.index_body_command = "onload=\"javascript:fix_top_menu ();\"";
+      options.index_header = ...
+      @ (opts, pars, vpars) ...
+        getopt ("__header__",
+                setfield ...
+                  (setfield (vpars, "body_command_option",
+                             "index_body_command"),
+                   "title_option", "index_title"));
+      options.index_footer = [sf_logo "</div>\n</body>\n</html>\n"];
 
       ## Package doc
       options.package_doc = "";
@@ -311,9 +435,11 @@ function options = get_html_options_project (options, project_name)
       options.website_files = "of-website-files";
 
     case "octave"
-      options.header = "__HEADER__(`%title')";
+      options.header = @ (opts, pars, vpars) ...
+        sprintf ("__HEADER__(`%s')", getopt ("title", vpars));
       options.footer = "__OCTAVE_TRAILER__";
-      options.title  = "Function Reference: %name";
+      options.title  = @ (opts, pars, vpars) ...
+                         sprintf ("Function Reference: %", vpars.name);
       options.include_overview = true;
 
     otherwise

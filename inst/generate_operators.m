@@ -35,18 +35,23 @@ function generate_operators (outdir = "htdocs", options = struct ())
   endif
 
   ## Create directories if needed
-  if (!exist (outdir, "dir"))
-    [succ, msg] = mkdir (outdir);
-    if (!succ)
-      error ("Unable to create directory %s:\n %s", outdir, msg);
-    endif
-  endif
+  assert_dir (outdir);
+
   name = fullfile (outdir, "operators.html");
 
   ## Generate html
+
   title = "Operators and Keywords";
   options.body_command = 'onload="javascript:fix_top_menu ();"';
-  [header, title, footer] = get_header_title_and_footer ("overview", options, title);
+
+  ## Initialize getopt.
+  getopt (options, struct ());
+
+  vpars = struct ("name", title,
+                  "pkgroot", "");
+  header = getopt ("overview_header", vpars);
+  title  = getopt ("overview_title",  vpars);
+  footer = getopt ("overview_footer", vpars);
 
   fid = fopen (name, "w");
   if (fid < 0)

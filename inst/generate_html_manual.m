@@ -28,11 +28,11 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
     error ("Not enough input arguments: at least one argument was expected.");
   endif
 
-  if (!ischar (srcdir))
+  if (! ischar (srcdir))
     error ("First input argument must be a string");
   endif
 
-  if (!ischar (outdir))
+  if (! ischar (outdir))
     error ("Second input argument must be a string");
   endif
 
@@ -44,12 +44,7 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   endif
 
   ## Create directories
-  if (!exist (outdir, "dir"))
-    [succ, msg] = mkdir (outdir);
-    if (!succ)
-      error ("Unable to create directory %s:\n %s", outdir, msg);
-    endif
-  endif
+  assert_dir (outdir);
 
   ###################################################
   ##  Generate reference for individual functions  ##
@@ -62,7 +57,7 @@ function generate_html_manual (srcdir, outdir = "htdocs", options = struct ())
   index.name = "octave";
   index.description = "GNU Octave comes with a large set of general-purpose functions that are listed below. This is the core set of functions that is available without any packages installed.";
   for k = 1:length (indices)
-    if (!isempty (indices{k}))
+    if (! isempty (indices{k}))
       ikp = indices{k}.provides;
       index.provides (end+1:end+length (ikp)) = ikp;
     endif
