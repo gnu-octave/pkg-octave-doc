@@ -1,3 +1,5 @@
+ ** Add repository link to index page.
+
  ** In the individual options, as returned by `get_html_options' and
     used in html generation, replacement strings ("%...") are not
     considered anymore. Instead, options can be anonymouns functions

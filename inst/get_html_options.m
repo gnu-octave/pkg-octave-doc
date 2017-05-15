@@ -152,6 +152,7 @@ function options = get_html_options_default (options)
   ## Leave empty for no download link
   default.download_link = "";
   default.older_versions_download = "";
+  default.repository_link = "";
 
   ## Create package licence page ?
   default.include_package_license = false;
@@ -342,6 +343,9 @@ fullfile(pars.package, "index.html") "\">" pars.package "</a></h3>\n\
         pars.package "-" pars.version "." opts.extension];
       options.older_versions_download = @ (opts, pars, vpars) ...
         fullfile (vpars.root, "released-packages/");
+      options.repository_link = @ (opts, pars, vpars) ...
+        fullfile (vpars.root,
+                  sprintf ("pkg-repository/%s/", pars.package));
       options.include_package_page = true;
       options.include_package_license = true;
       options.include_package_news = true;

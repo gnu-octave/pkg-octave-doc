@@ -556,13 +556,29 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"%s\" class=\"download_link\">\n", link);
       fprintf (fid, "      Download Package\n");
-      fprintf (fid, "    </a><br />\n");
+      fprintf (fid, "    </a></td></tr>\n");
+      if (! isempty (repository_link = ...
+                     getopt ("repository_link", vpars)))
+        fprintf (fid, "    <tr><td>\n");
+        fprintf (fid, "      <a href=\"%s\" class=\"repository_link\">\n",
+                 repository_link);
+        fprintf (fid,
+                 "        <img src=\"../repository.png\" alt=\"Repository icon\"\></a></td>\n");
+        fprintf (fid,
+                 "  <td><a href=\"%s\" class=\"repository_link\">",
+                 repository_link);
+        fprintf (fid, "Repository</a>\n");
+        fprintf (fid, "</td></tr>\n");
+      endif
+      ## The following link will have small text. So capitalize it,
+      ## too, and don't put it in parantheses, otherwise it might be
+      ## mistaken for a verbal attribute to the link above it.
       if (! isempty (older_versions_download = ...
-                     getopt ("older_versions_download")))
-        fprintf (fid, "    <a href=\"%s\"\n", older_versions_download);
-        fprintf (fid, "     class=\"older_versions_download\">(older versions)</a>\n");
+                     getopt ("older_versions_download", vpars)))
+        fprintf (fid, "    <tr><td /><td><a href=\"%s\"\n", older_versions_download);
+        fprintf (fid, "     class=\"older_versions_download\">Older versions</a></td></tr>\n");
       end
-      fprintf (fid, "  </td></tr></table>\n");
+      fprintf (fid, "  </table>\n");
       fprintf (fid, "</div>\n");
     endif
     fprintf (fid, "</td></tr>\n");

@@ -590,6 +590,8 @@ div.download_package {
 a.function_reference_link,
 a.download_link,
 a.homepage_link,
+a.repository_link,
+a.older_versions_download,
 a.package_doc,
 a.news_file {
   text-decoration: none;
