@@ -73,7 +73,7 @@ function opt = getopt (varargin)
 
       ## defaults
       if (! isfield (vpars, "pkgroot"))
-        vpars.pkgroot = ".";
+        vpars.pkgroot = "";
       endif
 
       ## pre-compute 'root' from 'pkgroot'
