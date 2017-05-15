@@ -321,7 +321,9 @@ function options = get_html_options_project (options, project_name)
                              "copying_body_command"),
                    "title_option", "copying_title"));
 
-      ## Options for package list page
+      ## Options for package list page. Don't add new items here, this
+      ## page should ideally be constructed from scratch at the server
+      ## side.
       options.include_package_list_item = true;
       options.package_list_item = @ (opts, pars, vpars) [ ...
 "<h3 class=\"package_name\" id=\"" ...
@@ -330,18 +332,16 @@ fullfile(pars.package, "index.html") "\">" pars.package "</a></h3>\n\
 <p class=\"package_desc\">" pars.shortdescription "</p>\n\
 <p>\n\
 <a class=\"package_link\" href=\"./" pars.package "/index.html\">details</a>\n\
-<a class=\"download_link\" \
-href=\"https://downloads.sourceforge.net/octave/" ...
-pars.package "-" pars.version "." opts.extension "?download\">download</a>\n\
 </p>\n"];
 
       ## Options for index package
       options.index_title = @ (opts, pars, vpars) ...
                               sprintf ("The '%s' Package", pars.package);
       options.download_link = @ (opts, pars, vpars) [ ...
-      "https://downloads.sourceforge.net/octave/" pars.package "-" ...
-      pars.version "." opts.extension "?download"];
-      options.older_versions_download = "https://sourceforge.net/projects/octave/files/";
+        fullfile(vpars.root, "download.php") "?package=" ...
+        pars.package "-" pars.version "." opts.extension];
+      options.older_versions_download = @ (opts, pars, vpars) ...
+        fullfile (vpars.root, "released-packages/");
       options.include_package_page = true;
       options.include_package_license = true;
       options.include_package_news = true;
