@@ -300,12 +300,12 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
         pos = vertcat (struct2cell (name_hashes.(["fun_", letter])){idx});
         ## linear positions of functions in 'first_sentences'
         lpos = cum_nfcns(pos(:, 1)) + pos(:, 2);
-        fileprintf (name_fn, "%s\n", funs{:});
-        fileprintf (desc_fn, "%s\n", f_s_linear{lpos});
+        fileprintf (name_fn, "alphabet database", "%s\n", funs{:});
+        fileprintf (desc_fn, "alphabet database", "%s\n", f_s_linear{lpos});
       else
         ## create empty files
-        fileprintf (name_fn, "");
-        fileprintf (desc_fn, "");
+        fileprintf (name_fn, "alphabet database", "");
+        fileprintf (desc_fn, "alphabet database", "");
       endif
 
       ## class names
@@ -321,7 +321,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
             mthd_fn = fullfile (classdir, mthds{mid});
             pos = name_hashes.(["class_", letter]). ...
                               (classes{cid}).(mthds{mid});
-            fileprintf (mthd_fn, [first_sentences{pos(1)}{pos(2)}, "\n"]);
+            fileprintf (mthd_fn, "alphabet database",
+                        [first_sentences{pos(1)}{pos(2)}, "\n"]);
           endfor
         endfor
       endif
@@ -339,7 +340,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
             fcn_fn = fullfile (nspdir, fcns{fid});
             pos = name_hashes.(["nsp_", letter]). ...
                               (nsps{nid}).(fcns{fid});
-            fileprintf (fcn_fn, [first_sentences{pos(1)}{pos(2)}, "\n"]);
+            fileprintf (fcn_fn, "alphabet database",
+                        [first_sentences{pos(1)}{pos(2)}, "\n"]);
           endfor
         endfor
       endif
@@ -355,19 +357,14 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   if (getopt ("include_package_list_item"))
 
     pkg_list_item_filename = getopt ("pkg_list_item_filename");
-    ## Extract first sentence for a short description, remove period at the end
-    shortdescription = regexprep (desc.description, '\.($| .*)', '');
 
     vpars = struct ("name", desc.name);
     text = getopt ("package_list_item", vpars);
 
-    fid = fopen (fullfile (packdir, pkg_list_item_filename), "w");
-    if (fid > 0)
-      fprintf (fid, text);
-      fclose (fid);
-    else
-      error ("Unable to open file %s.", pkg_list_item_filename);
-    endif
+    fileprintf (fullfile (packdir, pkg_list_item_filename),
+                pkg_list_item_filename,
+                text);
+
   endif
 
   #####################
@@ -788,9 +785,9 @@ function assert_dir (directory)
   endif
 endfunction
 
-function fileprintf (path, varargin)
+function fileprintf (path, what_file, varargin)
   if (([fid, msg] = fopen (path, "w")) == -1)
-    error ("Could not open alphabet database for writing");
+    error ("Could not open %s for writing", what_file);
   endif
   unwind_protect
     fprintf (fid, varargin{:});
