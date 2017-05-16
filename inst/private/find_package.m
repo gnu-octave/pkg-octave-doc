@@ -14,7 +14,11 @@
 ## along with this program; see the file COPYING.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-## Internal function
+## -*- texinfo -*-
+## @deftypefn {Function File} find_package ()
+## undocumented internal function
+## @end deftypefn
+
 function [package, found] = find_package (name)
   package = "octave";
   p = which (name);
