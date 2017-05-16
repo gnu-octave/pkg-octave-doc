@@ -14,7 +14,12 @@
 ## along with this program; see the file COPYING.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-function opt = getopt (varargin)
+## -*- texinfo -*-
+## @deftypefn {Function File} getopt ()
+## undocumented internal function
+## @end deftypefn
+
+function ret = getopt (varargin)
 
   ## this function performs the parameterization of options, if
   ## applicable
@@ -32,6 +37,22 @@ function opt = getopt (varargin)
   ## invariable parameters
   persistent pars;
 
+
+  if (iscell (varargin{1}))
+
+    if (strcmp (varargin{1}, "get_pars"))
+
+      ret = pars;
+
+      return;
+
+    else
+      error ("getopt: unknown request");
+    endif
+
+  endif
+
+
   if (isstruct (varargin{1}))
 
     ## initialization
@@ -44,15 +65,16 @@ function opt = getopt (varargin)
 
     pars.package = getpar (desc, "name", "");
     pars.version = getpar (desc, "version", "");
+    pars.description = getpar (desc, "description", "");
     ## next command and comment moved here from
     ## generate_package_html.m 
     ##
     ## Extract first sentence for a short description, remove period
     ## at the end.
-    pars.shortdescription = regexprep (getpar (desc, "description", ""),
+    pars.shortdescription = regexprep (pars.description,
                                        '\.($| .*)', '');
 
-    pars.date = date ();
+    pars.gen_date = datestr (date (), "yyyy-mm-dd");
     pars.ghv = (a = ver ("generate_html")).Version;
 
   elseif (ischar (varargin{1}))
@@ -79,13 +101,13 @@ function opt = getopt (varargin)
       ## pre-compute 'root' from 'pkgroot'
       vpars.root = fullfile ("..", vpars.pkgroot);
 
-      opt = opts.(optname) (opts, pars, vpars);
+      ret = opts.(optname) (opts, pars, vpars);
 
     else
 
       ## simple option
 
-      opt = opts.(optname);
+      ret = opts.(optname);
 
     endif
 

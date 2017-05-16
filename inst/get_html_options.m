@@ -183,8 +183,8 @@ function options = get_html_options_default (options)
   <title>%s</title>\n\
 </head>\n\
 <body>",
-                                           opts.charset, pars.date,
-                                           pars.ghv,
+                                           opts.charset,
+                                           pars.gen_date, pars.ghv,
                                            getopt ("title", vpars));
   default.footer = "</body>\n</html>";
 
@@ -237,7 +237,7 @@ function options = get_html_options_project (options, project_name)
   <head>\n\
   <meta http-equiv=\"content-type\" content=\"text/html; charset=" ...
   opts.charset "\" />\n\
-  <meta name=\"date\" content=\"" pars.date "\"/>\n\
+  <meta name=\"date\" content=\"" pars.gen_date "\"/>\n\
   <meta name=\"generator\" content=\"generate_html " pars.ghv "\" />\n\
   <meta name=\"author\" content=\"The Octave-Forge Community\" />\n\
   <meta name=\"description\" content=\"Octave-Forge is a collection of packages\

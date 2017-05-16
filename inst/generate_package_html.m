@@ -85,6 +85,38 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
             "package, or a structure giving its description."]);
   endif
 
+  ## Get detailed information about the package.
+  ##
+  ## We don't want a dependency on the struct package for
+  ## generate_html, otherwise the following could be:
+  ##
+  ## list = cell2struct (all_list.', {structcat(1, all_list{}).name}, 1).(packname)
+  ##
+  ## But probably pkg ("list") should not return a cell array of
+  ## structures anyway.
+  all_list = pkg ("list");
+  list = [];
+  for k = 1:length (all_list)
+    if (strcmp (all_list{k}.name, packname))
+      list = all_list{k};
+      break;
+    endif
+  endfor
+  if (isempty (list))
+    error ("Couldn't locate package '%s'", packname);
+  endif
+  depends = struct ();
+  for k = 1 : numel (list.depends)
+    it_depends = list.depends{k};
+    if (isfield (it_depends, "operator") && isfield (it_depends, "version"))
+      o = it_depends.operator;
+      v = it_depends.version;
+      depends.(it_depends.package) = sprintf ("%s %s", o, v);
+    else
+      depends.(it_depends.package) = "";
+    endif
+  endfor
+
   if (isempty (outdir))
     outdir = packname;
   elseif (! ischar (outdir))
@@ -365,6 +397,33 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
                 pkg_list_item_filename,
                 text);
 
+    ## Write easily parsable informational file.
+
+    export = getopt ({"get_pars"});
+
+    l_fields = {"date";
+                "author";
+                "maintainer";
+                "buildrequires";
+                "license";
+                "url"};
+
+    for field = l_fields.'
+      if (isfield (list, field{1}))
+        export.(field{1}) = list.(field{1});
+      else
+        export.(field{1}) = "";
+      endif
+    endfor
+
+    export.depends = depends;
+
+    json = encode_json_object (export);
+
+    fileprintf (fullfile (packdir, "description.json"),
+                "informational file",
+                sprintf ("%s\n", json));
+
   endif
 
   #####################
@@ -373,18 +432,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   if (! getopt ("include_package_news"))
     write_package_news = false;
   else
-    ## Get detailed information about the package
-    all_list = pkg ("list");
-    list = [];
-    for k = 1:length (all_list)
-      if (strcmp (all_list{k}.name, packname))
-        list = all_list{k};
-      endif
-    endfor
-    if (isempty (list))
-      error ("Couldn't locate package '%s'", packname);
-    endif
-
     ## Read news
     filename = fullfile (list.dir, "packinfo", "NEWS");
     fid = fopen (filename, "r");
@@ -487,17 +534,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ######################
 
   if (getopt ("include_package_page"))
-    ## Get detailed information about the package
-    all_list = pkg ("list");
-    list = [];
-    for k = 1:length (all_list)
-      if (strcmp (all_list{k}.name, packname))
-        list = all_list{k};
-      endif
-    endfor
-    if (isempty (list))
-      error ("Couldn't locate package '%s'", packname);
-    endif
 
     ## Open output file
     index_filename = "index.html";
@@ -631,16 +667,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
     if (isfield (list, "depends"))
       fprintf (fid, "    <tr><td>Dependencies: </td><td>\n");
-      for k = 1:length (list.depends)
-        p = list.depends{k}.package;
-        if (isfield (list.depends{k}, "operator") && isfield (list.depends{k}, "version"))
-          o = list.depends{k}.operator;
-          v = list.depends{k}.version;
-          vt = sprintf ("(%s %s) ", o, v);
-        else
-          vt = "";
-        endif
 
+      for [vt, p] = depends
         if (strcmpi (p, "octave"))
           fprintf (fid, "<a href=\"http://www.octave.org\">Octave</a> ");
         else
@@ -669,17 +697,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Write COPYING file ##
   ########################
   if (getopt ("include_package_license"))
-    ## Get detailed information about the package
-    all_list = pkg ("list");
-    list = [];
-    for k = 1:length (all_list)
-      if (strcmp (all_list{k}.name, packname))
-        list = all_list{k};
-      endif
-    endfor
-    if (isempty (list))
-      error ("Couldn't locate package '%s'", packname);
-    endif
 
     ## Read license
     filename = fullfile (list.dir, "packinfo", "COPYING");
@@ -794,4 +811,38 @@ function fileprintf (path, what_file, varargin)
   unwind_protect_cleanup
     fclose (fid);
   end_unwind_protect
+endfunction
+
+function json = encode_json_object (map, indent = "")
+
+  ## encodes only scalar structures, recursively all values must be
+  ## scalar structures or strings; adds no final newline
+
+  if ((nf = numel (fns = fieldnames (map))))
+
+    tmpl = strcat (["\n" indent '  "%s": %s'],
+                   repmat ([",\n" indent '  "%s": %s'], 1, nf - 1));
+
+  else
+    tmpl = "";
+  endif
+
+  for id = 1:nf
+
+    if (isstruct (map.(fns{id})))
+
+      map.(fns{id}) = ...
+      cstrcat ("\n", encode_json_object (map.(fns{id}), [indent "  "]));
+
+    else
+
+      map.(fns{id}) = cstrcat ('"', map.(fns{id}), '"');
+
+    endif
+
+  endfor
+
+  json = sprintf ([indent "{" tmpl "\n" indent "}"],
+                  vertcat (fns.', struct2cell (map).'){});
+  
 endfunction
