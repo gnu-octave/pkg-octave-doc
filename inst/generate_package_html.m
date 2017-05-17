@@ -147,6 +147,44 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Create function directory if needed
   assert_dir (fundir);
 
+  ## Write easily parsable informational file.
+
+  export = getopt ({"get_pars"});
+
+  l_fields = {"date";
+              "author";
+              "maintainer";
+              "buildrequires";
+              "license";
+              "url"};
+
+  for field = l_fields.'
+    if (isfield (list, field{1}))
+      export.(field{1}) = list.(field{1});
+    else
+      export.(field{1}) = "";
+    endif
+  endfor
+
+  export.depends = depends;
+
+  export.has_overview = getopt ("include_overview");
+  export.has_alphabetical_data = getopt ("include_alpha");
+  export.has_short_description = ...
+    getopt ("include_package_list_item");
+  export.has_news = getopt ("include_package_news");
+  export.has_package_doc = ! isempty (getopt ("package_doc"));
+  export.has_index = getopt ("include_package_page");
+  export.has_license = getopt ("include_package_license");
+  export.has_website_files = ! isempty (getopt ("website_files"));
+  export.has_demos = getopt ("include_demos");
+
+  json = encode_json_object (export);
+
+  fileprintf (fullfile (packdir, "description.json"),
+              "informational file",
+              sprintf ("%s\n", json));
+
   ##################################################
   ## Generate html pages for individual functions ##
   ##################################################
@@ -396,33 +434,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fileprintf (fullfile (packdir, pkg_list_item_filename),
                 pkg_list_item_filename,
                 text);
-
-    ## Write easily parsable informational file.
-
-    export = getopt ({"get_pars"});
-
-    l_fields = {"date";
-                "author";
-                "maintainer";
-                "buildrequires";
-                "license";
-                "url"};
-
-    for field = l_fields.'
-      if (isfield (list, field{1}))
-        export.(field{1}) = list.(field{1});
-      else
-        export.(field{1}) = "";
-      endif
-    endfor
-
-    export.depends = depends;
-
-    json = encode_json_object (export);
-
-    fileprintf (fullfile (packdir, "description.json"),
-                "informational file",
-                sprintf ("%s\n", json));
 
   endif
 
@@ -816,7 +827,7 @@ endfunction
 function json = encode_json_object (map, indent = "")
 
   ## encodes only scalar structures, recursively all values must be
-  ## scalar structures or strings; adds no final newline
+  ## scalar structures, strings, or booleans; adds no final newline
 
   if ((nf = numel (fns = fieldnames (map))))
 
@@ -833,6 +844,14 @@ function json = encode_json_object (map, indent = "")
 
       map.(fns{id}) = ...
       cstrcat ("\n", encode_json_object (map.(fns{id}), [indent "  "]));
+
+    elseif (isbool (map.(fns{id})))
+
+      if (map.(fns{id}))
+        map.(fns{id}) = "true";
+      else
+        map.(fns{id}) = "false";
+      endif
 
     else
 
