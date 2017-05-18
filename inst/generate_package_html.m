@@ -160,8 +160,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   num_categories = numel (desc.provides);
   anchors = links = implemented = cell (1, num_categories);
 
-  ## hash name information first, so we needn't go through all names
-  ## for each letter
+  ## hash name information, so we needn't go through all names for
+  ## each letter
   name_hashes = struct ();
   nfcns = zeros (num_categories, 1); # for generating numeric indices
                                      # later
@@ -189,6 +189,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
         ## namespaced function
         pkgroot = fullfile (pkgroot, "..");
         initial = lower (fun(1));
+        prefix = "nsp_";
         [nsp, fcn] = strsplit (fun, "."){:};
         assert_dir (nspdir = fullfile (fundir, nsp));
         if (fcn(1) == "@")
@@ -196,47 +197,33 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
           pkgroot = fullfile (pkgroot, "..");
           [class, method] = strsplit (fcn, "/"){:};
           assert_dir (fullfile (nspdir, class));
-          subpath = fullfile (nsp, class, sprintf ("%s.html", method));
-          outname = fullfile (fundir, subpath);
-          if (wrote_html (outname, pkgroot, fun))
-            implemented{k}(l) = true;
-            links{k}{l} = fullfile (local_fundir, subpath);
-            name_hashes.(["nsp_", initial]). ...
-                       (nsp).(class).(method) = [k, l];
-          endif
+          tree = {nsp, class, method};
         else
           ## namespaced normal function
-          subpath = fullfile (nsp, sprintf ("%s.html", fcn));
-          outname = fullfile (fundir, subpath);
-          if (wrote_html (outname, pkgroot, fun))
-            implemented{k}(l) = true;
-            links{k}{l} = fullfile (local_fundir, subpath);
-            name_hashes.(["nsp_", initial]).(nsp).(fcn) = [k, l];
-          endif
+          tree = {nsp, fcn};
         endif
       elseif (fun(1) == "@")
         ## class method
         pkgroot = fullfile (pkgroot, "..");
+        initial = lower (fun(2));
+        prefix = "class_";
         [class, method] = strsplit (fun, "/"){:};
         assert_dir (fullfile (fundir, class));
-        subpath = fullfile (class, sprintf ("%s.html", method));
-        outname = fullfile (fundir, subpath);
-        if (wrote_html (outname, pkgroot, fun))
-          implemented{k}(l) = true;
-          links{k}{l} = fullfile (local_fundir, subpath);
-          initial = lower (fun(2));
-          name_hashes.(["class_", initial]).(class).(method) = [k, l];
-        endif
+        tree = {class, method};
       else
         ## normal function
-        subpath = sprintf ("%s.html", fun);
-        outname = fullfile (fundir, subpath);
-        if (wrote_html (outname, pkgroot, fun))
-          implemented{k}(l) = true;
-          links{k}{l} = fullfile (local_fundir, subpath);
-          initial = lower (fun(1));
-          name_hashes.(["fun_", initial]).(fun) = [k, l];
-        endif
+        initial = lower (fun(1));
+        prefix = "fun_";
+        tree = {fun};
+      endif
+
+      subpath = fullfile (tree{1:end-1}, sprintf ("%s.html", tree{end}));
+      outname = fullfile (fundir, subpath);
+      if (wrote_html (outname, pkgroot, fun))
+        implemented{k}(l) = true;
+        links{k}{l} = fullfile (local_fundir, subpath);
+        name_hashes = setfield (name_hashes, [prefix, initial],
+                                tree{:}, [k, l]);
       endif
     endfor
   endfor
