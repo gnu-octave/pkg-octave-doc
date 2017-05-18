@@ -152,47 +152,95 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Generate html pages for individual functions ##
   ##################################################
 
-  num_categories = length (desc.provides);
-  anchors = implemented = cell (1, num_categories);
+  ## Since we loop over categories and functions, and now even check
+  ## for both namespaces and classes already here, we use the
+  ## opportunity to prepare some information for the alphabetical
+  ## database, too.
+
+  num_categories = numel (desc.provides);
+  anchors = links = implemented = cell (1, num_categories);
+
+  ## hash name information first, so we needn't go through all names
+  ## for each letter
+  name_hashes = struct ();
+  nfcns = zeros (num_categories, 1); # for generating numeric indices
+                                     # later
+
   for k = 1:num_categories
+
     F = desc.provides{k}.functions;
     category = desc.provides{k}.category;
+
+    if (k < num_categories)
+      nfcns(k + 1) = numel (F);
+    endif
 
     ## Create a valid anchor name by keeping only alphabetical characters
     anchors{k} = regexprep (category, "[^a-zA-Z]", "_");
 
     ## For each function in category
-    num_functions = length (F);
-    implemented{k} = cell (1, num_functions);
+    num_functions = numel (F);
+    implemented{k} = false (1, num_functions);
+    links{k} = cell (1, num_functions);
     for l = 1:num_functions
       fun = F{l};
-      ## for namespaced classes, "@" is not the first character
-      if (any (fun == "@"))
-        ## Extract @-directory name from function name
-        at_dir = fullfile (fundir, fileparts (fun));
-        ## Create directory if needed
-        assert_dir (at_dir);
-        ## Package root is two level upper in the case of an @-directory
-        pkgroot = "../..";
-      else
-        pkgroot = "..";
-      endif
-      outname = fullfile (fundir, sprintf ("%s.html", fun));
-      try
-        __html_help_text__ (outname, struct ("pkgroot", pkgroot,
-                                             "name", fun));
-        implemented{k}{l} = true;
-      catch
-        err = lasterror ();
-        if (strfind (err.message, "not found"))
-          warning ("marking '%s' as not implemented", fun);
-          implemented{k}{l} = false;
+      pkgroot = "..";
+      if (any (fun == "."))
+        ## namespaced function
+        pkgroot = fullfile (pkgroot, "..");
+        initial = lower (fun(1));
+        [nsp, fcn] = strsplit (fun, "."){:};
+        assert_dir (nspdir = fullfile (fundir, nsp));
+        if (fcn(1) == "@")
+          ## namespaced class method
+          pkgroot = fullfile (pkgroot, "..");
+          [class, method] = strsplit (fcn, "/"){:};
+          assert_dir (fullfile (nspdir, class));
+          subpath = fullfile (nsp, class, sprintf ("%s.html", method));
+          outname = fullfile (fundir, subpath);
+          if (wrote_html (outname, pkgroot, fun))
+            implemented{k}(l) = true;
+            links{k}{l} = fullfile (local_fundir, subpath);
+            name_hashes.(["nsp_", initial]). ...
+                       (nsp).(class).(method) = [k, l];
+          endif
         else
-          rethrow (err);
+          ## namespaced normal function
+          subpath = fullfile (nsp, sprintf ("%s.html", fcn));
+          outname = fullfile (fundir, subpath);
+          if (wrote_html (outname, pkgroot, fun))
+            implemented{k}(l) = true;
+            links{k}{l} = fullfile (local_fundir, subpath);
+            name_hashes.(["nsp_", initial]).(nsp).(fcn) = [k, l];
+          endif
         endif
-      end_try_catch
+      elseif (fun(1) == "@")
+        ## class method
+        pkgroot = fullfile (pkgroot, "..");
+        [class, method] = strsplit (fun, "/"){:};
+        assert_dir (fullfile (fundir, class));
+        subpath = fullfile (class, sprintf ("%s.html", method));
+        outname = fullfile (fundir, subpath);
+        if (wrote_html (outname, pkgroot, fun))
+          implemented{k}(l) = true;
+          links{k}{l} = fullfile (local_fundir, subpath);
+          initial = lower (fun(2));
+          name_hashes.(["class_", initial]).(class).(method) = [k, l];
+        endif
+      else
+        ## normal function
+        subpath = sprintf ("%s.html", fun);
+        outname = fullfile (fundir, subpath);
+        if (wrote_html (outname, pkgroot, fun))
+          implemented{k}(l) = true;
+          links{k}{l} = fullfile (local_fundir, subpath);
+          initial = lower (fun(1));
+          name_hashes.(["fun_", initial]).(fun) = [k, l];
+        endif
+      endif
     endfor
   endfor
+  cum_nfcns = cumsum (nfcns);
 
   #########################
   ## Write overview file ##
@@ -241,7 +289,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       ## For each function in category
       for l = 1:length (F)
         fun = F{l};
-        if (implemented{k}{l})
+        if (implemented{k}(l))
           try
             ## This will raise an error if the function is undocumented:
             first_sentences{k}{l} = get_first_help_sentence (fun, 200);
@@ -256,9 +304,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
           end_try_catch
           first_sentences{k}{l} = strrep (first_sentences{k}{l}, "\n", " ");
 
-          link = sprintf ("%s/%s.html", local_fundir, fun);
           fprintf (fid, "    <div class=\"func\"><b><a href=\"%s\">%s</a></b></div>\n",
-                   link, fun);
+                   links{k}{l}, fun);
           fprintf (fid, "    <div class=\"ftext\">%s</div>\n\n", ...
                    first_sentences{k}{l});
         else
@@ -277,47 +324,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 ################################################
 
   if (getopt ("include_alpha"))
-
-    ## hash name information first, so we needn't go through all names
-    ## for each letter
-    name_hashes = struct ();
-    nfcns = zeros (num_categories, 1); # for generating numeric
-                                       # indices later
-    for k = 1:num_categories
-      F = desc.provides{k}.functions;
-      if (k < num_categories)
-        nfcns(k + 1) = numel (F);
-      endif
-      for l = 1:numel (F)
-        if (implemented{k}{l})
-          fun = F{l};
-          if (any (fun == "."))
-            ## namespaced function
-            initial = lower (fun(1));
-            [nsp, fcn] = strsplit (fun, "."){:};
-            if (fcn(1) == "@")
-              ## namespaced class method
-              [class, method] = strsplit (fcn, "/"){:};
-              name_hashes.(["nsp_", initial]). ...
-                         (nsp).(class).(method) = [k, l];
-            else
-              ## namespaced normal function
-              name_hashes.(["nsp_", initial]).(nsp).(fcn) = [k, l];
-            endif
-          elseif (fun(1) == "@")
-            ## class method
-            initial = lower (fun(2));
-            [class, method] = strsplit (fun, "/"){:};
-            name_hashes.(["class_", initial]).(class).(method) = [k, l];
-          else
-            ## normal function
-            initial = lower (fun(1));
-            name_hashes.(["fun_", initial]).(fun) = [k, l];
-          endif
-        endif
-      endfor
-    endfor
-    cum_nfcns = cumsum (nfcns);
 
     ## directory for function information
     assert_dir (directory = fullfile (outdir, desc.name));
@@ -742,9 +748,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
               outdir, "f");
   endif
 
-  ###############################################
+  ##############################################
   ## write easily parsable informational file ##
-  ###############################################
+  ##############################################
 
   export = struct ();
 
@@ -867,6 +873,24 @@ function fileprintf (path, what_file, varargin)
   unwind_protect_cleanup
     fclose (fid);
   end_unwind_protect
+endfunction
+
+function succ = wrote_html (file, pkgroot, fun)
+
+  try
+    __html_help_text__ (file, struct ("pkgroot", pkgroot,
+                                      "name", fun));
+    succ = true;
+  catch
+    err = lasterror ();
+    if (strfind (err.message, "not found"))
+      warning ("marking '%s' as not implemented", fun);
+      succ = false;
+    else
+      rethrow (err);
+    endif
+  end_try_catch
+
 endfunction
 
 function json = encode_json_object (map, indent = "")
