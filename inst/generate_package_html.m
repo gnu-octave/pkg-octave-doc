@@ -203,7 +203,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     implemented{k} = cell (1, num_functions);
     for l = 1:num_functions
       fun = F{l};
-      if (fun(1) == "@")
+      ## for namespaced classes, "@" is not the first character
+      if (any (fun == "@"))
         ## Extract @-directory name from function name
         at_dir = fullfile (fundir, fileparts (fun));
         ## Create directory if needed
@@ -331,7 +332,15 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
             ## namespaced function
             initial = lower (fun(1));
             [nsp, fcn] = strsplit (fun, "."){:};
-            name_hashes.(["nsp_", initial]).(nsp).(fcn) = [k, l];
+            if (fcn(1) == "@")
+              ## namespaced class method
+              [class, method] = strsplit (fcn, "/"){:};
+              name_hashes.(["nsp_", initial]). ...
+                         (nsp).(class).(method) = [k, l];
+            else
+              ## namespaced normal function
+              name_hashes.(["nsp_", initial]).(nsp).(fcn) = [k, l];
+            endif
           elseif (fun(1) == "@")
             ## class method
             initial = lower (fun(2));
@@ -407,11 +416,29 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
           fcns = fieldnames (name_hashes.(["nsp_", letter]). ...
                                           (nsps{nid}));
           for fid = 1:numel (fcns)
-            fcn_fn = fullfile (nspdir, fcns{fid});
-            pos = name_hashes.(["nsp_", letter]). ...
-                              (nsps{nid}).(fcns{fid});
-            fileprintf (fcn_fn, "alphabet database",
-                        [first_sentences{pos(1)}{pos(2)}, "\n"]);
+            if (fcns{fid}(1) == "@")
+              ## namespaced class
+              assert_dir (nspcldir = fullfile (nspdir, fcns{fid}));
+              mthds = fieldnames (name_hashes.(["nsp_", letter]). ...
+                                             (nsps{nid}). ...
+                                             (fcns{fid}));
+              for mid = 1:numel (mthds)
+                mthd_fn = fullfile (nspcldir, mthds{mid});
+                pos = name_hashes.(["nsp_", letter]). ...
+                                 (nsps{nid}). ...
+                                 (fcns{fid}). ...
+                                 (mthds{mid});
+                fileprintf (mthd_fn, "alphabet database",
+                            [first_sentences{pos(1)}{pos(2)}, "\n"]);
+              endfor
+            else
+              ## namespaced normal function
+              fcn_fn = fullfile (nspdir, fcns{fid});
+              pos = name_hashes.(["nsp_", letter]). ...
+                               (nsps{nid}).(fcns{fid});
+              fileprintf (fcn_fn, "alphabet database",
+                          [first_sentences{pos(1)}{pos(2)}, "\n"]);
+            endif
           endfor
         endfor
       endif
