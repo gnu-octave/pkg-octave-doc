@@ -322,40 +322,34 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     ## flatten by concatenating all categories
     f_s_linear = horzcat (first_sentences{:});
 
-    ## FIXME: Do the php scripts really need, for functions, a file
-    ## for each letter, even if the file is empty? Otherwise loop over
-    ## fieldnames.
-    for letter = "a":"z"
+    for [tree, slot] = name_hashes  
+
+      prefix = slot(1:end-1);
+      letter = slot(end);
 
       ## function names
-      name_fn = fullfile (directory, ["function_names_", letter]);
-      desc_fn = fullfile (directory, ["function_descriptions_", letter]);
-      if (isfield (name_hashes, ["fun_", letter]))
-        [funs, idx] = sort (fieldnames (name_hashes.(["fun_", letter])));
-        pos = vertcat (struct2cell (name_hashes.(["fun_", letter])){idx});
+      if (strcmp (prefix, "fun_"))
+        name_fn = fullfile (directory, ["function_names_", letter]);
+        desc_fn = fullfile (directory, ["function_descriptions_", letter]);
+        [funs, idx] = sort (fieldnames (tree));
+        pos = vertcat (struct2cell (tree){idx});
         ## linear positions of functions in 'first_sentences'
         lpos = cum_nfcns(pos(:, 1)) + pos(:, 2);
         fileprintf (name_fn, "alphabet database", "%s\n", funs{:});
         fileprintf (desc_fn, "alphabet database", "%s\n", f_s_linear{lpos});
-      else
-        ## create empty files
-        fileprintf (name_fn, "alphabet database", "");
-        fileprintf (desc_fn, "alphabet database", "");
       endif
 
       ## class names
-      if (isfield (name_hashes, ["class_", letter]))
+      if (strcmp (prefix, "class_"))
         assert_dir (name_cl = fullfile (classes_dir,
                                         ["class_names_", letter]));
-        classes = sort (fieldnames (name_hashes.(["class_", letter])));
+        classes = sort (fieldnames (tree));
         for cid = 1:numel (classes)
           assert_dir (classdir = fullfile (name_cl, classes{cid}));
-          mthds = fieldnames (name_hashes.(["class_", letter]). ...
-                                          (classes{cid}));
+          mthds = fieldnames (tree.(classes{cid}));
           for mid = 1:numel (mthds)
             mthd_fn = fullfile (classdir, mthds{mid});
-            pos = name_hashes.(["class_", letter]). ...
-                              (classes{cid}).(mthds{mid});
+            pos = tree.(classes{cid}).(mthds{mid});
             fileprintf (mthd_fn, "alphabet database",
                         [first_sentences{pos(1)}{pos(2)}, "\n"]);
           endfor
@@ -363,35 +357,28 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       endif
 
       ## namespaces
-      if (isfield (name_hashes, ["nsp_", letter]))
+      if (strcmp (prefix, "nsp_"))
         assert_dir (name_nsp = fullfile (nsps_dir,
-                                        ["namespace_names_", letter]));
-        nsps = sort (fieldnames (name_hashes.(["nsp_", letter])));
+                                         ["namespace_names_", letter]));
+        nsps = sort (fieldnames (tree));
         for nid = 1:numel (nsps)
           assert_dir (nspdir = fullfile (name_nsp, nsps{nid}));
-          fcns = fieldnames (name_hashes.(["nsp_", letter]). ...
-                                          (nsps{nid}));
+          fcns = fieldnames (tree.(nsps{nid}));
           for fid = 1:numel (fcns)
             if (fcns{fid}(1) == "@")
               ## namespaced class
               assert_dir (nspcldir = fullfile (nspdir, fcns{fid}));
-              mthds = fieldnames (name_hashes.(["nsp_", letter]). ...
-                                             (nsps{nid}). ...
-                                             (fcns{fid}));
+              mthds = fieldnames (tree.(nsps{nid}).(fcns{fid}));
               for mid = 1:numel (mthds)
                 mthd_fn = fullfile (nspcldir, mthds{mid});
-                pos = name_hashes.(["nsp_", letter]). ...
-                                 (nsps{nid}). ...
-                                 (fcns{fid}). ...
-                                 (mthds{mid});
+                pos = tree.(nsps{nid}).(fcns{fid}).(mthds{mid});
                 fileprintf (mthd_fn, "alphabet database",
                             [first_sentences{pos(1)}{pos(2)}, "\n"]);
               endfor
             else
               ## namespaced normal function
               fcn_fn = fullfile (nspdir, fcns{fid});
-              pos = name_hashes.(["nsp_", letter]). ...
-                               (nsps{nid}).(fcns{fid});
+              pos = tree.(nsps{nid}).(fcns{fid});
               fileprintf (fcn_fn, "alphabet database",
                           [first_sentences{pos(1)}{pos(2)}, "\n"]);
             endif

@@ -1,3 +1,6 @@
+ ** No empty files are written anymore for the alphabetical function
+    database.
+
  ** Add repository link to index page.
 
  ** In the individual options, as returned by `get_html_options' and
