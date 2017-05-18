@@ -147,43 +147,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Create function directory if needed
   assert_dir (fundir);
 
-  ## Write easily parsable informational file.
-
-  export = getopt ({"get_pars"});
-
-  l_fields = {"date";
-              "author";
-              "maintainer";
-              "buildrequires";
-              "license";
-              "url"};
-
-  for field = l_fields.'
-    if (isfield (list, field{1}))
-      export.(field{1}) = list.(field{1});
-    else
-      export.(field{1}) = "";
-    endif
-  endfor
-
-  export.depends = depends;
-
-  export.has_overview = getopt ("include_overview");
-  export.has_alphabetical_data = getopt ("include_alpha");
-  export.has_short_description = ...
-    getopt ("include_package_list_item");
-  export.has_news = getopt ("include_package_news");
-  export.has_package_doc = ! isempty (getopt ("package_doc"));
-  export.has_index = getopt ("include_package_page");
-  export.has_license = getopt ("include_package_license");
-  export.has_website_files = ! isempty (getopt ("website_files"));
-  export.has_demos = getopt ("include_demos");
-
-  json = encode_json_object (export);
-
-  fileprintf (fullfile (packdir, "description.json"),
-              "informational file",
-              sprintf ("%s\n", json));
 
   ##################################################
   ## Generate html pages for individual functions ##
@@ -778,6 +741,61 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
                         website_files, "*"),
               outdir, "f");
   endif
+
+  ###############################################
+  ## write easily parsable informational file ##
+  ###############################################
+
+  export = struct ();
+
+  pars = getopt ({"get_pars"});
+
+  export.gen_date = pars.gen_date;
+  export.ghv = pars.ghv;
+
+  export.package.name = pars.package;
+
+  p_fields = {"version";
+              "description";
+              "shortdescription"};
+
+  for field = p_fields.'
+    export.package.(field{1}) = pars.(field{1});
+  endfor
+
+  l_fields = {"date";
+              "author";
+              "maintainer";
+              "buildrequires";
+              "license";
+              "url"};
+
+  for field = l_fields.'
+    if (isfield (list, field{1}))
+      export.package.(field{1}) = list.(field{1});
+    else
+      export.package.(field{1}) = "";
+    endif
+  endfor
+
+  export.package.depends = depends;
+
+  export.html.config.has_overview = getopt ("include_overview");
+  export.html.config.has_alphabetical_data = getopt ("include_alpha");
+  export.html.config.has_short_description = ...
+    getopt ("include_package_list_item");
+  export.html.config.has_news = getopt ("include_package_news");
+  export.html.config.has_package_doc = ! isempty (getopt ("package_doc"));
+  export.html.config.has_index = getopt ("include_package_page");
+  export.html.config.has_license = getopt ("include_package_license");
+  export.html.config.has_website_files = ! isempty (getopt ("website_files"));
+  export.html.config.has_demos = getopt ("include_demos");
+
+  json = encode_json_object (export);
+
+  fileprintf (fullfile (packdir, "description.json"),
+              "informational file",
+              sprintf ("%s\n", json));
 
 endfunction
 
