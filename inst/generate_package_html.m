@@ -117,6 +117,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
   endfor
 
+  ## Note paths used to write html in this variable.
+  paths = struct ();
+
   if (isempty (outdir))
     outdir = packname;
   elseif (! ischar (outdir))
@@ -143,7 +146,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   local_fundir = getopt ("function_dir");
   fundir = fullfile (packdir, local_fundir);
 
-
   ## Create function directory if needed
   assert_dir (fundir);
 
@@ -151,6 +153,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ##################################################
   ## Generate html pages for individual functions ##
   ##################################################
+
+  paths.function_help_dir = local_fundir;
 
   ## Since we loop over categories and functions, and now even check
   ## for both namespaces and classes already here, we use the
@@ -232,12 +236,17 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   #########################
   ## Write overview file ##
   #########################
+
+  paths.overview_file = "";
+
   first_sentences = cell (1, num_categories);
   if (getopt ("include_overview"))
 
     ## Create filename for the overview page
     overview_filename = getopt ("overview_filename");
     overview_filename = strrep (overview_filename, " ", "_");
+
+    paths.overview_file = overview_filename;
 
     fid = fopen (fullfile (packdir, overview_filename), "w");
     if (fid < 0)
@@ -310,6 +319,10 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Write function data for alphabetical lists ##
   ################################################
 
+  paths.alphabetical_database_functions_dir = "";
+  paths.alphabetical_database_classes_dir = "";
+  paths.alphabetical_database_namespaces_dir = "";
+
   if (getopt ("include_alpha"))
 
     ## directory for function information
@@ -318,6 +331,10 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     assert_dir (classes_dir = fullfile (directory, "classes"));
     ## subdirectory for namespace information
     assert_dir (nsps_dir = fullfile (directory, "namespaces"));
+
+    paths.alphabetical_database_functions_dir = ".";
+    paths.alphabetical_database_classes_dir = "classes";
+    paths.alphabetical_database_namespaces_dir = "namespaces";
 
     ## flatten by concatenating all categories
     f_s_linear = horzcat (first_sentences{:});
@@ -394,9 +411,13 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Write short description for forge overview page ##
   #####################################################
 
+  paths.short_description_file = "";
+
   if (getopt ("include_package_list_item"))
 
     pkg_list_item_filename = getopt ("pkg_list_item_filename");
+
+    paths.short_description_file = pkg_list_item_filename;
 
     vpars = struct ("name", desc.name);
     text = getopt ("package_list_item", vpars);
@@ -410,6 +431,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   #####################
   ## Write NEWS file ##
   #####################
+
+  paths.news_file = "";
+
   if (! getopt ("include_package_news"))
     write_package_news = false;
   else
@@ -426,6 +450,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
       ## Open output file
       news_filename = "NEWS.html";
+
+      paths.news_file = news_filename;
 
       fid = fopen (fullfile (packdir, news_filename), "w");
       if (fid < 0)
@@ -457,6 +483,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   # Is there a package documentation to be included ?
   write_package_documentation = ! isempty (getopt ("package_doc"));
 
+  paths.package_doc_dir = "";
+
   if (write_package_documentation)
 
     [~, doc_fn, doc_ext] = fileparts (getopt ("package_doc"));
@@ -464,6 +492,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     doc_src = fullfile (doc_root_dir, [doc_fn, doc_ext]);
     doc_subdir = "package_doc";
     doc_out_dir = fullfile (packdir, doc_subdir);
+
+    paths.package_doc_dir = doc_subdir;
 
     mkdir (doc_out_dir);
 
@@ -514,10 +544,14 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Write index file ##
   ######################
 
+  paths.index_file = "";
+
   if (getopt ("include_package_page"))
 
     ## Open output file
     index_filename = "index.html";
+
+    paths.index_file = index_filename;
 
     fid = fopen (fullfile (packdir, index_filename), "w");
     if (fid < 0)
@@ -677,6 +711,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ########################
   ## Write COPYING file ##
   ########################
+
+  paths.copying_file = "";
+
   if (getopt ("include_package_license"))
 
     ## Read license
@@ -690,6 +727,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
     ## Open output file
     copying_filename = "COPYING.html";
+
+    paths.copying_file = copying_filename;
 
     fid = fopen (fullfile (packdir, copying_filename), "w");
     if (fid < 0)
@@ -770,6 +809,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   export.html.config.has_license = getopt ("include_package_license");
   export.html.config.has_website_files = ! isempty (getopt ("website_files"));
   export.html.config.has_demos = getopt ("include_demos");
+
+  export.html.paths = paths;
 
   json = encode_json_object (export);
 
