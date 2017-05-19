@@ -306,9 +306,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fclose (fid);
   endif
 
-################################################
-## Write function data for alphabetical lists ##
-################################################
+  ################################################
+  ## Write function data for alphabetical lists ##
+  ################################################
 
   if (getopt ("include_alpha"))
 
@@ -465,13 +465,13 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     doc_subdir = "package_doc";
     doc_out_dir = fullfile (packdir, doc_subdir);
 
-    system (sprintf ('mkdir -p %s', doc_out_dir));
+    mkdir (doc_out_dir);
 
     ## Create makeinfo command
     makeinfo_cmd = sprintf ("%s --html -o %s %s", makeinfo_program (),
                             doc_out_dir, doc_src);
     if (! isempty (package_doc_options = getopt ("package_doc_options")))
-      makeinfo_cmd = [makeinfo_cmd, ' ', package_doc_options];
+      makeinfo_cmd = [makeinfo_cmd, " ", package_doc_options];
     endif
 
     ## Convert texinfo to HTML using makeinfo
@@ -484,11 +484,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
 
     ## Search the name of the main HTML index file.
-    package_doc_index = 'index.html';
+    package_doc_index = "index.html";
     if (! exist (fullfile (doc_out_dir, package_doc_index), "file"))
       ## Look for an HTML file with the same name as the texinfo source file
       [~, doc_fn, doc_ext] = fileparts (doc_src);
-      package_doc_index = [doc_fn, '.html'];
+      package_doc_index = [doc_fn, ".html"];
       if (! exist (fullfile (doc_out_dir, package_doc_index), "file"))
         ## If there is only one file, no hesitation
         html_fn_list = glob (fullfile (doc_out_dir, "*.html"));
@@ -496,7 +496,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
           [~, doc_fn, doc_ext] = fileparts (html_filenames_temp{1});
           package_doc_index = [doc_fn, doc_ext];
         else
-          error ('Unable to determine the root of the HTML manual.');
+          error ("Unable to determine the root of the HTML manual.");
         endif
       endif
     endif
