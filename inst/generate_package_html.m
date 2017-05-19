@@ -158,11 +158,13 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
   ## Since we loop over categories and functions, and now even check
   ## for both namespaces and classes already here, we use the
-  ## opportunity to prepare some information for the alphabetical
-  ## database, too.
+  ## opportunity to prepare some information for other functionality,
+  ## too.
 
   num_categories = numel (desc.provides);
-  anchors = links = implemented = cell (1, num_categories);
+
+  anchors = links = implemented = first_sentences = ...
+    cell (1, num_categories);
 
   ## hash name information, so we needn't go through all names for
   ## each letter
@@ -185,7 +187,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     ## For each function in category
     num_functions = numel (F);
     implemented{k} = false (1, num_functions);
-    links{k} = cell (1, num_functions);
+    links{k} = first_sentences{k} = cell (1, num_functions);
     for l = 1:num_functions
       fun = F{l};
       pkgroot = "..";
@@ -228,6 +230,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
         links{k}{l} = fullfile (local_fundir, subpath);
         name_hashes = setfield (name_hashes, [prefix, initial],
                                 tree{:}, [k, l]);
+        first_sentences{k}{l} = try_process_first_help_sentence (fun);
       endif
     endfor
   endfor
@@ -239,7 +242,6 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
   paths.overview_file = "";
 
-  first_sentences = cell (1, num_categories);
   if (getopt ("include_overview"))
 
     ## Create filename for the overview page
@@ -274,32 +276,16 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "  </select></p>\n\n");
 
     ## Generate function list by category
-    for k = 1:num_categories
+    for k = 1 : numel (first_sentences)
       F = desc.provides{k}.functions;
       category = desc.provides{k}.category;
       fprintf (fid, "  <h3 class=\"category\"><a name=\"%s\">%s</a></h3>\n\n",
                anchors{k}, category);
 
-      first_sentences{k} = cell (1, length (F));
-
       ## For each function in category
-      for l = 1:length (F)
+      for l = 1 : numel (first_sentences{k})
         fun = F{l};
-        if (implemented{k}(l))
-          try
-            ## This will raise an error if the function is undocumented:
-            first_sentences{k}{l} = get_first_help_sentence (fun, 200);
-          catch
-            err = lasterror ();
-            if ~ isempty (strfind (err.message, 'not documented'))
-              warning (sprintf ("%s is undocumented", fun));
-              first_sentences{k}{l} = "Not documented";
-            else
-              rethrow (err);
-            endif
-          end_try_catch
-          first_sentences{k}{l} = strrep (first_sentences{k}{l}, "\n", " ");
-
+        if (! isempty (first_sentences{k}{l}))
           fprintf (fid, "    <div class=\"func\"><b><a href=\"%s\">%s</a></b></div>\n",
                    links{k}{l}, fun);
           fprintf (fid, "    <div class=\"ftext\">%s</div>\n\n", ...
@@ -905,6 +891,25 @@ function succ = wrote_html (file, pkgroot, fun)
       rethrow (err);
     endif
   end_try_catch
+
+endfunction
+
+function text = try_process_first_help_sentence (fun)
+
+  try
+    ## This will raise an error if the function is undocumented:
+    text = get_first_help_sentence (fun, 200);
+  catch
+    err = lasterror ();
+    if (! isempty (strfind (err.message, "not documented")))
+      warning (sprintf ("%s is undocumented", fun));
+      text = "Not documented";
+    else
+      rethrow (err);
+    endif
+  end_try_catch
+
+  text = strrep (text, "\n", " ");
 
 endfunction
 
