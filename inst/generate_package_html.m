@@ -753,10 +753,12 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
   export = struct ();
 
+  export.generator = "generate_html";
+
   pars = getopt ({"get_pars"});
 
-  export.gen_date = pars.gen_date;
-  export.ghv = pars.ghv;
+  export.generator_version = pars.ghv;
+  export.date_generated = pars.gen_date;
 
   export.package.name = pars.package;
 
