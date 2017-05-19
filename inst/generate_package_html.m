@@ -579,13 +579,33 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "</div>\n");
     fprintf (fid, "</td>\n\n");
 
+    ## get icon attributions, if any
+    attrib = struct ();
+    attrib.download = '""';
+    attrib.repository = '""';
+    attrib.doc = '""';
+    attrib.manual = '""';
+    attrib.news = '""';
+    if (! isempty (website_files = getopt ("website_files")))
+      directory = fullfile (fileparts (mfilename ("fullpath")),
+                            website_files, "icons");
+      for [~, key] = attrib;
+        attribfile = fullfile (directory,
+                               sprintf ("%s.attrib", key));
+        if (! isempty (stat (attribfile)))
+          val = fileread (attribfile);
+          val(val == "\n") = [];
+          attrib.(key) = val;
+        endif
+      endfor
+    endif
     fprintf (fid, "<td>\n");
     vpars = struct ("name", desc.name);
     if (! isempty (link = getopt ("download_link", vpars)))
       fprintf (fid, "<div class=\"download_package\">\n");
       fprintf (fid, "  <table><tr><td>\n");
       fprintf (fid, "    <a href=\"%s\" class=\"download_link\">\n", link);
-      fprintf (fid, "      <img src=\"../download.png\" alt=\"Package download icon\"/>\n");
+      fprintf (fid, "      <img title=%s onmouseover=\"this.title=''\" src=\"../download.png\" alt=\"Package download icon\"/>\n", attrib.download);
       fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"%s\" class=\"download_link\">\n", link);
@@ -597,7 +617,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
         fprintf (fid, "      <a href=\"%s\" class=\"repository_link\">\n",
                  repository_link);
         fprintf (fid,
-                 "        <img src=\"../repository.png\" alt=\"Repository icon\"\></a></td>\n");
+                 "        <img title=%s onmouseover=\"this.title=''\" src=\"../repository.png\" alt=\"Repository icon\"\></a></td>\n", attrib.repository);
         fprintf (fid,
                  "  <td><a href=\"%s\" class=\"repository_link\">",
                  repository_link);
@@ -620,7 +640,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "<div class=\"package_function_reference\">\n");
     fprintf (fid, "  <table><tr><td>\n");
     fprintf (fid, "    <a href=\"%s\" class=\"function_reference_link\">\n", overview_filename);    
-    fprintf (fid, "      <img src=\"../doc.png\" alt=\"Function reference icon\"/>\n");
+    fprintf (fid, "      <img title=%s onmouseover=\"this.title=''\" src=\"../doc.png\" alt=\"Function reference icon\"/>\n", attrib.doc);
     fprintf (fid, "    </a>\n");
     fprintf (fid, "  </td><td>\n");
     fprintf (fid, "    <a href=\"%s\" class=\"function_reference_link\">\n", overview_filename);
@@ -631,7 +651,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       link = fullfile (doc_subdir, package_doc_index);
       fprintf (fid, "  <tr><td>\n");
       fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", link);      
-      fprintf (fid, "      <img src=\"../manual.png\" alt=\"Package doc icon\"/>\n");
+      fprintf (fid, "      <img title=%s onmouseover=\"this.title=''\" src=\"../manual.png\" alt=\"Package doc icon\"/>\n", attrib.manual);
       fprintf (fid, "    </a>\n");      
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", link);
@@ -642,7 +662,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     if (write_package_news)
       fprintf (fid, "  <tr><td>\n");
       fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");      
-      fprintf (fid, "      <img src=\"../news.png\" alt=\"Package news icon\"/>\n");
+      fprintf (fid, "      <img title=%s onmouseover=\"this.title=''\" src=\"../news.png\" alt=\"Package news icon\"/>\n", attrib.news);
       fprintf (fid, "    </a>\n");      
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");
