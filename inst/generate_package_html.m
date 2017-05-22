@@ -139,8 +139,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     error ("Third input argument must be a string or a structure");
   endif
 
-  ## Initialize getopt.
-  getopt (options, desc);
+  ## Initialize setopts.
+  setopts (options, desc);
 
   ## Function directory
   local_fundir = getopt ("function_dir");
@@ -775,7 +775,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
   export.generator = "generate_html";
 
-  pars = getopt ({"get_pars"});
+  [~, pars] = setopts ();
 
   export.generator_version = pars.ghv;
   export.date_generated = pars.gen_date;

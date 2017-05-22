@@ -19,110 +19,41 @@
 ## undocumented internal function
 ## @end deftypefn
 
-function ret = getopt (varargin)
+function ret = getopt (optname, vpars)
 
   ## this function performs the parameterization of options, if
   ## applicable
-  ##
-  ## initialize with 'getopt (options, pkg_desc)' (options is the
-  ## structure returned by 'get_html_options')
   ##
   ## get an option with 'getopt ("option_name");', or with 'getopt
   ## ("option_name", var_pars)', where var_pars is a structure with
   ## variable parameters like "pkgroot"
 
-  ## options
-  persistent opts;
+  [opts, pars] = setopts ();
 
-  ## invariable parameters
-  persistent pars;
+  if (is_function_handle (opts.(optname)))
 
+    ## parameterize option
 
-  if (iscell (varargin{1}))
-
-    if (strcmp (varargin{1}, "get_pars"))
-
-      ret = pars;
-
-      return;
-
-    else
-      error ("getopt: unknown request");
+    if (nargin () < 2)
+      vpars = struct ();
     endif
 
-  endif
-
-
-  if (isstruct (varargin{1}))
-
-    ## initialization
-
-    opts = varargin{1};
-
-    pars = struct ();
-
-    desc = varargin{2};
-
-    pars.package = getpar (desc, "name", "");
-    pars.version = getpar (desc, "version", "");
-    pars.description = getpar (desc, "description", "");
-    ## next command and comment moved here from
-    ## generate_package_html.m 
-    ##
-    ## Extract first sentence for a short description, remove period
-    ## at the end.
-    pars.shortdescription = regexprep (pars.description,
-                                       '\.($| .*)', '');
-
-    pars.gen_date = datestr (date (), "yyyy-mm-dd");
-    pars.ghv = (a = ver ("generate_html")).Version;
-
-  elseif (ischar (varargin{1}))
-
-    ## return an option
-
-    optname = varargin{1};
-
-    if (is_function_handle (opts.(optname)))
-
-      ## parameterize option
-
-      if (nargin () < 2)
-        vpars = struct ();
-      else
-        vpars = varargin{2};
-      endif
-
-      ## defaults
-      if (! isfield (vpars, "pkgroot"))
-        vpars.pkgroot = "";
-      endif
-
-      ## pre-compute 'root' from 'pkgroot'
-      vpars.root = fullfile ("..", vpars.pkgroot);
-
-      ret = opts.(optname) (opts, pars, vpars);
-
-    else
-
-      ## simple option
-
-      ret = opts.(optname);
-
+    ## defaults
+    if (! isfield (vpars, "pkgroot"))
+      vpars.pkgroot = "";
     endif
 
+    ## pre-compute 'root' from 'pkgroot'
+    vpars.root = fullfile ("..", vpars.pkgroot);
+
+    ret = opts.(optname) (opts, pars, vpars);
+
   else
-    error ("getopt: invalid usage");
-  endif
 
-endfunction
+    ## simple option
 
-function ret = getpar (s, field, default)
+    ret = opts.(optname);
 
-  if (isfield (s, field))
-    ret = s.(field);
-  else
-    ret = default;
   endif
 
 endfunction

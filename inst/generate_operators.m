@@ -44,8 +44,8 @@ function generate_operators (outdir = "htdocs", options = struct ())
   title = "Operators and Keywords";
   options.body_command = 'onload="javascript:fix_top_menu ();"';
 
-  ## Initialize getopt.
-  getopt (options, struct ());
+  ## Initialize setopts.
+  setopts (options, struct ());
 
   vpars = struct ("name", title,
                   "pkgroot", "");

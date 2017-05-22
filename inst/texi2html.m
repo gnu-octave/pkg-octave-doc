@@ -38,8 +38,8 @@ function [header, text, footer] = texi2html (text, options = struct (), root = "
     error ("Second input argument must be a string or a structure");
   endif
 
-  ## Initialize getopt.
-  getopt (options, struct ());
+  ## Initialize setopts.
+  setopts (options, struct ());
 
   ## Compute 'pkgroot' from 'root'.
   pkgroot = fileparts (fullfile (root, "dummy"))(1:end-3);

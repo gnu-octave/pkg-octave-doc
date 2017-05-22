@@ -60,8 +60,8 @@ function html_help_text ...
     error ("Third input argument must be a string or a structure");
   endif
 
-  ## Initialize getopt.
-  getopt (options, struct ("name", pkgname));
+  ## Initialize setopts.
+  setopts (options, struct ("name", pkgname));
 
   ## Call the actual function, now under private/.
   __html_help_text__ (outname, struct ("name", name,
