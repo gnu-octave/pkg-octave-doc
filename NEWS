@@ -1,15 +1,25 @@
- ** No empty files are written anymore for the alphabetical function
-    database.
+Summary of important user-visible changes for generate_html 0.3.0:
+-------------------------------------------------------------------
+
+ ** Nested namespaces and classes under namespaces are now handled in
+    generating the alphabetical function database.
+
+ ** Toplevel functions are now in separate files of the alphabetic
+    function database, and in the same directory tree as classes and
+    namespaces.
+
+ ** Function html helptexts are now in a directory tree corresponding
+    to that of the alphabetic function database.
 
  ** Add repository link to index page.
 
  ** In the individual options, as returned by `get_html_options' and
     used in html generation, replacement strings ("%...") are not
-    considered anymore. Instead, options can be anonymouns functions
+    considered anymore. Instead, options can be anonymous functions
     which use their arguments to configure the output string. So if
     users manually changed options with replacements, they have to do
-    it differently now; looking into the `get_html_optins.m' file will
-    help to figure out the correct way.
+    it differently now; looking into the `get_html_options.m' file
+    will help to figure out the correct way.
 
  ** Add Octave Forge stylesheet, icons, and javascript files.
 

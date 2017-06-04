@@ -169,17 +169,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## hash name information, so we needn't go through all names for
   ## each letter
   name_hashes = struct ();
-  nfcns = zeros (num_categories, 1); # for generating numeric indices
-                                     # later
 
   for k = 1:num_categories
 
     F = desc.provides{k}.functions;
     category = desc.provides{k}.category;
-
-    if (k < num_categories)
-      nfcns(k + 1) = numel (F);
-    endif
 
     ## Create a valid anchor name by keeping only alphabetical characters
     anchors{k} = regexprep (category, "[^a-zA-Z]", "_");
@@ -189,52 +183,37 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     implemented{k} = false (1, num_functions);
     links{k} = first_sentences{k} = cell (1, num_functions);
     for l = 1:num_functions
+
       fun = F{l};
-      pkgroot = "..";
-      if (any (fun == "."))
-        ## namespaced function
+      initial = lower (fun(isalpha (fun))(1));
+
+      tree = {};
+      ## strip and consider namespaces
+      nnsp = sum (fun == ".");
+      [tree{1:nnsp}, fcn] = strsplit (fun, "."){:};
+      pkgroot = fullfile ({".."}{ones (1, 1 + nnsp)});
+      assert_dir (tree, fundir);
+      ## strip and consider class name
+      if (fcn(1) == "@")
+        [tree{end + 1}, fcn] = strsplit (fcn, "/"){:};
         pkgroot = fullfile (pkgroot, "..");
-        initial = lower (fun(1));
-        prefix = "nsp_";
-        [nsp, fcn] = strsplit (fun, "."){:};
-        assert_dir (nspdir = fullfile (fundir, nsp));
-        if (fcn(1) == "@")
-          ## namespaced class method
-          pkgroot = fullfile (pkgroot, "..");
-          [class, method] = strsplit (fcn, "/"){:};
-          assert_dir (fullfile (nspdir, class));
-          tree = {nsp, class, method};
-        else
-          ## namespaced normal function
-          tree = {nsp, fcn};
-        endif
-      elseif (fun(1) == "@")
-        ## class method
-        pkgroot = fullfile (pkgroot, "..");
-        initial = lower (fun(2));
-        prefix = "class_";
-        [class, method] = strsplit (fun, "/"){:};
-        assert_dir (fullfile (fundir, class));
-        tree = {class, method};
-      else
-        ## normal function
-        initial = lower (fun(1));
-        prefix = "fun_";
-        tree = {fun};
+        assert_dir (fullfile (fundir, tree{:}));
       endif
+      ## consider function name
+      tree{end + 1} = fcn;
 
       subpath = fullfile (tree{1:end-1}, sprintf ("%s.html", tree{end}));
       outname = fullfile (fundir, subpath);
       if (wrote_html (outname, pkgroot, fun))
         implemented{k}(l) = true;
         links{k}{l} = fullfile (local_fundir, subpath);
-        name_hashes = setfield (name_hashes, [prefix, initial],
-                                tree{:}, [k, l]);
+        name_hashes = setfield (name_hashes, initial, tree{:},
+                                [k, l]);
         first_sentences{k}{l} = try_process_first_help_sentence (fun);
       endif
     endfor
+
   endfor
-  cum_nfcns = cumsum (nfcns);
 
   #########################
   ## Write overview file ##
@@ -305,91 +284,13 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## Write function data for alphabetical lists ##
   ################################################
 
-  paths.alphabetical_database_functions_dir = "";
-  paths.alphabetical_database_classes_dir = "";
-  paths.alphabetical_database_namespaces_dir = "";
+  paths.alphabetical_database_dir = "";
 
   if (getopt ("include_alpha"))
 
-    ## directory for function information
-    assert_dir (directory = fullfile (outdir, desc.name));
-    ## subdirectory for class information
-    assert_dir (classes_dir = fullfile (directory, "classes"));
-    ## subdirectory for namespace information
-    assert_dir (nsps_dir = fullfile (directory, "namespaces"));
+    paths.alphabetical_database_dir = "alpha";
 
-    paths.alphabetical_database_functions_dir = ".";
-    paths.alphabetical_database_classes_dir = "classes";
-    paths.alphabetical_database_namespaces_dir = "namespaces";
-
-    ## flatten by concatenating all categories
-    f_s_linear = horzcat (first_sentences{:});
-
-    for [tree, slot] = name_hashes  
-
-      prefix = slot(1:end-1);
-      letter = slot(end);
-
-      ## function names
-      if (strcmp (prefix, "fun_"))
-        name_fn = fullfile (directory, ["function_names_", letter]);
-        desc_fn = fullfile (directory, ["function_descriptions_", letter]);
-        [funs, idx] = sort (fieldnames (tree));
-        pos = vertcat (struct2cell (tree){idx});
-        ## linear positions of functions in 'first_sentences'
-        lpos = cum_nfcns(pos(:, 1)) + pos(:, 2);
-        fileprintf (name_fn, "alphabet database", "%s\n", funs{:});
-        fileprintf (desc_fn, "alphabet database", "%s\n", f_s_linear{lpos});
-      endif
-
-      ## class names
-      if (strcmp (prefix, "class_"))
-        assert_dir (name_cl = fullfile (classes_dir,
-                                        ["class_names_", letter]));
-        classes = sort (fieldnames (tree));
-        for cid = 1:numel (classes)
-          assert_dir (classdir = fullfile (name_cl, classes{cid}));
-          mthds = fieldnames (tree.(classes{cid}));
-          for mid = 1:numel (mthds)
-            mthd_fn = fullfile (classdir, mthds{mid});
-            pos = tree.(classes{cid}).(mthds{mid});
-            fileprintf (mthd_fn, "alphabet database",
-                        [first_sentences{pos(1)}{pos(2)}, "\n"]);
-          endfor
-        endfor
-      endif
-
-      ## namespaces
-      if (strcmp (prefix, "nsp_"))
-        assert_dir (name_nsp = fullfile (nsps_dir,
-                                         ["namespace_names_", letter]));
-        nsps = sort (fieldnames (tree));
-        for nid = 1:numel (nsps)
-          assert_dir (nspdir = fullfile (name_nsp, nsps{nid}));
-          fcns = fieldnames (tree.(nsps{nid}));
-          for fid = 1:numel (fcns)
-            if (fcns{fid}(1) == "@")
-              ## namespaced class
-              assert_dir (nspcldir = fullfile (nspdir, fcns{fid}));
-              mthds = fieldnames (tree.(nsps{nid}).(fcns{fid}));
-              for mid = 1:numel (mthds)
-                mthd_fn = fullfile (nspcldir, mthds{mid});
-                pos = tree.(nsps{nid}).(fcns{fid}).(mthds{mid});
-                fileprintf (mthd_fn, "alphabet database",
-                            [first_sentences{pos(1)}{pos(2)}, "\n"]);
-              endfor
-            else
-              ## namespaced normal function
-              fcn_fn = fullfile (nspdir, fcns{fid});
-              pos = tree.(nsps{nid}).(fcns{fid});
-              fileprintf (fcn_fn, "alphabet database",
-                          [first_sentences{pos(1)}{pos(2)}, "\n"]);
-            endif
-          endfor
-        endfor
-      endif
-
-    endfor
+    process_alpha_tree (name_hashes, fullfile (packdir, "alpha"));
 
   endif
 
@@ -826,6 +727,27 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
               "informational file",
               sprintf ("%s\n", json));
 
+function process_alpha_tree (tree, path)
+
+  if (isstruct (tree))
+
+    assert_dir (path);
+
+    for [subtree, name] = tree
+
+      process_alpha_tree (subtree, fullfile (path, name));
+
+    endfor
+
+  else
+
+    fileprintf (path, "alphabet_database",
+                [first_sentences{tree(1)}{tree(2)}, "\n"]);
+
+  endif
+
+endfunction
+
 endfunction
 
 function copy_files (filetype, file, doc_root_dir, doc_out_dir)
@@ -878,13 +800,27 @@ function copy_files (filetype, file, doc_root_dir, doc_out_dir)
 
 endfunction
 
-function assert_dir (directory)
+function assert_dir (directory, basepath)
+
+  if (nargin == 2)
+    ## 'directory' is a string array
+    for id = 1 : numel (directory)
+      assert_dir (basepath = fullfile (basepath, directory{id}));
+    endfor
+
+    return;
+
+  endif
+  
+  ## 'directory' is a string
+
   if (! exist (directory, "dir"))
     [succ, msg] = mkdir (directory);
     if (! succ)
       error ("Could not create '%s': %s", directory, msg);
     endif
   endif
+
 endfunction
 
 function fileprintf (path, what_file, varargin)
