@@ -692,9 +692,11 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   endfor
 
   l_fields = {"date";
+              "title";
               "author";
               "maintainer";
               "buildrequires";
+              "systemrequirements";
               "license";
               "url"};
 
