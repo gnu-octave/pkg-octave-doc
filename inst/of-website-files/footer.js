@@ -22,8 +22,8 @@ function write_footer ()
   document.write
   (`
 <div id="sf_logo">
-  <a href="https://sourceforge.net"><img src="https://sourceforge.net/sflogo.php?group_id=2888&amp;type=1"
-     width="88" height="31" style="border: 0;" alt="SourceForge.net Logo"/></a>
+  <a href="https://sourceforge.net"><img src="https://sourceforge.net/sflogo.php?group_id=2888&amp;type=13"
+     width="120" height="30" style="border: 0;" alt="SourceForge.net Logo"/></a>
 </div>
    `);
 }
