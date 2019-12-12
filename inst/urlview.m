@@ -69,7 +69,7 @@ function urlview (url, varargin)
   ## check for unknown option names
   known = {"browser"};
   if (numel (unknown = setdiff (fieldnames (opts), known)))
-    warning ("unknown option(s):%s", sprintf (" %s", unknown{}));
+    warning ("unknown option(s):%s", sprintf (" %s", unknown{:}));
   endif
 
   ## set option values
@@ -77,8 +77,8 @@ function urlview (url, varargin)
 
   if (isempty (browser))
     for cmd = {"firefox", "epiphany"}
-      if (! ([err, path] = system (sprintf ("which %s", cmd{}))))
-        browser = cmd{};
+      if (! ([err, path] = system (sprintf ("which %s", cmd{:}))))
+        browser = cmd{:};
         break
       endif
     endfor
@@ -92,7 +92,7 @@ function urlview (url, varargin)
   endif
 
   if (strcmp (method, "get")
-      && numel (url) + npars + numel ([pars{}]) > 2048)
+      && numel (url) + npars + numel ([pars{:}]) > 2048)
     error ("url size limit 2048 of method 'get' exceeded")
   endif
 
@@ -108,7 +108,7 @@ function urlview (url, varargin)
 
     if (npars)
       data = ...
-      sprintf ('  <input type="hidden" name="%s" value="%s">', pars{});
+      sprintf ('  <input type="hidden" name="%s" value="%s">', pars{:});
     else
       data = "";
     endif

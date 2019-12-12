@@ -105,7 +105,7 @@ function ret = check_duplicates (varargin)
   ## check for unknown option names
   known = {"excl"; "syms"; "text_only"; "url"; "browser"};
   if (numel (unknown = setdiff (fieldnames (opts), known)))
-    warning ("unknown option(s):%s", sprintf (" %s", unknown{}));
+    warning ("unknown option(s):%s", sprintf (" %s", unknown{:}));
   endif
 
   ## set option values

@@ -90,7 +90,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ## We don't want a dependency on the struct package for
   ## generate_html, otherwise the following could be:
   ##
-  ## list = cell2struct (all_list.', {structcat(1, all_list{}).name}, 1).(packname)
+  ## list = cell2struct (all_list.', {structcat(1, all_list{:}).name}, 1).(packname)
   ##
   ## But probably pkg ("list") should not return a cell array of
   ## structures anyway.
@@ -911,6 +911,6 @@ function json = encode_json_object (map, indent = "")
   endfor
 
   json = sprintf ([indent "{" tmpl "\n" indent "}"],
-                  vertcat (fns.', struct2cell (map).'){});
+                  vertcat (fns.', struct2cell (map).'){:});
   
 endfunction
