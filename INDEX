@@ -1,4 +1,4 @@
-generate_html >> Generate HTML web page from help texts
+generate_doc >> Generate documentation web page from help texts
 Main functions
  html_help_text
  generate_package_html

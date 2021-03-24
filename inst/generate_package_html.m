@@ -94,28 +94,32 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ##
   ## But probably pkg ("list") should not return a cell array of
   ## structures anyway.
-  all_list = pkg ("list");
+  
   list = [];
-  for k = 1:length (all_list)
-    if (strcmp (all_list{k}.name, packname))
-      list = all_list{k};
-      break;
-    endif
-  endfor
-  if (isempty (list))
-    error ("Couldn't locate package '%s'", packname);
-  endif
   depends = struct ();
-  for k = 1 : numel (list.depends)
-    it_depends = list.depends{k};
-    if (isfield (it_depends, "operator") && isfield (it_depends, "version"))
-      o = it_depends.operator;
-      v = it_depends.version;
-      depends.(it_depends.package) = sprintf ("%s %s", o, v);
-    else
-      depends.(it_depends.package) = "";
+  if (! strcmp (packname, "octave"))
+    all_list = pkg ("list");
+    for k = 1:length (all_list)
+      if (strcmp (all_list{k}.name, packname))
+        list = all_list{k};
+        break;
+      endif
+    endfor
+    if (isempty (list))
+      error ("Couldn't locate package '%s'", packname);
     endif
-  endfor
+    depends = struct ();
+    for k = 1 : numel (list.depends)
+      it_depends = list.depends{k};
+      if (isfield (it_depends, "operator") && isfield (it_depends, "version"))
+        o = it_depends.operator;
+        v = it_depends.version;
+        depends.(it_depends.package) = sprintf ("%s %s", o, v);
+      else
+        depends.(it_depends.package) = "";
+      endif
+    endfor
+  endif
 
   ## Note paths used to write html in this variable.
   paths = struct ();
@@ -171,6 +175,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   name_hashes = struct ();
 
   for k = 1:num_categories
+    printf ("Category %2d/%2d\n", k, num_categories);
 
     F = desc.provides{k}.functions;
     category = desc.provides{k}.category;
@@ -185,6 +190,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     for l = 1:num_functions
 
       fun = F{l};
+      printf ("  %2d/%2d %s\n", l, num_functions, fun);
       initial = lower (fun(isalpha (fun))(1));
 
       tree = {};
@@ -290,7 +296,8 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
     paths.alphabetical_database_dir = "alpha";
 
-    process_alpha_tree (name_hashes, fullfile (packdir, "alpha"));
+    process_alpha_tree (name_hashes, fullfile (packdir, "alpha"), 
+                        first_sentences);
 
   endif
 
@@ -728,8 +735,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   fileprintf (fullfile (packdir, "description.json"),
               "informational file",
               sprintf ("%s\n", json));
+endfunction
 
-function process_alpha_tree (tree, path)
+function process_alpha_tree (tree, path, first_sentences)
 
   if (isstruct (tree))
 
@@ -737,7 +745,7 @@ function process_alpha_tree (tree, path)
 
     for [subtree, name] = tree
 
-      process_alpha_tree (subtree, fullfile (path, name));
+      process_alpha_tree (subtree, fullfile (path, name), first_sentences);
 
     endfor
 
@@ -747,8 +755,6 @@ function process_alpha_tree (tree, path)
                 [first_sentences{tree(1)}{tree(2)}, "\n"]);
 
   endif
-
-endfunction
 
 endfunction
 
@@ -826,10 +832,13 @@ function assert_dir (directory, basepath)
 endfunction
 
 function fileprintf (path, what_file, varargin)
-  if (([fid, msg] = fopen (path, "w")) == -1)
+  [fid, msg] = fopen (path, "w");
+  if (fid == -1)
     error ("Could not open %s for writing", what_file);
   endif
   unwind_protect
+    varargin{1} = strrep (varargin{1}, "%",    "%%");
+    varargin{1} = strrep (varargin{1}, "%%%%", "%%");  # revert double escapes
     fprintf (fid, varargin{:});
   unwind_protect_cleanup
     fclose (fid);
@@ -839,8 +848,7 @@ endfunction
 function succ = wrote_html (file, pkgroot, fun)
 
   try
-    __html_help_text__ (file, struct ("pkgroot", pkgroot,
-                                      "name", fun));
+    __html_help_text__ (file, struct ("pkgroot", pkgroot, "name", fun));
     succ = true;
   catch
     err = lasterror ();

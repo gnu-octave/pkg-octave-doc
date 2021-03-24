@@ -9,6 +9,12 @@ The package is designed to be as general as possible,
 but also contains convenience functions for generating a set of pages
 for entire packages.
 
+The GNU Octave function reference can be created using
+```
+generate_html_manual ("/path/to/octave", "htdocs", ...
+                      get_html_options ("octave-forge"));
+```
+
 This is a fork of the
 [generate_html](https://gnu-octave.github.io/pkg-index/package/generate_html)
 package.
