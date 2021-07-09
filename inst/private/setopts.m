@@ -64,7 +64,7 @@ function [ret_opts, ret_pars] = setopts (options, desc)
                                      '\.($| .*)', '');
 
   pars.gen_date = datestr (date (), "yyyy-mm-dd");
-  pars.ghv = (a = ver ("generate_html")).Version;
+  pars.ghv = (a = ver ("generate_doc")).Version;
 
 endfunction
 
