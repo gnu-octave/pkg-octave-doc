@@ -42,7 +42,7 @@ function [ret_opts, ret_pars] = setopts (options, desc)
     ret_opts = opts;
 
     ret_pars = pars;
-    
+
     return;
 
   endif
@@ -64,7 +64,7 @@ function [ret_opts, ret_pars] = setopts (options, desc)
                                      '\.($| .*)', '');
 
   pars.gen_date = datestr (date (), "yyyy-mm-dd");
-  pars.ghv = (a = ver ("generate_doc")).Version;
+  pars.ghv = (a = ver ("octave-doc")).Version;
 
 endfunction
 
