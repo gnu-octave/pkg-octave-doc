@@ -34,11 +34,11 @@
 ## package:
 ##
 ## @example
-## generate_package_html ("image", "image_html");
+## generate_package_html ("image", "out_dir");
 ## @end example
 ##
-## The resulting files will be available in the @t{"image_html"} directory. The
-## index page will be called @t{"image_html/index.html"}.
+## The resulting files will be available in the @t{"out_dir"} directory. The
+## index page will be called @t{"out_dir/index.html"}.
 ##
 ## If you want to include prepared package documentation in html format,
 ## you have to set @var{options}.package_doc manually with the filename
@@ -52,69 +52,20 @@
 ## @seealso{get_html_options}
 ## @end deftypefn
 
-function generate_package_html (name = [], outdir = "htdocs", options = struct ())
+function generate_package_html (packname, outdir = "htdocs", options = struct ())
 
   ## Check input
-  if (isempty (name))
-    list = pkg ("list");
-    for k = 1:length (list)
-      generate_package_html (list{k}.name, outdir, options);
-    endfor
-    return;
-  elseif (isstruct (name))
-    desc = name;
-    if (isfield (name, "name"))
-      packname = desc.name;
-    else
-      packname = "";
-    endif
-  elseif (ischar (name))
-    packname = name;
-    pkg ("load", name);
-    desc = (pkg ("describe", name)){1};
-  else
-    error (["First input must either be the name of a ", ...
-            "package, or a structure giving its description."]);
+  if ((nargin < 1) || (nargin > 3) || ! ischar (packname))
+    print_usage ();
   endif
 
-  ## Get detailed information about the package.
-  ##
-  ## We don't want a dependency on the struct package for
-  ## generate_html, otherwise the following could be:
-  ##
-  ## list = cell2struct (all_list.', {structcat(1, all_list{:}).name}, 1).(packname)
-  ##
-  ## But probably pkg ("list") should not return a cell array of
-  ## structures anyway.
-
-  list = [];
-  depends = struct ();
-  if (! strcmp (packname, "octave"))
-    all_list = pkg ("list");
-    for k = 1:length (all_list)
-      if (strcmp (all_list{k}.name, packname))
-        list = all_list{k};
-        break;
-      endif
-    endfor
-    if (isempty (list))
-      error ("Couldn't locate package '%s'", packname);
-    endif
-    depends = struct ();
-    for k = 1 : numel (list.depends)
-      it_depends = list.depends{k};
-      if (isfield (it_depends, "operator") && isfield (it_depends, "version"))
-        o = it_depends.operator;
-        v = it_depends.version;
-        depends.(it_depends.package) = sprintf ("%s %s", o, v);
-      else
-        depends.(it_depends.package) = "";
-      endif
-    endfor
-  endif
+  pkg ("load", packname);
+  desc = (pkg ("describe", packname)){1};
 
   ## Note paths used to write html in this variable.
   paths = struct ();
+  list = [];            # TODO: remove
+  depends = struct ();  # TODO: remove
 
   if (isempty (outdir))
     outdir = packname;
@@ -241,37 +192,29 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     footer = getopt ("overview_footer", vpars);
 
     fprintf (fid, "%s\n", header);
-    fprintf (fid, "<h2 class=\"tbdesc\">%s</h2>\n\n", desc.name);
+    fprintf (fid, "<h1 class=\"tbdesc\">%s</h1>\n\n", desc.name);
 
-    fprintf (fid, "  <div class=\"package_description\">\n");
-    fprintf (fid, "    %s\n", desc.description);
-    fprintf (fid, "  </div>\n\n");
-
-    fprintf (fid, "<p>Select category:  <select name=\"cat\" onchange=\"location = this.options[this.selectedIndex].value;\">\n");
-    for k = 1:num_categories
-      category = desc.provides{k}.category;
-      fprintf (fid, "    <option value=\"#%s\">%s</option>\n", anchors{k}, category);
-    endfor
-    fprintf (fid, "  </select></p>\n\n");
+    fprintf (fid, "<div class=\"package_description\">\n");
+    fprintf (fid, "  %s\n", desc.description);
+    fprintf (fid, "</div>\n\n");
 
     ## Generate function list by category
     for k = 1 : numel (first_sentences)
       F = desc.provides{k}.functions;
       category = desc.provides{k}.category;
-      fprintf (fid, "  <h3 class=\"category\"><a name=\"%s\">%s</a></h3>\n\n",
-               anchors{k}, category);
+      fprintf (fid, "<h2 class=\"category\">%s</h2>\n\n", category);
 
       ## For each function in category
       for l = 1 : numel (first_sentences{k})
         fun = F{l};
         if (! isempty (first_sentences{k}{l}))
-          fprintf (fid, "    <div class=\"func\"><b><a href=\"%s\">%s</a></b></div>\n",
+          fprintf (fid, "<div class=\"func\"><a href=\"%s\">%s</a></div>\n",
                    links{k}{l}, fun);
-          fprintf (fid, "    <div class=\"ftext\">%s</div>\n\n", ...
+          fprintf (fid, "<div class=\"ftext\">&mdash; %s</div>\n\n", ...
                    first_sentences{k}{l});
         else
-          fprintf (fid, "    <div class=\"func\"><b>%s</b></div>\n", fun);
-          fprintf (fid, "    <div class=\"ftext\">Not implemented.</div>\n\n");
+          fprintf (fid, "<div class=\"func\">%s</div>\n", fun);
+          fprintf (fid, "<div class=\"ftext\">No help text.</div>\n\n");
         endif
       endfor
     endfor

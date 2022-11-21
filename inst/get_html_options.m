@@ -167,13 +167,12 @@ function options = get_html_options_default (options)
   default.title = @ (opts, pars, vpars) sprintf ("%s", vpars.name);
   default.body_command = "";
   default.header = @ (opts, pars, vpars) sprintf ("\
-<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\
- \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n\
-<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n\
+<!DOCTYPE html>\n\
+<html lang=\"en\">\n\
 <head>\n\
-  <meta http-equiv=\"content-type\" content=\"text/html; charset=%s\" />\n\
-  <meta name=\"date\" content=\"%s\" />\n\
-  <meta name=\"generator\" content=\"generate_html %s\" />\n\
+  <meta http-equiv=\"content-type\" content=\"text/html; charset=%s\">\n\
+  <meta name=\"date\" content=\"%s\">\n\
+  <meta name=\"generator\" content=\"generate_html %s\">\n\
   <title>%s</title>\n\
 </head>\n\
 <body>",
@@ -185,7 +184,7 @@ function options = get_html_options_default (options)
   ## Style sheet (mandatory if style sheet is accessed in the
   ## header). Set to struct() by default to throw an error if used
   ## in strings without explicitly having set it.
-  default.css = struct ();
+  default.css = "style.css";
 
   ## Encoding
   default.charset = "utf-8";

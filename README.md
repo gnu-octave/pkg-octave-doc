@@ -14,8 +14,7 @@ Create a function reference for an installed Octave package in a `htdocs`
 subfolder relative to the current directory:
 
 ```
-generate_package_html ("installed_package_to_document", "htdocs", ...
-                       get_html_options ("octave-forge"));
+generate_package_html ("installed_package", "htdocs");
 ```
 
 
@@ -25,13 +24,11 @@ Create an Octave (core) function reference in a `htdocs` subfolder relative to
 the current directory:
 
 ```
-generate_html_manual ("/path/to/octave", "htdocs", ...
-                      get_html_options ("octave-forge"));
+generate_html_manual ("/path/to/octave/repo", "htdocs");
 ```
 
 
 ## Further notes
 
 This is a fork of the
-[generate_html](https://gnu-octave.github.io/packages/generate_html)
-package.
+[generate_html](https://packages.octave.org/generate_html) package.
