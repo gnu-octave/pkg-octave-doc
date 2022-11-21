@@ -94,7 +94,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
   ##
   ## But probably pkg ("list") should not return a cell array of
   ## structures anyway.
-  
+
   list = [];
   depends = struct ();
   if (! strcmp (packname, "octave"))
@@ -196,12 +196,14 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
       tree = {};
       ## strip and consider namespaces
       nnsp = sum (fun == ".");
-      [tree{1:nnsp}, fcn] = strsplit (fun, "."){:};
+      tmpfsplit = strsplit (fun, ".");
+      [tree{1:nnsp}, fcn] = tmpfsplit{:};
       pkgroot = fullfile ({".."}{ones (1, 1 + nnsp)});
       assert_dir (tree, fundir);
       ## strip and consider class name
       if (fcn(1) == "@")
-        [tree{end + 1}, fcn] = strsplit (fcn, "/"){:};
+        tmpfsplit = strsplit (fun, "/");
+        [tree{end + 1}, fcn] = tmpfsplit{:};
         pkgroot = fullfile (pkgroot, "..");
         assert_dir (fullfile (fundir, tree{:}));
       endif
@@ -296,7 +298,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
 
     paths.alphabetical_database_dir = "alpha";
 
-    process_alpha_tree (name_hashes, fullfile (packdir, "alpha"), 
+    process_alpha_tree (name_hashes, fullfile (packdir, "alpha"),
                         first_sentences);
 
   endif
@@ -547,7 +549,7 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     fprintf (fid, "<tr><td>\n");
     fprintf (fid, "<div class=\"package_function_reference\">\n");
     fprintf (fid, "  <table><tr><td>\n");
-    fprintf (fid, "    <a href=\"%s\" class=\"function_reference_link\">\n", overview_filename);    
+    fprintf (fid, "    <a href=\"%s\" class=\"function_reference_link\">\n", overview_filename);
     fprintf (fid, "      <img title=%s onmouseover=\"this.title=''\" src=\"../doc.png\" alt=\"Function reference icon\"/>\n", attrib.doc);
     fprintf (fid, "    </a>\n");
     fprintf (fid, "  </td><td>\n");
@@ -558,9 +560,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     if (write_package_documentation)
       link = fullfile (doc_subdir, package_doc_index);
       fprintf (fid, "  <tr><td>\n");
-      fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", link);      
+      fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", link);
       fprintf (fid, "      <img title=%s onmouseover=\"this.title=''\" src=\"../manual.png\" alt=\"Package doc icon\"/>\n", attrib.manual);
-      fprintf (fid, "    </a>\n");      
+      fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"%s\" class=\"package_doc\">\n", link);
       fprintf (fid, "      Package Documentation\n");
@@ -569,9 +571,9 @@ function generate_package_html (name = [], outdir = "htdocs", options = struct (
     endif
     if (write_package_news)
       fprintf (fid, "  <tr><td>\n");
-      fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");      
+      fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");
       fprintf (fid, "      <img title=%s onmouseover=\"this.title=''\" src=\"../news.png\" alt=\"Package news icon\"/>\n", attrib.news);
-      fprintf (fid, "    </a>\n");      
+      fprintf (fid, "    </a>\n");
       fprintf (fid, "  </td><td>\n");
       fprintf (fid, "    <a href=\"NEWS.html\" class=\"news_file\">\n");
       fprintf (fid, "      NEWS\n");
@@ -819,7 +821,7 @@ function assert_dir (directory, basepath)
     return;
 
   endif
-  
+
   ## 'directory' is a string
 
   if (! exist (directory, "dir"))
@@ -920,5 +922,5 @@ function json = encode_json_object (map, indent = "")
 
   json = sprintf ([indent "{" tmpl "\n" indent "}"],
                   vertcat (fns.', struct2cell (map).'){:});
-  
+
 endfunction

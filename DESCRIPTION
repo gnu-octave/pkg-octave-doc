@@ -1,7 +1,7 @@
 name: octave-doc
 version: 0.4.0
 date: 2021-08-17
-author: Søren Hauberg <soren@hauberg.org> and others
+author: Søren Hauberg <soren@hauberg.org>
 maintainer: Kai T. Ohlhus <k.ohlhus@gmail.com>
 title: Generate HTML web page from help texts
 description: This package provides functions for generating HTML pages that

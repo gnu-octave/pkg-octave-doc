@@ -79,10 +79,11 @@ function __html_help_text__ (outname, vpars)
         endif
 
         ## Create text
-        demo_num ++;
+        demo_num++;
         demo_header = sprintf ("<h2>Demonstration %d</h2>\n<div class=\"demo\">\n", demo_num);
         demo_footer = "</div>\n";
 
+        demo_k = {};
         demo_k{1} = "<p>The following code</p>\n";
         demo_k{2} = sprintf ("<pre class=\"example\">%s</pre>\n", code_k);
         if (has_text && has_images)
@@ -95,7 +96,7 @@ function __html_help_text__ (outname, vpars)
           demo_k{4} = sprintf ("<pre class=\"example\">%s</pre>\n", output);
         elseif (has_images) # no text
           demo_k{3} = sprintf ("<p>Produces the following %s</p>\n", ft);
-          demo_k{6} = sprintf ("<p>%s</p>\n", images_in_html (images));
+          demo_k{4} = sprintf ("<p>%s</p>\n", images_in_html (images));
         else # neither text nor images
           demo_k{3} = sprintf ("<p>gives an example of how '%s' is used.</p>\n", name);
         endif

@@ -86,7 +86,7 @@ function all_index = txi2index (srcdir)
       elseif (strncmpi (SECTION, line, length (SECTION)))
         section = strtrim (line (length (SECTION)+1:end));
         if (idx == 0 || !isempty (index.provides{idx}.functions))
-          idx ++;
+          idx++;
         endif
 
         index.provides{idx} = struct ();
@@ -94,7 +94,7 @@ function all_index = txi2index (srcdir)
         index.provides{idx}.functions = {};
       elseif (strncmpi (DOCSTRING, line, length (DOCSTRING)))
         if (idx == 0)
-          idx ++;
+          idx++;
 
           index.provides{idx} = struct ();
           index.provides{idx}.category = default_section;
