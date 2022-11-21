@@ -64,7 +64,11 @@ function [ret_opts, ret_pars] = setopts (options, desc)
                                      '\.($| .*)', '');
 
   pars.gen_date = datestr (date (), "yyyy-mm-dd");
-  pars.ghv = (a = ver ("octave-doc")).Version;
+  try
+    pars.ghv = (a = ver ("octave-doc")).Version;
+  catch
+    pars.ghv = "DEV";
+  end_try_catch
 
 endfunction
 
