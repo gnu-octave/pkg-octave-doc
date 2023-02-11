@@ -31,12 +31,9 @@ package_texi2html (pkgname)
 2. Implement a function for building a function reference for Octave core
  functions.
 
-```
-generate_html_manual ("/path/to/octave/repo", "htdocs");
-```
-
 
 ## Further notes
 
-This is a fork of the
-[generate_html](https://packages.octave.org/generate_html) package.
+Albeit completely overhauled, this is a fork of the
+[generate_html](https://packages.octave.org/generate_html) package previously
+used for Source Forge reference pages.
