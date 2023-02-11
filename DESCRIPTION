@@ -1,12 +1,13 @@
 name: octave-doc
 version: 0.4.0
-date: 2021-08-17
-author: Søren Hauberg <soren@hauberg.org>
-maintainer: Kai T. Ohlhus <k.ohlhus@gmail.com>
+date: 2023-02-11
+author: various authors
+maintainer: Andreas Bertsatos <abertsatos@biol.uoa.gr>
 title: Generate HTML web page from help texts
 description: This package provides functions for generating HTML pages that
- contain the help texts for a set of functions. The package is designed to be
- as general as possible, but also contains convenience functions for generating
- a set of pages for entire packages.
+ contain the help texts of the functions of an octave package. The package is
+ designed to work with installed packages and use their INDEX file for creating
+ the respective functions' HTML pages. The default layout is based on boootstrap
+ 5 and it follows the design of the Octave Packages GitHub page.
 categories: package
-Depends: octave (>= 4.0.0)
+Depends: octave (>= 6.1.0)
