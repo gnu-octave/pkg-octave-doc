@@ -28,7 +28,9 @@ package_texi2html (pkgname)
 ## TODO
 
 1. Add documentation and BISTs to the existing functions.
-2. Implement a function for building a function reference for Octave core
+2. Update functionality to include DEMOS at the bottom of each function's page
+like in Source Forge site.
+3. Implement a function for building a function reference for Octave core
  functions.
 
 
