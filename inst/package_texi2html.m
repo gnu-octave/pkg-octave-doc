@@ -62,7 +62,7 @@ function package_texi2html (pkgname)
   endif
 
   ## Copy octave logo
-  sd = fullfile ("_layouts", "octave-logo.svg");
+  sd = fullfile (file_in_loadpath ("octave-logo.svg"));
   [status, msg, msgid] = copyfile (sd, asset, "f");
   if (status != 1)
     error ("package_texi2html: cannot copy octave logo to %s directory.", asset);
@@ -90,7 +90,7 @@ function package_texi2html (pkgname)
     endif
     pkg_icon = strcat (asset, "/", pkg_icon);
   else
-    sd = fullfile ("_layouts", "pkg.png");
+    sd = fullfile (file_in_loadpath ("pkg.png"));
     [status, msg, msgid] = copyfile (sd, asset, "f");
     if (status != 1)
       error ("package_texi2html: cannot copy default package logo to %s directory.", asset);
