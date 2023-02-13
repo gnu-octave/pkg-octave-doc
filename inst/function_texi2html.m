@@ -160,11 +160,14 @@ function function_texi2html (fcnname, pkgfcns, info)
   ## Find the function's category
   fcn_idx = find (strcmp (pkgfcns(:,1), fcnname));
   catname = pkgfcns{fcn_idx, 2};
-  ## Add link to function's source code
-  url = pkgfcns{fcn_idx, 3};
-  url_text = strcat (["<p><strong>Source Code: </strong>\n"], ...
-                     ["  <a href=""", url, """>", fcnname, "</a>\n</div>"]);
-  fcn_text = strrep (fcn_text, "</div>", url_text);
+
+  ## Add link to function's source code (if applicable)
+  if (size (pkgfcns, 2) == 3)
+    url = pkgfcns{fcn_idx, 3};
+    url_text = strcat (["<p><strong>Source Code: </strong>\n"], ...
+                       ["  <a href=""", url, """>", fcnname, "</a>\n</div>"]);
+    fcn_text = strrep (fcn_text, "</div>", url_text);
+  endif
 
   ## Populate index template with package info
   fnc_template = fileread (fullfile ("_layouts", "function_template.html"));

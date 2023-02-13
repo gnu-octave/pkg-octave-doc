@@ -74,7 +74,8 @@ function pkgfcns = find_GHurls (pkgurl, pkgfcns)
       if (! isempty (fcn_idx))
         base_fd = strsplit (fcnurls{fcn_idx,2}, filesep)([end-level:end]);
         path_fd = fullfile ("tree/main", base_fd(:){:});
-        fcn_url = fullfile (pkgurl, path_fd, fcnfilename);
+        full_fd = fullfile (path_fd, fcnfilename);
+        fcn_url = strcat (pkgurl, "/", full_fd);
         pkgfcns(i,3) = fcn_url;
       endif
 
