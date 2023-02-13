@@ -18,7 +18,7 @@
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {@var{fcnurls} =} find_GHurls (@var{pkgurl}, @var{pkgfcns})
 ##
-## Retrieve URLs to every function's location within the package's GitHub
+## Retrieve unique URLs to every function's location within the package's GitHub
 ## repository.
 ##
 ## @seealso{function_texi2html}
