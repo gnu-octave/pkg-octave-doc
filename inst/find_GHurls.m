@@ -40,7 +40,9 @@ function pkgfcns = find_GHurls (pkgurl, pkgfcns)
   [status, ~] = unix (sprintf ("git clone %s.git %s > /dev/null 2>&1", ...
                                pkgurl, tmpDIR));
   if (status)
-    error ("package_texi2html: unable to clone %s.git.", pkgurl);
+    warning ("package_texi2html: unable to clone %s.git.", pkgurl);
+    warning ("Link to source code in HTML pages will be omitted.");
+    return;
   endif
 
   ## Find files and folders' contents in repository root
