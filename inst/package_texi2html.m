@@ -16,10 +16,10 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {pkg-octave-doc} {} package_texi2html (@var{fcnname}, @var{pkgfcns}, @var{info})
-## @deftypefnx {pkg-octave-doc} {[@var{pkgfcns}, @var{info}] =} package_texi2html (@dots{})
+## @deftypefn  {pkg-octave-doc} {} package_texi2html (@var{pkgname})
+## @deftypefnx {pkg-octave-doc} {[@var{pkgfcns}, @var{info}] =} package_texi2html (@var{pkgname})
 ##
-## Generate HTML page for a particular package.
+## Generate HTML pages for am entire package.
 ##
 ## @seealso{function_texi2html}
 ## @end deftypefn

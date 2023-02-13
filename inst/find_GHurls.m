@@ -16,9 +16,10 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {pkg-octave-doc} {@var{fcnurls} =} find_GHurls (@var{pkgurl})
+## @deftypefn  {pkg-octave-doc} {@var{fcnurls} =} find_GHurls (@var{pkgurl}, @var{pkgfcns})
 ##
-## Generate HTML page for a particular package.
+## Retrieve URLs to every function's location within the package's GitHub
+## repository.
 ##
 ## @seealso{function_texi2html}
 ## @end deftypefn
