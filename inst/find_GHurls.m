@@ -16,7 +16,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {pkg-octave-doc} {@var{fcnurls} =} find_GHurls (@var{pkgurl}, @var{pkgfcns})
+## @deftypefn  {pkg-octave-doc} {@var{pkgfcns} =} find_GHurls (@var{pkgurl}, @var{pkgfcns})
 ##
 ## Retrieve unique URLs to every function's location within the package's GitHub
 ## repository.
