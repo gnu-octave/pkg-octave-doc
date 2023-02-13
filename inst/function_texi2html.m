@@ -29,6 +29,14 @@ function function_texi2html (fcnname, pkgfcns, info)
     print_usage ();
   endif
 
+  if (! iscell (pkgfcns))
+    print_usage ();
+  endif
+
+  if (! isstruct (info))
+    print_usage ();
+  endif
+
   [text, format] = get_help_text (fcnname);
 
   ## Scan text for @tex and @end tex tags and replace their bodies with
@@ -77,7 +85,6 @@ function function_texi2html (fcnname, pkgfcns, info)
   fclose (fid);
 
   [status, ~] = unix (sprintf ("texi2html %s > /dev/null 2>&1", fcnfile));
-
   if (status)
     error ("function_texi2html: unable to convert to html.");
   endif
@@ -90,7 +97,7 @@ function function_texi2html (fcnname, pkgfcns, info)
 
   ## Remove content before <body> tag and after <hr size="1">
   txt_beg = strfind (fcn_text, "<body ");
-  txt_end = strfind (fcn_text, '<hr size="1">') - 1;
+  txt_end = strfind (fcn_text, "<hr size=""1"">") - 1;
   fcn_text = fcn_text([txt_beg:txt_end]);
 
   ## Remove <body *> tag
@@ -133,34 +140,38 @@ function function_texi2html (fcnname, pkgfcns, info)
     f_num = numel (fnames);
     for i = 1:f_num
       str = fnames{i};
-      if (any (strcmp (pkgfcns, str)))
+      if (any (strcmp (pkgfcns(:,1), str)))
         str1 = strrep (str, filesep, "_");
-        new_str = ['  <a href="',str1,'.html">',str,'</a>'];
+        new_str = ["  <a href=""",str1,".html"">",str,"</a>"];
       else
         new_str = str;
       endif
       if (i < f_num)
         new_see = [new_see, new_str, (", \n")];
       else
-        new_see = [new_see, new_str, "\n</p></div>\n"];
+        new_see = [new_see, new_str, "\n</p>\n</div>"];
       endif
     endfor
     fcn_text = strrep (fcn_text, seealso, new_see);
   else
-    fcn_text = strrep (fcn_text, "</dd></dl>", "</div>");
+    fcn_text = strrep (fcn_text, "</dd></dl>", "\n</div>");
   endif
 
-  ## TODO
+  ## Find the function's category
+  fcn_idx = find (strcmp (pkgfcns(:,1), fcnname));
+  catname = pkgfcns{fcn_idx, 2};
   ## Add link to function's source code
-  #tmp = ['<p> source code: <a href="index.html">',info.PKG_NAME,'</a></p>'];
-  #fcn_text = [fcn_text, tmp];
+  url = pkgfcns{fcn_idx, 3};
+  url_text = strcat (["<p><strong>Source Code: </strong>\n"], ...
+                     ["  <a href=""", url, """>", fcnname, "</a>\n</div>"]);
+  fcn_text = strrep (fcn_text, "</div>", url_text);
 
   ## Populate index template with package info
   fnc_template = fileread (fullfile ("_layouts", "function_template.html"));
   fnc_template = strrep (fnc_template, "{{PKG_ICON}}", info.PKG_ICON);
   fnc_template = strrep (fnc_template, "{{PKG_NAME}}", info.PKG_NAME);
   fnc_template = strrep (fnc_template, "{{PKG_TITLE}}", info.PKG_TITLE);
-  fnc_template = strrep (fnc_template, "{{CAT_NAME}}", info.CAT_NAME);
+  fnc_template = strrep (fnc_template, "{{CAT_NAME}}", catname);
   fnc_template = strrep (fnc_template, "{{OCTAVE_LOGO}}", info.OCTAVE_LOGO);
   fnc_template = strrep (fnc_template, "{{FCN_NAME}}", fcnname);
   fnc_template = strrep (fnc_template, "{{FCN_TEXT}}", fcn_text);

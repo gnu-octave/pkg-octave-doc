@@ -17,15 +17,20 @@
 
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {} package_texi2html (@var{fcnname}, @var{pkgfcns}, @var{info})
+## @deftypefnx {pkg-octave-doc} {[@var{pkgfcns}, @var{info}] =} package_texi2html (@dots{})
 ##
 ## Generate HTML page for a particular package.
 ##
 ## @seealso{function_texi2html}
 ## @end deftypefn
 
-function package_texi2html (pkgname)
+function [varargout] = package_texi2html (pkgname)
 
   if (! ischar (pkgname))
+    print_usage ();
+  endif
+
+  if (nargout != 0 && nargout != 2)
     print_usage ();
   endif
 
@@ -46,6 +51,31 @@ function package_texi2html (pkgname)
     cat(i).name = pkg_cat{i}.category;
     cat(i).fcns = pkg_cat{i}.functions;
   endfor
+
+  ## Build function list from package index
+  fcn_idx = 0;
+  for i = 1:numel (cat)
+    for j = 1:numel (cat(i).fcns)
+      ## Add function to list
+      fcn_idx += 1;
+      pkgfcns(fcn_idx, 1) = {cat(i).fcns{j}};
+      pkgfcns(fcn_idx, 2) = {cat(i).name};
+    endfor
+  endfor
+
+  ## Get package info
+  pkg_info = pkg ("list", pkgname);
+  pkg_ver = pkg_info{1}.version;
+  pkg_date = pkg_info{1}.date;
+  pkg_title = pkg_info{1}.title;
+  pkg_descr = pkg_info{1}.description;
+  info.PKG_URL = pkg_info{1}.url;
+
+  ## Check if package repository is at GitHub
+  GH = strfind (info.PKG_URL, "https://github.com/");
+  if (GH == 1)
+    pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
+  endif
 
   ## Create "assets" folder (if it exists, remove it and create new)
   asset = "assets";
@@ -71,14 +101,14 @@ function package_texi2html (pkgname)
 
   ## Get package's logo from /doc folder from package's installation directory
   ## If no .svg or .png image available, use pkg default icon from _layouts
-  pkg_info = pkg ("list", pkgname);
   sd = fullfile (pkg_info{1}.dir, "doc");
   if (exist (fullfile (sd, [pkgname, ".png"])) == 2)
     pkg_icon = [pkgname, ".png"];
     sd = fullfile (sd, pkg_icon);
     [status, msg, msgid] = copyfile (sd, asset, "f");
     if (status != 1)
-      error ("package_texi2html: cannot copy %s logo to %s directory.", pkgname, asset);
+      error ("package_texi2html: cannot copy %s logo to %s directory.", ...
+             pkgname, asset);
     endif
     pkg_icon = strcat (asset, "/", pkg_icon);
   elseif (exist (fullfile (sd, [pkgname, ".svg"])) == 2)
@@ -86,14 +116,16 @@ function package_texi2html (pkgname)
     sd = fullfile (sd, pkg_icon);
     [status, msg, msgid] = copyfile (sd, asset, "f");
     if (status != 1)
-      error ("package_texi2html: cannot copy %s logo to %s directory.", pkgname, asset);
+      error ("package_texi2html: cannot copy %s logo to %s directory.", ...
+             pkgname, asset);
     endif
     pkg_icon = strcat (asset, "/", pkg_icon);
   else
     sd = fullfile (file_in_loadpath ("pkg.png"));
     [status, msg, msgid] = copyfile (sd, asset, "f");
     if (status != 1)
-      error ("package_texi2html: cannot copy default package logo to %s directory.", asset);
+      error (strcat (["package_texi2html: cannot copy default package"], ...
+                     sprintf (" logo to %s directory.", asset)));
     endif
     pkg_icon = [pkgname, ".png"];
     old_name = fullfile ("assets", "pkg.png");
@@ -105,18 +137,22 @@ function package_texi2html (pkgname)
     pkg_icon = strcat (asset, "/", pkg_icon);
   endif
 
-  ## Get package info
-  pkg_info = pkg ("list", pkgname);
-  pkg_ver = pkg_info{1}.version;
-  pkg_date = pkg_info{1}.date;
-  pkg_title = pkg_info{1}.title;
-  pkg_descr = pkg_info{1}.description;
-
-  ## Copy specific info for function_texi2html
+  ## Copy specific info for other functions
   info.PKG_ICON = pkg_icon;
   info.PKG_NAME = pkgname;
   info.PKG_TITLE = pkg_title;
   info.OCTAVE_LOGO = octave_logo;
+
+  ## If nargout > 0, then return output arguments and do not generate HTML files
+  if (nargout > 0)
+    varargout{1} = pkgfcns;
+    varargout{2} = info;
+    ## Unload package if it was loaded from this function
+    if (pkg_loaded)
+      pkg ("unload", pkgname);
+    endif
+    return;
+  endif
 
   ## Populate index template with package info
   index_template = fileread (fullfile ("_layouts", "index_template.html"));
@@ -145,12 +181,11 @@ function package_texi2html (pkgname)
   index_template = strrep (index_template, "{{CATEGORY_SELECTOR}}", cat_text);
 
   ## Populate categories with functions
-  fcn_idx = 0;
   fcn_list = "";
   for i = 1:numel (cat)
     catname = cat(i).name;
     tmp1 = ["           <h3 class=""category"">\n"];
-    tmp2 = sprintf ("             <a name=""%s"">%s", cat(i).name, cat(i).name);
+    tmp2 = sprintf ("             <a name=""%s"">%s", catname, catname);
     tmp3 = ["</a>\n           </h3>\n"];
     fcn_list = [fcn_list tmp1 tmp2 tmp3];
     for j = 1:numel (cat(i).fcns)
@@ -165,22 +200,11 @@ function package_texi2html (pkgname)
       tmp1 = ["           <div class=""ftext"">\n"];
       tmp2 = sprintf ("             %s\n           </div>\n", fnc1);
       fcn_list = [fcn_list tmp1 tmp2];
-
-      ## Add function to list
-      fcn_idx += 1;
-      pkgfcns(fcn_idx) = {cat(i).fcns{j}};
-    endfor
-  endfor
-  index_template = strrep (index_template, "{{PKG_FUNCTION_LIST}}", fcn_list);
-
-  ## Build individual function html
-  for i = 1:numel (cat)
-    info.CAT_NAME = cat(i).name;
-    for j = 1:numel (cat(i).fcns)
-      fcnname = cat(i).fcns{j};
+      ## Build individual function html
       function_texi2html (fcnname, pkgfcns, info);
     endfor
   endfor
+  index_template = strrep (index_template, "{{PKG_FUNCTION_LIST}}", fcn_list);
 
   ## Unload package if it was loaded from this function
   if (pkg_loaded)
