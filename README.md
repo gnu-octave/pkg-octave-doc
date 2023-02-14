@@ -19,13 +19,23 @@ be installed and available to $PATH.
 also include a URL to their respective repository locations.  This feature is only
 available for packages hosted at GitHub.
 
-## Octave package function reference
+* Octave (>=6.1.0).
+
+## Installation
+
+To install the latest development version type:
+
+```
+pkg install "https://github.com/gnu-octave/pkg-octave-doc/archive/refs/heads/main.zip"
+```
+
+## Usage
 
 Create a function reference for all functions listed in the INDEX file of an
 installed Octave package in the working directory:
 
 ```
-package_texi2html (pkgname)
+package_texi2html ("pkg-octave-doc")
 ```
 
 
