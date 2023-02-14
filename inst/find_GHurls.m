@@ -21,6 +21,32 @@
 ## Retrieve unique URLs to every function's location within the package's GitHub
 ## repository.
 ##
+## @code{find_GHurls} takes two input arguments, @var{pkgurl}, a char string
+## with the URL to the root directory to the package's GitHub repository and
+## @var{pkgfcns}, a Nx2 cell array containing the package's available functions
+## (1st column) and their respective category (2nd column).
+##
+## Note: @code{find_GHurls} explicitly works with repositories hosted on GitHub!
+## @var{pkgurl} can be easily retrieved from the @code{PKG_URL} field of the
+## @var{info} structure returned from @code{package_texi2html}.
+##
+## @code{find_GHurls} returns a cell array, @var{pkgfcns}, by appending a third
+## column to the input @var{pkgfcns} with the URLs to the source code location
+## of each individual function listed in the 1st column of @var{pkgfcns}.
+## @code{find_GHurls} relies on @code{git}, which must be installed and
+## available to the system's @code{$PATH}, and an active internet connection to
+## clone the targeted repository to a temporary directory.  If @code{git} fails
+## for any reason, @code{find_GHurls} returns a verbatim copy of the input
+## @var{pkgfcns}.
+##
+## Use the following example to obtain a cell array with each function's URL to
+## its source code location at GitHub:
+##
+## @example
+## [pkgfcns, info] = package_texi2html ("statistics");
+## pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
+## @end example
+##
 ## @seealso{function_texi2html}
 ## @end deftypefn
 
