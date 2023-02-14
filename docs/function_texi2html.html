@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Statistics: function_texi2html</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    <script type="text/javascript" async
+      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML">
+    </script>
+  </head>
+  <body>
+    <div class="bg-dark">
+      <div class="container-xl">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+          <div class="container-fluid">
+            <a class="navbar-brand" href=index.html>
+              <img src="assets/pkg-octave-doc.png" alt="pkg-octave-doc" class="d-inline-block align-top" width="25" height="25">
+              Octave Package Documentation
+            </a>
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="index.html#Documentation">
+                    <i class="fas fa-list-alt"></i>
+                    Documentation
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://gnu-octave.github.io/packages/">
+                  <img src="assets/octave-logo.svg" alt="GNU Octave logo" class="d-inline-block align-top" width="25" height="25">
+                    Octave Packages
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://www.octave.org">
+                    <i class="fas fa-home"></i>
+                    GNU Octave website
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+    <div class="container-xl my-4">
+      <div class="card rounded">
+        <div class="card-header card-header-mod">
+          <div class="row d-flex flex-wrap align-items-center">
+            <div class="col-sm-3 col-md-5 mb-2 mb-sm-0">
+              <h3 class="d-inline-block mr-2">
+              Function&nbsp;Reference: <b><code>function_texi2html</code></b>
+              </h3>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+<dl>
+<dt><u>pkg-octave-doc:</u> <b>function_texi2html</b><i> (<var>fcnname</var>, <var>pkgfcns</var>, <var>info</var>)</i></dt>
+</dl>
+
+<p> Generate HTML page for a particular function.
+</p>
+<div class="ms-5">
+<p> <code>function_texi2html</code> requires three input arguments: <var>fcnname</var>, a
+ char string with the function&rsquo;s name; <var>pkgfcns</var>, a cell array with all
+ available functions of a package; and <var>info</var>, a structure with relevant
+ information about the package, which the function <var>fcnname</var> belongs to.
+</p>
+<p> <var>pkgfcns</var> can be either a <em>Nx2</em> or a <em>Nx3</em> cell array, whose
+ 1st column list all available function names, the 2nd column list the each
+ function&rsquo;s category, and the 3rd column contains the URL to the function&rsquo;s
+ source code.  <var>pkgfcns</var> is used to relative references to other pages of
+ functions which are listed in the <code>See also</code> tag.  When a 3rd column is
+ present, <code>function_texi2html</code> uses it to add a source code link of the
+ the function in <var>fcnname</var>.
+</p>
+<p> The <var>info</var> structure requires at least the following fields:
+</p>
+ <table>
+<thead><tr><th width="20%">Field Name</th><th width="80%">Description</th></tr></thead>
+<tr><td width="20%"><code>PKG_ICON</code></td><td width="80%">The relative reference to the package&rsquo;s logo image
+ which must be either in .svg or .png format and it is located in the newly
+ created <code>assets/</code> folder inside the working directory.</td></tr>
+<tr><td width="20%"><code>PKG_NAME</code></td><td width="80%">The package&rsquo;s name (e.g. &quot;statistics&quot;)</td></tr>
+<tr><td width="20%"><code>PKG_TITLE</code></td><td width="80%">The package&rsquo;s title (e.g. &quot;Statistics&quot;)</td></tr>
+<tr><td width="20%"><code>OCTAVE_LOGO</code></td><td width="80%">The relative reference to Octave&rsquo;s logo, also
+ located inside <code>assets/</code> folder.</td></tr>
+</table>
+
+<p> To generate a suitable <em>Nx2</em> cell array for a specific package, use the
+ <code>package_texi2html</code> function and to populate is with the 3rd column use
+ <code>find_GHurls</code>.  The <var>info</var> structure can also be created with
+ <code>package_texi2html</code>.
+</p>
+<p> <strong>See also: </strong>
+  <a href="package_texi2html.html">package_texi2html</a>, 
+  <a href="find_GHurls.html">find_GHurls</a>
+</p>
+<p><strong>Source Code: </strong>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/function_texi2html.m">function_texi2html</a>
+</div>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
