@@ -19,9 +19,74 @@
 ## @deftypefn  {pkg-octave-doc} {} package_texi2html (@var{pkgname})
 ## @deftypefnx {pkg-octave-doc} {[@var{pkgfcns}, @var{info}] =} package_texi2html (@var{pkgname})
 ##
-## Generate HTML pages for am entire package.
+## Generate HTML pages for an entire package.
 ##
-## @seealso{function_texi2html}
+## @code{package_texi2html} takes a single input argument, @var{pkgname}, which
+## is a char array with the package's name whose HTML documentation need to be
+## generated.  The function considers the current working path as the root
+## directory of the built pages.  It creates an @code{index.html} page with the
+## available functions (and their subdivision into separate categories) of the
+## package according to its INDEX file.  Although the INDEX file (if absent) is
+## automatically generated during the package's installation, it is best
+## practice to include one in the package's source so there is full comtrol of
+## the categorization among the functions.  Individual functions HTML pages area
+## generated with @code{function_texi2html}.
+##
+## The generated pages follow the template of the Octave Packages GitHub Pages
+## based on bootstrap 5 and they have similar layout to the older documentation
+## reference pages at Source Forge.  For packages whose repository is available
+## at GitHub, individual URLs to each function's location within the reposity
+## are retrieved and used to add a link to source code in each function's page.
+## This requires an internet connection and @code{git} installed and available
+## to the @code{$PATH}.  If not available, the source code link is omitted and
+## the functions' HTML pages are generated without it.
+##
+## For the @code{package_texi2html} to work, @code{texi2html} must be installed
+## and available to the system's @code{$PATH}.
+##
+## Optionally, @code{package_texi2html} can return two output arguments, namely
+## @var{pkgfcns} and @var{info}, which are necessary for the @code{find_GHurls}
+## and @code{function_texi2html} functions.  In such case, the HTML pages
+## generation is skipped.  This is useful for building individual function pages
+## without the need to regenerate the package's entire documentation.
+##
+## Examples:
+##
+## @example
+## [pkgfcns, info] = package_texi2html ("statistics");
+## pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
+## function_texi2html ("mean", pkgfcns, info);
+## @end example
+##
+## Returning arguments:
+##
+## @itemize
+## @item
+## @var{pkgfcns} is a Nx2 cell array containing the package's available
+## functions (1st column) and their respective category (2nd column).
+##
+## @item
+## @var{info} is a structure with the following fields:
+##
+## @multitable @columnfractions 0.2 0.8
+## @headitem Field Name @tab Description
+## @item @code{PKG_URL} @tab The URL to the package's repository at GitHub.
+##
+## @item @code{PKG_ICON} @tab The relative reference to the package's logo image
+## which must be either in .svg or .png format and it is located in the newly
+## created @code{assets/} folder inside the working directory.
+##
+## @item @code{PKG_NAME} @tab The package's name (e.g. "statistics")
+##
+## @item @code{PKG_TITLE} @tab The package's title (e.g. "Statistics")
+##
+## @item @code{OCTAVE_LOGO} @tab The relative reference to Octave's logo, also
+## located inside @code{assets/} folder.
+##
+## @end multitable
+## @end itemize
+##
+## @seealso{function_texi2html, find_GHurls}
 ## @end deftypefn
 
 function [varargout] = package_texi2html (pkgname)
@@ -223,3 +288,11 @@ function [varargout] = package_texi2html (pkgname)
   fclose (fid);
 
 endfunction
+
+%!error package_texi2html (1)
+%!error package_texi2html (1, 2)
+%!error package_texi2html ({"statistics"})
+%!error out1 = package_texi2html ("statistics")
+%!error [out1, out2, out3] = package_texi2html ("statistics")
+%!error [pkgfcns, info] = package_texi2html ("st@t1st1cs")
+%!error package_texi2html ("st@t1st1cs")
