@@ -11,3 +11,5 @@ description: This package provides functions for generating HTML pages that
  5 and it follows the design of the Octave Packages GitHub page.
 categories: package
 Depends: octave (>= 6.1.0)
+License: GPLv3+
+Url: https://github.com/gnu-octave/pkg-octave-doc
