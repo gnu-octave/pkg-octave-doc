@@ -21,7 +21,7 @@
 ## Retrieve unique URLs to every function's location within the package's GitHub
 ## repository.
 ##
-## @code{find_GHurls} takes two input arguments, @var{pkgurl}, a char string
+## @code{find_GHurls} requires two input arguments, @var{pkgurl}, a char string
 ## with the URL to the root directory to the package's GitHub repository and
 ## @var{pkgfcns}, a Nx2 cell array containing the package's available functions
 ## (1st column) and their respective category (2nd column).
@@ -52,13 +52,21 @@
 
 function pkgfcns = find_GHurls (pkgurl, pkgfcns)
 
+  if (nargin != 2)
+    print_usage ();
+  endif
+
   if (! ischar (pkgurl))
+    print_usage ();
+  endif
+
+  if (! iscell (pkgfcns))
     print_usage ();
   endif
 
   ## Check if package repository is at GitHub
   GH = strfind (pkgurl, "https://github.com/");
-  if (GH != 1)
+  if (isempty (GH))
     error ("find_sourcecode: package repository must be at GitHub.");
   endif
 
@@ -128,4 +136,10 @@ function pkgfcns = find_GHurls (pkgurl, pkgfcns)
   endwhile
 
 endfunction
+
+%!error find_GHurls (1)
+%!error find_GHurls (1, cell (2))
+%!error find_GHurls ("https://github.com/gnu-octave/pkg-octave-doc")
+%!error find_GHurls ("https://github.com/gnu-octave/pkg-octave-doc", [2, 3])
+%!error find_GHurls ("https://somedomain.com/pkg-octave-doc", cell (2))
 
