@@ -22,7 +22,7 @@
 ## Generate HTML pages for an entire package.
 ##
 ## @code{package_texi2html} takes a single input argument, @var{pkgname}, which
-## is a char array with the package's name whose HTML documentation need to be
+## is a char string with the package's name whose HTML documentation need to be
 ## generated.  The function considers the current working path as the root
 ## directory of the built pages.  It creates an @code{index.html} page with the
 ## available functions (and their subdivision into separate categories) of the
@@ -38,8 +38,8 @@
 ## at GitHub, individual URLs to each function's location within the reposity
 ## are retrieved and used to add a link to source code in each function's page.
 ## This requires an internet connection and @code{git} installed and available
-## to the @code{$PATH}.  If not available, the source code link is omitted and
-## the functions' HTML pages are generated without it.
+## to the system's @code{$PATH}.  If not available, the source code link is
+## omitted and the functions' HTML pages are generated without it.
 ##
 ## For the @code{package_texi2html} to work, @code{texi2html} must be installed
 ## and available to the system's @code{$PATH}.
