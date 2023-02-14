@@ -59,6 +59,10 @@
 
 function function_texi2html (fcnname, pkgfcns, info)
 
+  if (nargin != 3)
+    print_usage ();
+  endif
+
   if (! ischar (fcnname))
     print_usage ();
   endif
@@ -68,6 +72,11 @@ function function_texi2html (fcnname, pkgfcns, info)
   endif
 
   if (! isstruct (info))
+    print_usage ();
+  endif
+
+  if (! isfield (info, "PKG_ICON") || ! isfield (info, "PKG_NAME") || ...
+      ! isfield (info, "PKG_TITLE") || ! isfield (info, "OCTAVE_LOGO"))
     print_usage ();
   endif
 
@@ -226,4 +235,12 @@ function function_texi2html (fcnname, pkgfcns, info)
 
 endfunction
 
-
+%!error function_texi2html (1)
+%!error function_texi2html (1, 2)
+%!error function_texi2html (1, cell (2))
+%!error function_texi2html (1, cell (2), struct("PKG_ICON", {""}, ...
+%! "PKG_NAME", {""}, "PKG_TITLE", {""}, "OCTAVE_LOGO", {""}))
+%!error function_texi2html ("find_GHurls", "text" , struct("PKG_ICON", {""}, ...
+%! "PKG_NAME", {""}, "PKG_TITLE", {""}, "OCTAVE_LOGO", {""}))
+%!error function_texi2html ("find_GHurls", cell (2) , struct("field", {""}, ...
+%! "PKG_NAME", {""}, "PKG_TITLE", {""}, "OCTAVE_LOGO", {""}))
