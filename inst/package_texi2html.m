@@ -82,7 +82,6 @@
 ##
 ## @item @code{OCTAVE_LOGO} @tab The relative reference to Octave's logo, also
 ## located inside @code{assets/} folder.
-##
 ## @end multitable
 ## @end itemize
 ##
