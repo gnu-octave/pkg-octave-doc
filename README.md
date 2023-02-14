@@ -11,14 +11,18 @@ documentation reference pages at Source Forge.
 
 ## Requirements
 
-The function `function_texi2html` relies on the
+* The function `function_texi2html` relies on the
 [texi2html](https://www.nongnu.org/texi2html/) software which must be
 be installed and available to $PATH.
+
+* If `git` and an internet connection are available, the functions' generated pages
+also include a URL to their respective repository locations.  This feature is only
+available for packages hosted at GitHub.
 
 ## Octave package function reference
 
 Create a function reference for all functions listed in the INDEX file of an
-installed Octave package in the current directory:
+installed Octave package in the working directory:
 
 ```
 package_texi2html (pkgname)
@@ -27,13 +31,9 @@ package_texi2html (pkgname)
 
 ## TODO
 
-1. Add documentation and BISTs to the existing functions.
-2. Update functionality to include DEMOS at the bottom of each function's
+1. Update functionality to include DEMOS at the bottom of each function's
 page like in Source Forge site.
-3. Figure out a way to retrieving a url link to each individual function's 
-source code within the package's repository and add a url right after the
-**See also:** tag at the end of the function's reference docstring.
-4. Implement a function for building a similar documentation reference for
+2. Implement a function for building a similar documentation reference for
 Octave core functions.
 
 
