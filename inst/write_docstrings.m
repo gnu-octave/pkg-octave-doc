@@ -73,7 +73,7 @@ endfunction
 %!test
 %! options.ignore_errors = false;
 %! options.document_private_functions = false;
-%! directory = "/home/siko1056/.local/share/octave/7.3.0/io-2.6.4";
-%! opts.output_directory = "build";
-%! write_docstrings (collect_docstrings (directory, options), opts);
+#%! directory = "/home/siko1056/.local/share/octave/7.3.0/io-2.6.4";
+#%! opts.output_directory = "build";
+#%! write_docstrings (collect_docstrings (directory, options), opts);
 

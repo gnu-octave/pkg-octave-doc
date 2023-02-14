@@ -140,9 +140,9 @@ endfunction
 %!error<must be a non-negative integer> collect_docstrings ("dir", ...
 %!  struct ("max_recursion_depth", true));
 
-%!test
-%! options.ignore_errors = false;
-%! options.document_private_functions = true;
-%! directory = "/home/siko1056/.local/share/octave/7.3.0/io-2.6.4";
-%! fcns = collect_docstrings (directory, options);
+#%!test
+#%! options.ignore_errors = false;
+#%! options.document_private_functions = true;
+#%! directory = "/home/siko1056/.local/share/octave/7.3.0/io-2.6.4";
+#%! fcns = collect_docstrings (directory, options);
 
