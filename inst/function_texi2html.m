@@ -20,7 +20,41 @@
 ##
 ## Generate HTML page for a particular function.
 ##
-## @seealso{package_texi2html}
+## @code{function_texi2html} requires three input arguments: @var{fcnname}, a
+## char string with the function's name; @var{pkgfcns}, a cell array with all
+## available functions of a package; and @var{info}, a structure with relevant
+## information about the package, which the function @var{fcnname} belongs to.
+##
+## @var{pkgfcns} can be either a @math{Nx2} or a @math{Nx3} cell array, whose
+## 1st column list all available function names, the 2nd column list the each
+## function's category, and the 3rd column contains the URL to the function's
+## source code.  @var{pkgfcns} is used to relative references to other pages of
+## functions which are listed in the @code{See also} tag.  When a 3rd column is
+## present, @code{function_texi2html} uses it to add a source code link of the
+## the function in @var{fcnname}.
+##
+## The @var{info} structure requires at least the following fields:
+##
+## @multitable @columnfractions 0.2 0.8
+## @headitem Field Name @tab Description
+## @item @code{PKG_ICON} @tab The relative reference to the package's logo image
+## which must be either in .svg or .png format and it is located in the newly
+## created @code{assets/} folder inside the working directory.
+##
+## @item @code{PKG_NAME} @tab The package's name (e.g. "statistics")
+##
+## @item @code{PKG_TITLE} @tab The package's title (e.g. "Statistics")
+##
+## @item @code{OCTAVE_LOGO} @tab The relative reference to Octave's logo, also
+## located inside @code{assets/} folder.
+## @end multitable
+##
+## To generate a suitable @math{Nx2} cell array for a specific package, use the
+## @code{package_texi2html} function and to populate is with the 3rd column use
+## @code{find_GHurls}.  The @var{info} structure can also be created with
+## @code{package_texi2html}.
+##
+## @seealso{package_texi2html, find_GHurls}
 ## @end deftypefn
 
 function function_texi2html (fcnname, pkgfcns, info)
