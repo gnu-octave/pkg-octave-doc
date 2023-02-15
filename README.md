@@ -9,6 +9,8 @@ with **pkg**. The generated pages follow the template of the Octave Packages at
 GitHub Pages based on bootstrap 5 and they have similar layout to the older
 documentation reference pages at Source Forge.
 
+You can find its documentation at [https://gnu-octave.github.io/pkg-octave-doc/](https://gnu-octave.github.io/pkg-octave-doc/).
+
 ## Requirements
 
 * The function `function_texi2html` relies on the
