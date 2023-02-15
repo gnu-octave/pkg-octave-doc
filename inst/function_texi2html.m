@@ -54,6 +54,9 @@
 ## @code{find_GHurls}.  The @var{info} structure can also be created with
 ## @code{package_texi2html}.
 ##
+## @code{function_texi2html} depends on @code{texi2html} command line tool
+## version 1.82, which must be installed and available on the system's $PATH.
+##
 ## @seealso{package_texi2html, find_GHurls}
 ## @end deftypefn
 
@@ -124,7 +127,7 @@ function function_texi2html (fcnname, pkgfcns, info)
   ## Check that 'texi2html' exists in system's PATH
   [status, msg] = unix ("texi2html --version");
   if (status)
-    error ("function_texi2html: 'texi2html' is not available to system's PATH.");
+    error ("function_texi2html: 'texi2html' command-line tool is missing.");
   elseif (! strcmp (strtrim (msg), "1.82"))
     error ("function_texi2html: 'texi2html' version must be 1.82.");
   endif
