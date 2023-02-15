@@ -132,8 +132,16 @@ function function_texi2html (fcnname, pkgfcns, info)
     error ("function_texi2html: 'texi2html' version must be 1.82.");
   endif
 
+  ## Fix texi tags that 'texi2html' cannot process or generates error
+  ## @qcode -> @code
+  text = strrep (text, "@qcode", "@code");
+  ## @abbr  -> @asis
+  text = strrep (text, "@abbr", "@asis");
+
   ## Fix file separator in function names with @
   fcnfile = strrep (fcnname, filesep, "_");
+
+  ## Save text to file
   fid = fopen (fcnfile, "w");
   fprintf (fid, "%s", text);
   fclose (fid);
@@ -164,7 +172,7 @@ function function_texi2html (fcnname, pkgfcns, info)
   for i = numel (dta_idx):-1:1
     fcn_text([dta_idx(i)+5:dt_aidx(i)+4]) = [];
   endfor
-
+  disp (fcnname);
   ## Fix </dd></dl> positions and add left margin after 1st sentence
   fcn_text = strrep (fcn_text, "<dd>", "</dl>\n");
   pbeg_idx = strfind (fcn_text, "<p>");
