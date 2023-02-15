@@ -24,7 +24,7 @@ available for packages hosted at GitHub.
 
 ## Installation
 
-To install the latest version (0.4.0) you need Octave (>=6.1.0) installed on your system. If you have Octave (>=7.2.0) you can install it by typing:
+To install the latest version (0.4.2) you need Octave (>=6.1.0) installed on your system. If you have Octave (>=7.2.0) you can install it by typing:
 
 ```
 pkg install -forge pkg-octave-doc
