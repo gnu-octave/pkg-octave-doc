@@ -121,6 +121,14 @@ function function_texi2html (fcnname, pkgfcns, info)
     endfor
   endif
 
+  ## Check that 'texi2html' exists in system's PATH
+  [status, msg] = unix ("texi2html --version");
+  if (status)
+    error ("function_texi2html: 'texi2html' is not available to system's PATH.");
+  elseif (! strcmp (strtrim (msg), "1.82"))
+    error ("function_texi2html: 'texi2html' version must be 1.82.");
+  endif
+
   ## Fix file separator in function names with @
   fcnfile = strrep (fcnname, filesep, "_");
   fid = fopen (fcnfile, "w");
