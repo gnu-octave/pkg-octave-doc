@@ -14,7 +14,7 @@ You can find its documentation at [https://gnu-octave.github.io/pkg-octave-doc/]
 ## Requirements
 
 * The function `function_texi2html` relies on the
-[texi2html](https://www.nongnu.org/texi2html/) software which must be
+[texi2html v1.82](https://www.nongnu.org/texi2html/) software which must be
 be installed and available to $PATH.
 
 * If `git` and an internet connection are available, the functions' generated pages
