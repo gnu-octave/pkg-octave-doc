@@ -46,7 +46,7 @@ function html = build_DEMOS (fcnname)
     demos_template = fileread (fullfile ("_layouts", "demos_template.html"));
 
     ## For each demo
-    for d = 1:numel (demos)
+    for demo_num = 1:numel (demos)
 
       text = "";
 
@@ -63,7 +63,7 @@ function html = build_DEMOS (fcnname)
         page_screen_output (false, "local");
 
         ## Format HTML string with demo code
-        code = demos{d};
+        code = demos{demo_num};
         text = [text "                  <table><tbody><tr>\n"];
         text = [text "                    <td>&nbsp;</td>\n"];
         text = [text "                    <td><pre class=""example"">\n"];
@@ -91,7 +91,7 @@ function html = build_DEMOS (fcnname)
 
         ## Save figures
         images = {};
-        r = d * 100;
+        r = demo_num * 100;
         while (! isempty (get (0, "currentfigure")))
           r = r + 1;
           fig = gcf ();
@@ -117,7 +117,8 @@ function html = build_DEMOS (fcnname)
         endif
 
         ## Append demo text to html
-        demo_html = strrep (demos_template, "{{NUMBER}}", sprintf ("%d", d));
+        demo_html = strrep (demos_template, "{{NUMBER}}", ...
+                            sprintf ("%d", demo_num));
         demo_html = strrep (demo_html, "{{DEMO}}", sprintf ("%s", text));
         demo_html = [demo_html "\n"];
       unwind_protect_cleanup
