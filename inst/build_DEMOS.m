@@ -119,11 +119,11 @@ function html = build_DEMOS (fcnname)
           endif
 
           ## Append demo demo_html to html
-          demo_html = strrep (demos_template, "{{NUMBER}}", ...
+          full_demo_html = strrep (demos_template, "{{NUMBER}}", ...
                               sprintf ("%d", demo_num));
-          demo_html = strrep (demo_html, "{{DEMO}}", ...
+          full_demo_html = strrep (full_demo_html, "{{DEMO}}", ...
                               sprintf ("%s", demo_html));
-          demo_html = [demo_html "\n"];
+          full_demo_html = [full_demo_html "\n"];
         unwind_protect_cleanup
           delete (diary_file);
           set (0, "defaultfigurevisible", dfv);
@@ -131,7 +131,7 @@ function html = build_DEMOS (fcnname)
           page_screen_output(oldpso);
         end_unwind_protect
 
-        html = [html demo_html];
+        html = [html full_demo_html];
       catch
         printf ("Unable to process demo %d from %s:\n %s\n", ...
                 demo_num, fcnname, lasterr);
