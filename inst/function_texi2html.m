@@ -235,7 +235,11 @@ function function_texi2html (fcnname, pkgfcns, info)
       fcn_text = strrep (fcn_text, "</div>", url_text);
     endif
 
-    ## Populate index template with package info
+    ## Add DEMOS (if applicable)
+    demo_txt = build_DEMOS (fcnname);
+    fcn_text = [fcn_text "\n" demo_txt];
+
+    ## Populate function template with package info
     fnc_template = fileread (fullfile ("_layouts", "function_template.html"));
     fnc_template = strrep (fnc_template, "{{PKG_ICON}}", info.PKG_ICON);
     fnc_template = strrep (fnc_template, "{{PKG_NAME}}", info.PKG_NAME);
@@ -248,7 +252,8 @@ function function_texi2html (fcnname, pkgfcns, info)
     ## Populate default template
     default_template = fileread (fullfile ("_layouts", "default.html"));
     output_str = default_template;
-    output_str = strrep (output_str, "{{TITLE}}", ["Statistics: ", fcnname]);
+    TITLE = sprintf ("%s: %s", info.PKG_TITLE, fcnname);
+    output_str = strrep (output_str, "{{TITLE}}", TITLE);
     output_str = strrep (output_str, "{{BODY}}", fnc_template);
 
     ## Write html to file
