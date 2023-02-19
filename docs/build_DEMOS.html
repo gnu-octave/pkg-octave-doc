@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Octave Package Documentation</title>
+    <title>Octave Package Documentation: build_DEMOS</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -16,7 +16,7 @@
       <div class="container-xl">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
           <div class="container-fluid">
-            <a class="navbar-brand" href=https://gnu-octave.github.io/packages/pkg-octave-doc>
+            <a class="navbar-brand" href=index.html>
               <img src="assets/pkg-octave-doc.png" alt="pkg-octave-doc" class="d-inline-block align-top" width="25" height="25">
               Octave Package Documentation
             </a>
@@ -25,6 +25,12 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
               <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="index.html#Documentation">
+                    <i class="fas fa-list-alt"></i>
+                    Documentation
+                  </a>
+                </li>
                 <li class="nav-item">
                   <a class="nav-link" href="https://gnu-octave.github.io/packages/">
                   <img src="assets/octave-logo.svg" alt="GNU Octave logo" class="d-inline-block align-top" width="25" height="25">
@@ -47,69 +53,28 @@
       <div class="card rounded">
         <div class="card-header card-header-mod">
           <div class="row d-flex flex-wrap align-items-center">
-            <div class="col-sm-3 col-md-2 mb-2 mb-sm-0">
-              <img src="assets/pkg-octave-doc.png" class="d-block m-auto" alt="pkg-octave-doc">
-            </div>
-            <div class="col-sm-9 col-md-10">
-              <h3 class="d-inline-block mr-2">pkg-octave-doc</h3>
-              <b>0.4.2&nbsp;2023-02-15</b>
-              <p class="indent">
-                This package provides functions for generating HTML pages that  contain the help texts of the functions of an octave package. The package is  designed to work with installed packages and use their INDEX file for creating  the respective functions' HTML pages. The default layout is based on boootstrap  5 and it follows the design of the Octave Packages GitHub page.
-              </p>
+            <div class="col-sm-3 col-md-5 mb-2 mb-sm-0">
+              <h3 class="d-inline-block mr-2">
+              Function&nbsp;Reference: <b><code>build_DEMOS</code></b>
+              </h3>
             </div>
           </div>
         </div>
         <div class="card-body">
-           <p>Select Category:
-             <select name="cat" onchange="location = this.options[this.selectedIndex].value;">
-             <option value="#Documentation">Documentation</option>
-             </select>
-           <p>
+<dl>
+<dt><u>pkg-octave-doc:</u> <var>html</var> = <b>build_DEMOS</b><i> (<var>fcnname</var>)</i></dt>
+</dl>
 
-           <h3 class="category">
-             <a name="Documentation">Documentation</a>
-           </h3>
-           <div class="lead">
-             <b>
-             <a href="build_DEMOS.html">build_DEMOS</a>
-             </b>
-           </div>
-           <div class="ftext">
-             Build HTML from available DEMOS in a particular function.
-           </div>
-           <div class="lead">
-             <b>
-             <a href="find_DEMOS.html">find_DEMOS</a>
-             </b>
-           </div>
-           <div class="ftext">
-             Retrieve DEMO blocks from a particular function.
-           </div>
-           <div class="lead">
-             <b>
-             <a href="find_GHurls.html">find_GHurls</a>
-             </b>
-           </div>
-           <div class="ftext">
-             Retrieve unique URLs to every function's location within the package's
-GitHub repository.
-           </div>
-           <div class="lead">
-             <b>
-             <a href="function_texi2html.html">function_texi2html</a>
-             </b>
-           </div>
-           <div class="ftext">
-             Generate HTML page for a particular function.
-           </div>
-           <div class="lead">
-             <b>
-             <a href="package_texi2html.html">package_texi2html</a>
-             </b>
-           </div>
-           <div class="ftext">
-             Generate HTML pages for an entire package.
-           </div>
+<p> Build HTML from available DEMOS in a particular function.
+</p>
+<div class="ms-5">
+<p> <strong>See also: </strong>
+  <a href="function_texi2html.html">function_texi2html</a>, 
+  <a href="find_GHurls.html">find_GHurls</a>
+</p>
+<p><strong>Source Code: </strong>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/build_DEMOS.m">build_DEMOS</a>
+</div>
 
         </div>
       </div>
