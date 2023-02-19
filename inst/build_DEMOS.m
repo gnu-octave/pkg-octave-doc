@@ -62,7 +62,6 @@ function html = build_DEMOS (fcnname)
         set (0, "defaultfigurevisible", "off");
         oldpager = PAGER('/dev/null');
         oldpso = page_screen_output(1);
-        oldpoi = page_output_immediately(1);
 
         ## Format HTML string with demo code
         code = demos{demo_num};
@@ -128,7 +127,6 @@ function html = build_DEMOS (fcnname)
         set (0, "defaultfigurevisible", dfv);
         PAGER(oldpager);
         page_screen_output(oldpso);
-        page_output_immediately(oldpoi);
       end_unwind_protect
 
       html = [html demo_html];
