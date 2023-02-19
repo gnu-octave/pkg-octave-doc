@@ -45,91 +45,97 @@ function html = build_DEMOS (fcnname)
     ## Load demos template
     demos_template = fileread (fullfile ("_layouts", "demos_template.html"));
 
+    ## Fixed HTML strings
+    tmp_0 = "                  <table><tbody><tr>\n";
+    tmp_1 = "                    <td>&nbsp;</td>\n";
+    tmp_2 = "                    <td><pre class=""example"">\n";
+    tmp_3 = "                    </pre></td></tr></tbody>\n";
+    tmp_4 = "                  </table>\n";
+    tmp_5 = "                  <div class=""text-center"">\n";
+    tmp_6 = "                    <img src=""";
+    tmp_7 = """ class=""rounded img-thumbnail""";
+    tmp_8 = " alt=""plotted figure"">\n";
+    tmp_9 = "                  </div><p></p>\n";
+
     ## For each demo
     for demo_num = 1:numel (demos)
+      try
+        ## Initialize HTML string for this demo
+        demo_html = "";
 
-      tmptext = "";
-
-      ## Prepare environment variables
-      close all
-      diary_file = "__diary__.txt";
-      if (exist (diary_file, "file"))
-        delete (diary_file);
-      endif
-      unwind_protect
-        ## Get current values
-        dfv = get (0, "defaultfigurevisible");
-        set (0, "defaultfigurevisible", "off");
-        oldpager = PAGER('/dev/null');
-        oldpso = page_screen_output(1);
-
-        ## Format HTML string with demo code
-        code = demos{demo_num};
-        tmptext = [tmptext "                  <table><tbody><tr>\n"];
-        tmptext = [tmptext "                    <td>&nbsp;</td>\n"];
-        tmptext = [tmptext "                    <td><pre class=""example"">\n"];
-        tmptext = [tmptext code];
-
-        ## Evaluate DEMO code
-        diary (diary_file);
-        eval (code);
-        diary ("off");
-
-        ## Read __diary__.txt
-        fid = fopen (diary_file);
-        demo_text = fscanf (fid, "%c", Inf);
-        fclose (fid);
-        #demo_text = strtrim (diary_text);
-
-        ## Format HTML string
-        newline = strfind (demo_text, "\n");
-        for i = 1:numel (newline) - 1
-          tmp = demo_text([newline(i):newline(i+1)-1]);
-          tmptext = strcat(tmptext, sprintf("%s", tmp));
-        endfor
-        tmptext = [tmptext "                    </pre></td></tr></tbody>\n"];
-        tmptext = [tmptext "                  </table>\n"];
-
-        ## Save figures
-        images = {};
-        r = demo_num * 100;
-        while (! isempty (get (0, "currentfigure")))
-          r = r + 1;
-          fig = gcf ();
-          name = sprintf ("%s_%d.png", fcnfile, r);
-          fullpath = fullfile ("assets", name);
-          print (fig, fullpath);
-          images{end+1} = fullpath;
-          close (fig);
-        endwhile
-
-        ## Reverse image list, since we got them latest-first
-        images = images (end:-1:1);
-
-        if (! isempty (images))
-          for i = 1:numel (images)
-            tmptext = [tmptext "                  <div class=""text-center"">\n"];
-            tmptext = [tmptext "                    <img src="""];
-            tmptext = [tmptext sprintf("%s", images{i})];
-            tmptext = [tmptext """ class=""rounded img-thumbnail"""];
-            tmptext = [tmptext " alt=""plotted figure"">\n"];
-            tmptext = [tmptext "                  </div><p></p>\n"];
-          endfor
+        ## Prepare environment variables
+        close all
+        diary_file = "__diary__.txt";
+        if (exist (diary_file, "file"))
+          delete (diary_file);
         endif
+        unwind_protect
+          ## Get current values
+          dfv = get (0, "defaultfigurevisible");
+          set (0, "defaultfigurevisible", "off");
+          oldpager = PAGER('/dev/null');
+          oldpso = page_screen_output(1);
 
-        ## Append demo tmptext to html
-        demo_html = strrep (demos_template, "{{NUMBER}}", ...
-                            sprintf ("%d", demo_num));
-        demo_html = strrep (demo_html, "{{DEMO}}", sprintf ("%s", tmptext));
-        demo_html = [demo_html "\n"];
-      unwind_protect_cleanup
-        delete (diary_file);
-        set (0, "defaultfigurevisible", dfv);
-        PAGER(oldpager);
-        page_screen_output(oldpso);
-      end_unwind_protect
+          ## Format HTML string with demo code
+          code = demos{demo_num};
+          demo_html = [demo_html tmp_0 tmp_1 tmp_2 code];
 
-      html = [html demo_html];
+          ## Evaluate DEMO code
+          diary (diary_file);
+          eval (code);
+          diary ("off");
+
+          ## Read __diary__.txt
+          fid = fopen (diary_file);
+          demo_text = fscanf (fid, "%c", Inf);
+          fclose (fid);
+
+          ## Format HTML string with demo output
+          demo_html = [demo_html demo_text tmp_3 tmp_4];
+
+          ## Save figures
+          images = {};
+          figure_num = demo_num * 100;
+          while (! isempty (get (0, "currentfigure")))
+            figure_num = figure_num + 1;
+            fig = gcf ();
+            name = sprintf ("%s_%d.png", fcnfile, figure_num);
+            fullpath = fullfile ("assets", name);
+            print (fig, fullpath);
+            images{end+1} = fullpath;
+            close (fig);
+          endwhile
+
+          ## Reverse image list, since we got them latest-first
+          images = images (end:-1:1);
+
+          ## Add reference to image (if applicable)
+          if (! isempty (images))
+            for i = 1:numel (images)
+              demo_html = [demo_html tmp_5 tmp_6];
+              demo_html = [demo_html sprintf("%s", images{i})];
+              demo_html = [demo_html tmp_7 tmp_8 tmp_9];
+            endfor
+          endif
+
+          ## Append demo demo_html to html
+          demo_html = strrep (demos_template, "{{NUMBER}}", ...
+                              sprintf ("%d", demo_num));
+          demo_html = strrep (demo_html, "{{DEMO}}", ...
+                              sprintf ("%s", demo_html));
+          demo_html = [demo_html "\n"];
+        unwind_protect_cleanup
+          delete (diary_file);
+          set (0, "defaultfigurevisible", dfv);
+          PAGER(oldpager);
+          page_screen_output(oldpso);
+        end_unwind_protect
+
+        html = [html demo_html];
+      catch
+        printf ("Unable to process demo %d from %s:\n %s\n", ...
+                demo_num, fcnname, lasterr);
+      end_try_catch
     endfor
   endif
 
