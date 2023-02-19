@@ -60,7 +60,9 @@ function html = build_DEMOS (fcnname)
         ## Get current values
         dfv = get (0, "defaultfigurevisible");
         set (0, "defaultfigurevisible", "off");
-        page_screen_output (false, "local");
+        oldpager = PAGER('/dev/null');
+        oldpso = page_screen_output(1);
+        oldpoi = page_output_immediately(1);
 
         ## Format HTML string with demo code
         code = demos{demo_num};
@@ -124,7 +126,9 @@ function html = build_DEMOS (fcnname)
       unwind_protect_cleanup
         delete (diary_file);
         set (0, "defaultfigurevisible", dfv);
-        ##page_screen_output (pso);
+        PAGER(oldpager);
+        page_screen_output(oldpso);
+        page_output_immediately(oldpoi);
       end_unwind_protect
 
       html = [html demo_html];
