@@ -48,7 +48,7 @@ function html = build_DEMOS (fcnname)
     ## For each demo
     for demo_num = 1:numel (demos)
 
-      text = "";
+      tmptext = "";
 
       ## Prepare environment variables
       close all
@@ -65,10 +65,10 @@ function html = build_DEMOS (fcnname)
 
         ## Format HTML string with demo code
         code = demos{demo_num};
-        text = [text "                  <table><tbody><tr>\n"];
-        text = [text "                    <td>&nbsp;</td>\n"];
-        text = [text "                    <td><pre class=""example"">\n"];
-        text = [text code];
+        tmptext = [tmptext "                  <table><tbody><tr>\n"];
+        tmptext = [tmptext "                    <td>&nbsp;</td>\n"];
+        tmptext = [tmptext "                    <td><pre class=""example"">\n"];
+        tmptext = [tmptext code];
 
         ## Evaluate DEMO code
         diary (diary_file);
@@ -85,10 +85,10 @@ function html = build_DEMOS (fcnname)
         newline = strfind (demo_text, "\n");
         for i = 1:numel (newline) - 1
           tmp = demo_text([newline(i):newline(i+1)-1]);
-          text = strcat(text, sprintf("%s", tmp));
+          tmptext = strcat(tmptext, sprintf("%s", tmp));
         endfor
-        text = [text "                    </pre></td></tr></tbody>\n"];
-        text = [text "                  </table>\n"];
+        tmptext = [tmptext "                    </pre></td></tr></tbody>\n"];
+        tmptext = [tmptext "                  </table>\n"];
 
         ## Save figures
         images = {};
@@ -108,19 +108,19 @@ function html = build_DEMOS (fcnname)
 
         if (! isempty (images))
           for i = 1:numel (images)
-            text = [text "                  <div class=""text-center"">\n"];
-            text = [text "                    <img src="""];
-            text = [text sprintf("%s", images{i})];
-            text = [text """ class=""rounded img-thumbnail"""];
-            text = [text " alt=""plotted figure"">\n"];
-            text = [text "                  </div><p></p>\n"];
+            tmptext = [tmptext "                  <div class=""text-center"">\n"];
+            tmptext = [tmptext "                    <img src="""];
+            tmptext = [tmptext sprintf("%s", images{i})];
+            tmptext = [tmptext """ class=""rounded img-thumbnail"""];
+            tmptext = [tmptext " alt=""plotted figure"">\n"];
+            tmptext = [tmptext "                  </div><p></p>\n"];
           endfor
         endif
 
-        ## Append demo text to html
+        ## Append demo tmptext to html
         demo_html = strrep (demos_template, "{{NUMBER}}", ...
                             sprintf ("%d", demo_num));
-        demo_html = strrep (demo_html, "{{DEMO}}", sprintf ("%s", text));
+        demo_html = strrep (demo_html, "{{DEMO}}", sprintf ("%s", tmptext));
         demo_html = [demo_html "\n"];
       unwind_protect_cleanup
         delete (diary_file);
