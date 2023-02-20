@@ -244,29 +244,36 @@ function [varargout] = package_texi2html (pkgname)
   cat_text = [cat_text "             </select>\n           <\p>\n"];
   index_template = strrep (index_template, "{{CATEGORY_SELECTOR}}", cat_text);
 
+  ## Fixed HTML strings
+  tmp_0 = "           <h3 class=""category"">\n";
+  tmp_1 = "</a>\n           </h3>\n";
+  tmp_2 = "           <table class=""table table-striped"">\n";
+  tmp_3 = "             <tbody>\n";
+  tmp_4 = "               <tr>\n                 <td>\n";
+  tmp_5 = "                   <b><code>\n                   <a href=""";
+  tmp_6 = "                   </code></b>\n                 </td>\n";
+  tmp_7 = "               </tr>\n";
+  tmp_8 = "             </tbody>\n";
+  tmp_9 = "           </table>\n";
+
   ## Populate categories with functions
   fcn_list = "";
   for i = 1:numel (cat)
     catname = cat(i).name;
-    tmp1 = ["           <h3 class=""category"">\n"];
-    tmp2 = sprintf ("             <a name=""%s"">%s", catname, catname);
-    tmp3 = ["</a>\n           </h3>\n"];
-    fcn_list = [fcn_list tmp1 tmp2 tmp3];
+    tmp_cat = sprintf ("             <a name=""%s"">%s", catname, catname);
+    fcn_list = [fcn_list tmp_0 tmp_cat tmp_1 tmp_2 tmp_3];
     for j = 1:numel (cat(i).fcns)
       fcnname = cat(i).fcns{j};
       fcnfile = strrep (fcnname, filesep, "_");
-      tmp1 = strcat (["           <div class=""lead"">\n"], ...
-                     ["             <b>\n             <a href="""]);
-      tmp2 = sprintf ("%s.html"">%s</a>\n", fcnfile, fcnname);
-      tmp3 = strcat (["             </b>\n           </div>\n"]);
-      fcn_list = [fcn_list tmp1 tmp2 tmp3];
-      fnc1 = get_first_help_sentence (fcnname, 240);
-      tmp1 = ["           <div class=""ftext"">\n"];
-      tmp2 = sprintf ("             %s\n           </div>\n", fnc1);
-      fcn_list = [fcn_list tmp1 tmp2];
+      tmp_fcn = sprintf ("%s.html"">%s</a>\n", fcnfile, fcnname);
+      fcn_list = [fcn_list tmp_4 tmp_5 tmp_fcn tmp_6];
+      fcnfirst = get_first_help_sentence (fcnname, 240);
+      tmp_fcn = sprintf ("                 <td>%s</td>\n", fcnfirst);
+      fcn_list = [fcn_list tmp_fcn tmp_7];
       ## Build individual function html
       function_texi2html (fcnname, pkgfcns, info);
     endfor
+    fcn_list = [fcn_list tmp_8 tmp_9];
   endfor
   index_template = strrep (index_template, "{{PKG_FUNCTION_LIST}}", fcn_list);
 
