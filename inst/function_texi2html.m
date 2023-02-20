@@ -59,7 +59,7 @@
 ## @code{function_texi2html} depends on the @qcode{texi2html} command line tool
 ## version 1.82, which must be installed and available on the system's $PATH,
 ## and the generated HTML code is based on the @qcode{function_template.html}
-## layout.
+## and @qcode{default_fcn.html} layouts.
 ##
 ## @seealso{package_texi2html, find_GHurls, build_DEMOS}
 ## @end deftypefn

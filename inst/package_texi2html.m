@@ -34,13 +34,14 @@
 ##
 ## The generated pages follow the template of the Octave Packages GitHub Pages
 ## based on bootstrap 5 and the generated HTML code is based on the
-## @qcode{index_template.html} layout.  For packages whose repository is
-## available at GitHub, individual URLs to each function's location within the
-## reposity are retrieved and used to add a link to source code in each
-## function's page.  This requires an internet connection and @code{git}
-## installed and available to the system's @code{$PATH}.  If not available, the
-## source code link is omitted and the functions' HTML pages are generated
-## without it.
+## @qcode{index_template.html} and @qcode{default_fcn.html} layouts.
+##
+## For packages whose repository is available at GitHub, individual URLs to each
+## function's location within the reposity are retrieved and used to add a link
+## to source code in each function's page.  This requires an internet connection
+## and @code{git} installed and available to the system's @code{$PATH}.  If not
+## available, the source code link is omitted and the functions' HTML pages are
+## generated without it.
 ##
 ## For the @code{package_texi2html} to work, the @qcode{texi2html} command line
 ## tool, version 1.82, must be installed and available to the system's
