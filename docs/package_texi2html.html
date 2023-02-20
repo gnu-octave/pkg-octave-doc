@@ -81,16 +81,19 @@
  generated with <code>function_texi2html</code>.
 </p>
 <p> The generated pages follow the template of the Octave Packages GitHub Pages
- based on bootstrap 5 and they have similar layout to the older documentation
- reference pages at Source Forge.  For packages whose repository is available
- at GitHub, individual URLs to each function&rsquo;s location within the reposity
- are retrieved and used to add a link to source code in each function&rsquo;s page.
- This requires an internet connection and <code>git</code> installed and available
- to the system&rsquo;s <code>$PATH</code>.  If not available, the source code link is
- omitted and the functions&rsquo; HTML pages are generated without it.
+ based on bootstrap 5 and the generated HTML code is based on the
+ <code>index_template.html</code> and <code>default_fcn.html</code> layouts.
 </p>
-<p> For the <code>package_texi2html</code> to work, <code>texi2html</code> must be installed
- and available to the system&rsquo;s <code>$PATH</code>.
+<p> For packages whose repository is available at GitHub, individual URLs to each
+ function&rsquo;s location within the reposity are retrieved and used to add a link
+ to source code in each function&rsquo;s page.  This requires an internet connection
+ and <code>git</code> installed and available to the system&rsquo;s <code>$PATH</code>.  If not
+ available, the source code link is omitted and the functions&rsquo; HTML pages are
+ generated without it.
+</p>
+<p> For the <code>package_texi2html</code> to work, the <code>texi2html</code> command line
+ tool, version 1.82, must be installed and available to the system&rsquo;s
+ <code>$PATH</code>.
 </p>
 <p> Optionally, <code>package_texi2html</code> can return two output arguments, namely
  <var>pkgfcns</var> and <var>info</var>, which are necessary for the <code>find_GHurls</code>
@@ -100,9 +103,9 @@
 </p>
 <p> Examples:
 </p>
- <table><tr><td>&nbsp;</td><td><pre class="example"> [pkgfcns, info] = package_texi2html (&quot;statistics&quot;);
+ <table><tr><td>&nbsp;</td><td><pre class="example"> [pkgfcns, info] = package_texi2html (&quot;pkg-octave-doc&quot;);
  pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
- function_texi2html (&quot;mean&quot;, pkgfcns, info);
+ function_texi2html (&quot;find_GHurls&quot;, pkgfcns, info);
  </pre></td></tr></table>
 
 <p> Returning arguments:
@@ -118,19 +121,21 @@
  <table>
 <thead><tr><th width="20%">Field Name</th><th width="80%">Description</th></tr></thead>
 <tr><td width="20%"><code>PKG_URL</code></td><td width="80%">The URL to the package&rsquo;s repository at GitHub.</td></tr>
-<tr><td width="20%"><code>PKG_ICON</code></td><td width="80%">The relative reference to the package&rsquo;s logo image
- which must be either in .svg or .png format and it is located in the newly
- created <code>assets/</code> folder inside the working directory.</td></tr>
-<tr><td width="20%"><code>PKG_NAME</code></td><td width="80%">The package&rsquo;s name (e.g. &quot;statistics&quot;)</td></tr>
-<tr><td width="20%"><code>PKG_TITLE</code></td><td width="80%">The package&rsquo;s title (e.g. &quot;Statistics&quot;)</td></tr>
+<tr><td width="20%"><code>PKG_ICON</code></td><td width="80%">The relative reference to the package&rsquo;s logo
+ image which must be either in .svg or .png format and it is located in the
+ newly created <code>assets/</code> folder inside the working directory.</td></tr>
+<tr><td width="20%"><code>PKG_NAME</code></td><td width="80%">The package&rsquo;s name (e.g. &quot;pkg-octave-doc&quot;)</td></tr>
+<tr><td width="20%"><code>PKG_TITLE</code></td><td width="80%">The package&rsquo;s title (e.g. &quot;Octave Package
+ Documentation&quot;)</td></tr>
 <tr><td width="20%"><code>OCTAVE_LOGO</code></td><td width="80%">The relative reference to Octave&rsquo;s logo, also
- located inside <code>assets/</code> folder.</td></tr>
+ located inside the <code>assets/</code> folder.</td></tr>
 </table>
 </li></ul>
 
 <p> <strong>See also: </strong>
   <a href="function_texi2html.html">function_texi2html</a>, 
-  <a href="find_GHurls.html">find_GHurls</a>
+  <a href="find_GHurls.html">find_GHurls</a>, 
+  <a href="build_DEMOS.html">build_DEMOS</a>
 </p>
 <p><strong>Source Code: </strong>
   <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/package_texi2html.m">package_texi2html</a>

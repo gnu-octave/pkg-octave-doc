@@ -85,13 +85,14 @@
 </p>
  <table>
 <thead><tr><th width="20%">Field Name</th><th width="80%">Description</th></tr></thead>
-<tr><td width="20%"><code>PKG_ICON</code></td><td width="80%">The relative reference to the package&rsquo;s logo image
- which must be either in .svg or .png format and it is located in the newly
- created <code>assets/</code> folder inside the working directory.</td></tr>
-<tr><td width="20%"><code>PKG_NAME</code></td><td width="80%">The package&rsquo;s name (e.g. &quot;statistics&quot;)</td></tr>
-<tr><td width="20%"><code>PKG_TITLE</code></td><td width="80%">The package&rsquo;s title (e.g. &quot;Statistics&quot;)</td></tr>
+<tr><td width="20%"><code>PKG_ICON</code></td><td width="80%">The relative reference to the package&rsquo;s logo
+ image which must be either in .svg or .png format and it is located in the
+ newly created <code>assets/</code> folder inside the working directory.</td></tr>
+<tr><td width="20%"><code>PKG_NAME</code></td><td width="80%">The package&rsquo;s name (e.g. &quot;pkg-octave-doc&quot;)</td></tr>
+<tr><td width="20%"><code>PKG_TITLE</code></td><td width="80%">The package&rsquo;s title (e.g. &quot;Octave Package
+ Documentation&quot;)</td></tr>
 <tr><td width="20%"><code>OCTAVE_LOGO</code></td><td width="80%">The relative reference to Octave&rsquo;s logo, also
- located inside <code>assets/</code> folder.</td></tr>
+ located inside the <code>assets/</code> folder.</td></tr>
 </table>
 
 <p> To generate a suitable <em>Nx2</em> cell array for a specific package, use the
@@ -99,12 +100,15 @@
  <code>find_GHurls</code>.  The <var>info</var> structure can also be created with
  <code>package_texi2html</code>.
 </p>
-<p> <code>function_texi2html</code> depends on <code>texi2html</code> command line tool
- version 1.82, which must be installed and available on the system&rsquo;s $PATH.
+<p> <code>function_texi2html</code> depends on the <code>texi2html</code> command line tool
+ version 1.82, which must be installed and available on the system&rsquo;s $PATH,
+ and the generated HTML code is based on the <code>function_template.html</code>
+ and <code>default_fcn.html</code> layouts.
 </p>
 <p> <strong>See also: </strong>
   <a href="package_texi2html.html">package_texi2html</a>, 
-  <a href="find_GHurls.html">find_GHurls</a>
+  <a href="find_GHurls.html">find_GHurls</a>, 
+  <a href="build_DEMOS.html">build_DEMOS</a>
 </p>
 <p><strong>Source Code: </strong>
   <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/function_texi2html.m">function_texi2html</a>

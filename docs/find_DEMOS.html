@@ -65,10 +65,20 @@
 <dt><u>pkg-octave-doc:</u> <var>demos</var> = <b>find_DEMOS</b><i> (<var>fcnname</var>)</i></dt>
 </dl>
 
-<p> Retrieve DEMO blocks from a particular function.
+<p> Retrieve the DEMO code blocks from a particular function.
 </p>
 <div class="ms-5">
+ <ul>
+<li>
+ <var>fcnname</var> is a char string with the function&rsquo;s name.
+
+ </li><li>
+ <var>demos</var> is cell array with each cell containing a char string with the
+ code block of each DEMO available in <var>fcnname</var>.
+ </li></ul>
+
 <p> <strong>See also: </strong>
+  <a href="build_DEMOS.html">build_DEMOS</a>, 
   <a href="function_texi2html.html">function_texi2html</a>, 
   <a href="find_GHurls.html">find_GHurls</a>
 </p>
