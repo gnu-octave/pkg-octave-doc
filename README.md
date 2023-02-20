@@ -24,7 +24,7 @@ available for packages hosted at GitHub.
 
 ## Installation
 
-To install the latest version (0.4.3) you need Octave (>=6.1.0) installed on your system. If you have Octave (>=7.2.0) you can install it by typing:
+To install the latest version (0.4.4) you need Octave (>=6.1.0) installed on your system. If you have Octave (>=7.2.0) you can install it by typing:
 
 ```
 pkg install -forge pkg-octave-doc
@@ -48,7 +48,9 @@ package_texi2html ("pkg-octave-doc")
 
 ## TODO
 
-1. Implement a function for building a similar documentation reference for
+1. Implement a function for listing alphabetically all functions available
+from every package in Octave Packages that can be installed with `pkg`.
+2. Implement a function for building a similar documentation reference for
 Octave core functions.
 
 
