@@ -48,8 +48,8 @@
 ##
 ## @item @qcode{OCTAVE_LOGO} @tab The relative reference to Octave's logo, also
 ## located inside the @qcode{assets/} folder.
-## @end multitable
 ##
+## @end multitable
 ##
 ## To generate a suitable @math{Nx2} cell array for a specific package, use the
 ## @code{package_texi2html} function and to populate is with the 3rd column use
