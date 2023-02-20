@@ -87,7 +87,7 @@ function html = build_DEMOS (fcnname)
 
           ## Format HTML string with demo code
           code = demos{demo_num};
-          demo_html = [demo_html tmp_0 tmp_1 tmp_2 code];
+          demo_html = [demo_html tmp_0 tmp_1 tmp_2 code "\n"];
 
           ## Evaluate DEMO code
           diary (diary_file);
