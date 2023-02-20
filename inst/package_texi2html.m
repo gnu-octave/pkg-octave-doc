@@ -158,6 +158,13 @@ function [varargout] = package_texi2html (pkgname)
     error ("package_texi2html: cannot create %s directory.", asset);
   endif
 
+  ## Copy custom.css to /assets for index.html page
+  sd = fullfile (file_in_loadpath ("custom.css"));
+  [status, msg, msgid] = copyfile (sd, asset, "f");
+  if (status != 1)
+    error ("package_texi2html: cannot copy custom.css to %s directory.", asset);
+  endif
+
   ## Copy octave logo
   sd = fullfile (file_in_loadpath ("octave-logo.svg"));
   [status, msg, msgid] = copyfile (sd, asset, "f");
