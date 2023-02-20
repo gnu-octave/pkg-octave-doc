@@ -18,9 +18,18 @@
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {@var{demos} =} find_DEMOS (@var{fcnname})
 ##
-## Retrieve DEMO blocks from a particular function.
+## Retrieve the DEMO code blocks from a particular function.
 ##
-## @seealso{function_texi2html, find_GHurls}
+## @itemize
+## @item
+## @var{fcnname} is a char string with the function's name.
+##
+## @item
+## @var{demos} is cell array with each cell containing a char string with the
+## code block of each DEMO available in @var{fcnname}.
+## @end itemize
+##
+## @seealso{build_DEMOS, function_texi2html, find_GHurls}
 ## @end deftypefn
 
 function demos = find_DEMOS (fcnname)

@@ -18,9 +18,18 @@
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {@var{html} =} build_DEMOS (@var{fcnname})
 ##
-## Build HTML from available DEMOS in a particular function.
+## Generate HTML code from the available DEMOS of a particular function.
 ##
-## @seealso{function_texi2html, find_GHurls}
+## @itemize
+## @item
+## @var{fcnname} is a char string with the function's name.
+##
+## @item
+## @var{html} is a char string with the generated HTML code based on the
+## @qcode{demos_template.html} layout for every DEMO available in @var{fcnname}.
+## @end itemize
+##
+## @seealso{find_DEMOS, function_texi2html, find_GHurls}
 ## @end deftypefn
 
 function html = build_DEMOS (fcnname)
