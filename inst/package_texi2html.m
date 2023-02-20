@@ -24,7 +24,7 @@
 ## @code{package_texi2html} takes a single input argument, @var{pkgname}, which
 ## is a char string with the package's name whose HTML documentation need to be
 ## generated.  The function considers the current working path as the root
-## directory of the built pages.  It creates an @code{index.html} page with the
+## directory of the built pages.  It creates an @qcode{index.html} page with the
 ## available functions (and their subdivision into separate categories) of the
 ## package according to its INDEX file.  Although the INDEX file (if absent) is
 ## automatically generated during the package's installation, it is best
@@ -33,16 +33,18 @@
 ## generated with @code{function_texi2html}.
 ##
 ## The generated pages follow the template of the Octave Packages GitHub Pages
-## based on bootstrap 5 and they have similar layout to the older documentation
-## reference pages at Source Forge.  For packages whose repository is available
-## at GitHub, individual URLs to each function's location within the reposity
-## are retrieved and used to add a link to source code in each function's page.
-## This requires an internet connection and @code{git} installed and available
-## to the system's @code{$PATH}.  If not available, the source code link is
-## omitted and the functions' HTML pages are generated without it.
+## based on bootstrap 5 and the generated HTML code is based on the
+## @qcode{index_template.html} layout.  For packages whose repository is
+## available at GitHub, individual URLs to each function's location within the
+## reposity are retrieved and used to add a link to source code in each
+## function's page.  This requires an internet connection and @code{git}
+## installed and available to the system's @code{$PATH}.  If not available, the
+## source code link is omitted and the functions' HTML pages are generated
+## without it.
 ##
-## For the @code{package_texi2html} to work, @code{texi2html} must be installed
-## and available to the system's @code{$PATH}.
+## For the @code{package_texi2html} to work, the @qcode{texi2html} command line
+## tool, version 1.82, must be installed and available to the system's
+## @code{$PATH}.
 ##
 ## Optionally, @code{package_texi2html} can return two output arguments, namely
 ## @var{pkgfcns} and @var{info}, which are necessary for the @code{find_GHurls}
@@ -53,9 +55,9 @@
 ## Examples:
 ##
 ## @example
-## [pkgfcns, info] = package_texi2html ("statistics");
+## [pkgfcns, info] = package_texi2html ("pkg-octave-doc");
 ## pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
-## function_texi2html ("mean", pkgfcns, info);
+## function_texi2html ("find_GHurls", pkgfcns, info);
 ## @end example
 ##
 ## Returning arguments:
@@ -70,22 +72,23 @@
 ##
 ## @multitable @columnfractions 0.2 0.8
 ## @headitem Field Name @tab Description
-## @item @code{PKG_URL} @tab The URL to the package's repository at GitHub.
+## @item @qcode{PKG_URL} @tab The URL to the package's repository at GitHub.
 ##
-## @item @code{PKG_ICON} @tab The relative reference to the package's logo image
-## which must be either in .svg or .png format and it is located in the newly
-## created @code{assets/} folder inside the working directory.
+## @item @qcode{PKG_ICON} @tab The relative reference to the package's logo
+## image which must be either in .svg or .png format and it is located in the
+## newly created @code{assets/} folder inside the working directory.
 ##
-## @item @code{PKG_NAME} @tab The package's name (e.g. "statistics")
+## @item @qcode{PKG_NAME} @tab The package's name (e.g. "pkg-octave-doc")
 ##
-## @item @code{PKG_TITLE} @tab The package's title (e.g. "Statistics")
+## @item @qcode{PKG_TITLE} @tab The package's title (e.g. "Octave Package
+## Documentation")
 ##
-## @item @code{OCTAVE_LOGO} @tab The relative reference to Octave's logo, also
-## located inside @code{assets/} folder.
+## @item @qcode{OCTAVE_LOGO} @tab The relative reference to Octave's logo, also
+## located inside the @qcode{assets/} folder.
 ## @end multitable
 ## @end itemize
 ##
-## @seealso{function_texi2html, find_GHurls}
+## @seealso{function_texi2html, find_GHurls, build_DEMOS}
 ## @end deftypefn
 
 function [varargout] = package_texi2html (pkgname)

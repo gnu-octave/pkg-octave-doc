@@ -29,7 +29,7 @@
 ## 1st column list all available function names, the 2nd column list the each
 ## function's category, and the 3rd column contains the URL to the function's
 ## source code.  @var{pkgfcns} is used to relative references to other pages of
-## functions which are listed in the @code{See also} tag.  When a 3rd column is
+## functions which are listed in the @qcode{See also} tag.  When a 3rd column is
 ## present, @code{function_texi2html} uses it to add a source code link of the
 ## the function in @var{fcnname}.
 ##
@@ -37,27 +37,31 @@
 ##
 ## @multitable @columnfractions 0.2 0.8
 ## @headitem Field Name @tab Description
-## @item @code{PKG_ICON} @tab The relative reference to the package's logo image
-## which must be either in .svg or .png format and it is located in the newly
-## created @code{assets/} folder inside the working directory.
+## @item @qcode{PKG_ICON} @tab The relative reference to the package's logo
+## image which must be either in .svg or .png format and it is located in the
+## newly created @qcode{assets/} folder inside the working directory.
 ##
-## @item @code{PKG_NAME} @tab The package's name (e.g. "statistics")
+## @item @qcode{PKG_NAME} @tab The package's name (e.g. "pkg-octave-doc")
 ##
-## @item @code{PKG_TITLE} @tab The package's title (e.g. "Statistics")
+## @item @qcode{PKG_TITLE} @tab The package's title (e.g. "Octave Package
+## Documentation")
 ##
-## @item @code{OCTAVE_LOGO} @tab The relative reference to Octave's logo, also
-## located inside @code{assets/} folder.
+## @item @qcode{OCTAVE_LOGO} @tab The relative reference to Octave's logo, also
+## located inside the @qcode{assets/} folder.
 ## @end multitable
+##
 ##
 ## To generate a suitable @math{Nx2} cell array for a specific package, use the
 ## @code{package_texi2html} function and to populate is with the 3rd column use
 ## @code{find_GHurls}.  The @var{info} structure can also be created with
 ## @code{package_texi2html}.
 ##
-## @code{function_texi2html} depends on @code{texi2html} command line tool
-## version 1.82, which must be installed and available on the system's $PATH.
+## @code{function_texi2html} depends on the @qcode{texi2html} command line tool
+## version 1.82, which must be installed and available on the system's $PATH,
+## and the generated HTML code is based on the @qcode{function_template.html}
+## layout.
 ##
-## @seealso{package_texi2html, find_GHurls}
+## @seealso{package_texi2html, find_GHurls, build_DEMOS}
 ## @end deftypefn
 
 function function_texi2html (fcnname, pkgfcns, info)
