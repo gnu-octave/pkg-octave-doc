@@ -34,7 +34,7 @@
 ##
 ## The generated pages follow the template of the Octave Packages GitHub Pages
 ## based on bootstrap 5 and the generated HTML code is based on the
-## @qcode{index_template.html} and @qcode{default_fcn.html} layouts.
+## @qcode{index_template.html} and @qcode{default.html} layouts.
 ##
 ## For packages whose repository is available at GitHub, individual URLs to each
 ## function's location within the reposity are retrieved and used to add a link
@@ -157,13 +157,6 @@ function [varargout] = package_texi2html (pkgname)
   [status, msg, msgid] = mkdir (asset);
   if (status != 1)
     error ("package_texi2html: cannot create %s directory.", asset);
-  endif
-
-  ## Copy custom.css to /assets for index.html page
-  sd = fullfile (file_in_loadpath ("custom.css"));
-  [status, msg, msgid] = copyfile (sd, asset, "f");
-  if (status != 1)
-    error ("package_texi2html: cannot copy custom.css to %s directory.", asset);
   endif
 
   ## Copy octave logo
@@ -294,7 +287,7 @@ function [varargout] = package_texi2html (pkgname)
   endif
 
   ## Populate default template
-  default_template = fileread (fullfile ("_layouts", "default_pkg.html"));
+  default_template = fileread (fullfile ("_layouts", "default.html"));
   output_str = default_template;
   output_str = strrep (output_str, "{{TITLE}}", pkg_title);
   output_str = strrep (output_str, "{{BODY}}", index_template);

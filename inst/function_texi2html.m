@@ -59,7 +59,7 @@
 ## @code{function_texi2html} depends on the @qcode{texi2html} command line tool
 ## version 1.82, which must be installed and available on the system's $PATH,
 ## and the generated HTML code is based on the @qcode{function_template.html}
-## and @qcode{default_fcn.html} layouts.
+## and @qcode{default.html} layouts.
 ##
 ## @seealso{package_texi2html, find_GHurls, build_DEMOS}
 ## @end deftypefn
@@ -254,7 +254,7 @@ function function_texi2html (fcnname, pkgfcns, info)
     fnc_template = strrep (fnc_template, "{{FCN_TEXT}}", fcn_text);
 
     ## Populate default template
-    default_template = fileread (fullfile ("_layouts", "default_fcn.html"));
+    default_template = fileread (fullfile ("_layouts", "default.html"));
     output_str = default_template;
     TITLE = sprintf ("%s: %s", info.PKG_TITLE, fcnname);
     output_str = strrep (output_str, "{{TITLE}}", TITLE);
