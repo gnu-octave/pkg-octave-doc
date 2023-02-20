@@ -254,7 +254,7 @@ function function_texi2html (fcnname, pkgfcns, info)
     fnc_template = strrep (fnc_template, "{{FCN_TEXT}}", fcn_text);
 
     ## Populate default template
-    default_template = fileread (fullfile ("_layouts", "default.html"));
+    default_template = fileread (fullfile ("_layouts", "default_fcn.html"));
     output_str = default_template;
     TITLE = sprintf ("%s: %s", info.PKG_TITLE, fcnname);
     output_str = strrep (output_str, "{{TITLE}}", TITLE);

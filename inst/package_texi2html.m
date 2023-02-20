@@ -293,7 +293,7 @@ function [varargout] = package_texi2html (pkgname)
   endif
 
   ## Populate default template
-  default_template = fileread (fullfile ("_layouts", "default.html"));
+  default_template = fileread (fullfile ("_layouts", "default_pkg.html"));
   output_str = default_template;
   output_str = strrep (output_str, "{{TITLE}}", pkg_title);
   output_str = strrep (output_str, "{{BODY}}", index_template);
