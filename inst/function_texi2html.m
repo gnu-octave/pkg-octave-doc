@@ -133,11 +133,14 @@ function function_texi2html (fcnname, pkgfcns, info)
     endif
 
     ## Check that 'texi2html' exists in system's PATH
-    [status, msg] = unix ("texi2html --version");
+    [status, texi2html_ver] = unix ("texi2html --version");
     if (status)
       error ("function_texi2html: 'texi2html' command-line tool is missing.");
-    elseif (compare_versions (msg, '1.82', '!='))
-      error ("function_texi2html: 'texi2html' version must be exactly 1.82.");
+    elseif (compare_versions (texi2html_ver, '1.82', '<'))
+      error ("function_texi2html: 'texi2html' version must be at least 1.82.");
+    elseif (compare_versions (texi2html_ver, '1.82', '>'))
+      warning ("pkg-octave-doc:texi2html-ver", ...
+	       "function_texi2html: 'texi2html' version > 1.82: not well-tested, use at your own risk.\n");
     endif
 
     ## Fix texi tags that 'texi2html' cannot process or generates error
@@ -167,7 +170,12 @@ function function_texi2html (fcnname, pkgfcns, info)
 
     ## Remove content before <body> tag and after <hr size="1">
     txt_beg = strfind (fcn_text, "<body ");
-    txt_end = strfind (fcn_text, "<hr size=""1"">") - 1;
+    ## TODO: Issue #6: reliably strip the "This document was generated..."
+    if (compare_versions (texi2html_ver, '5.0', '>='))
+      txt_end = strfind (fcn_text, "<hr>\n<p>\n <font size=""-1"">") - 1;
+    else
+      txt_end = strfind (fcn_text, "<hr size=""1"">") - 1;
+    endif
     fcn_text = fcn_text([txt_beg:txt_end]);
 
     ## Remove <body *> tag
