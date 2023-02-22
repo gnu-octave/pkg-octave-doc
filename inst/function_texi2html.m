@@ -136,7 +136,7 @@ function function_texi2html (fcnname, pkgfcns, info)
     [status, msg] = unix ("texi2html --version");
     if (status)
       error ("function_texi2html: 'texi2html' command-line tool is missing.");
-    elseif (compare_versions (msg, "1.82", "!="))
+    elseif (! strcmp (strtrim (msg), "1.82"))
       error ("function_texi2html: 'texi2html' version must be exactly 1.82.");
     endif
 
