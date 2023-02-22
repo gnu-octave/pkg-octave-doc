@@ -52,7 +52,7 @@ package_texi2html ("pkg-octave-doc")
 
 * fields of structures: it is best practice to write them as `@var{structure_name}.@qcode{field_name}` which appears in the command window as `structure_name.field_name` and in HTML as <var>structure_name</var>.<code>field_name</code>. In bootstrap 5, the `<code>` tag is not highlighted and it looks better than here :smiley:.
 
-* Avoid nesting `@itemize` and `multitable` blocks because they are not parsed correctly by `texi2html`. You can achieve the same visual result by segmenting them.
+* Avoid nesting `@itemize` and `@multitable` blocks because they are not parsed correctly by `texi2html`. You can achieve the same visual result by segmenting them.
 
 * Table columns in HTML use dynamic width, os if you wish to maintain the required width for better visualization, add extra empty `@tags` inbetween.
 
