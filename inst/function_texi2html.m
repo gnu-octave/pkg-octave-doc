@@ -167,7 +167,7 @@ function function_texi2html (fcnname, pkgfcns, info)
 
     ## Remove content before <body> tag and after <hr size="1">
     txt_beg = strfind (fcn_text, "<body ");
-    txt_end = strfind (fcn_text, "</p></dd></dl>") + 13;
+    txt_end = strfind (fcn_text, "<hr size=""1"">") - 1;
     fcn_text = fcn_text([txt_beg:txt_end]);
 
     ## Remove <body *> tag
