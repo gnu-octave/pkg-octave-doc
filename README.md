@@ -24,7 +24,7 @@ available for packages hosted at GitHub.
 
 ## Installation
 
-To install the latest version (0.4.5) you need Octave (>=7.2.0) installed on your system. You can install it by typing:
+To install the latest version (0.4.7) you need Octave (>=7.2.0) installed on your system. You can install it by typing:
 
 ```
 pkg install -forge pkg-octave-doc
@@ -54,7 +54,7 @@ package_texi2html ("pkg-octave-doc")
 
 * Avoid nesting `@itemize` and `@multitable` blocks because they are not parsed correctly by `texi2html`. You can achieve the same visual result by segmenting them.
 
-* Table columns in HTML use dynamic width, os if you wish to maintain the required width for better visualization, add extra empty `@tags` inbetween.
+* Table columns in HTML use dynamic width, so if you wish to maintain the required width for better visualization, add extra empty `@tags` inbetween.
 
 For example:
 ````
@@ -86,6 +86,7 @@ DEFUN_DLD (libsvmread, args, nargout,
 This function ...
 ````
 
+`@math{}` texi tags are converted to `<math></math>` html tags and their contents are scanned for `x` and `*` characters, which are replaced by `&times;` in order to properly display the multiplication symbol. Make sure that lower case `x` within the `@math{}` tags is explicitly used for denoting multiplication and it is not used for anything else (e.g. variable name).  This feature, introduced in release 0.4.7, only affects the contents of `@math{}` texi tags. 
 
 ## TODO
 
