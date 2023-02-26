@@ -15,6 +15,9 @@
       font-style: italics;
       font-weight: bold;
     }
+    td {
+      vertical-align: top;
+    }
     </style>
   </head>
   <body>
@@ -79,7 +82,7 @@
  available functions of a package; and <var>info</var>, a structure with relevant
  information about the package, which the function <var>fcnname</var> belongs to.
 </p>
-<p> <var>pkgfcns</var> can be either a <em>Nx2</em> or a <em>Nx3</em> cell array, whose
+<p> <var>pkgfcns</var> can be either a <math>N&times;2</math> or a <math>N&times;3</math> cell array, whose
  1st column list all available function names, the 2nd column list the each
  function&rsquo;s category, and the 3rd column contains the URL to the function&rsquo;s
  source code.  <var>pkgfcns</var> is used to relative references to other pages of
@@ -101,7 +104,7 @@
  located inside the <code>assets/</code> folder.</td></tr>
 </table>
 
-<p> To generate a suitable <em>Nx2</em> cell array for a specific package, use the
+<p> To generate a suitable <math>N&times;2</math> cell array for a specific package, use the
  <code>package_texi2html</code> function and to populate is with the 3rd column use
  <code>find_GHurls</code>.  The <var>info</var> structure can also be created with
  <code>package_texi2html</code>.
