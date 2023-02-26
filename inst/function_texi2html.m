@@ -188,6 +188,31 @@ function function_texi2html (fcnname, pkgfcns, info)
     tmp_str1 = fcn_text([pbeg_idx(1):pend_idx(1)+4]);
     fcn_text = strrep (fcn_text, tmp_str1, [tmp_str1, "<div class=""ms-5"">\n"]);
 
+    ## Replace <em> and </em> tags with <math> and </math>, respectively.
+    ## Evaluate each case whether it conforms to size dimensions and replace
+    ## 'x' or '*' with '&times;'.
+    ## alphanumeric chars
+    fcn_text = strrep (fcn_text, "<em>", "<math>");
+    fcn_text = strrep (fcn_text, "</em>", "</math>");
+    math_beg = strfind (fcn_text, "<math>") + 6;
+    math_end = strfind (fcn_text, "</math>") - 1;
+    if (! isempty (math_beg) && ! isempty (math_end))
+      times_idx = [];
+      for j = numel (math_beg):-1:1
+        math_txt = fcn_text([math_beg(j):math_end(j)]);
+        char_idx = [strchr(math_txt, "x") strchr(math_txt, "*")];
+        if (! isempty (char_idx))
+          char_idx = math_beg(j) + char_idx - 1;
+          times_idx = [times_idx char_idx];
+        endif
+      endfor
+      times_idx = sort (times_idx);
+      for j = numel (times_idx):-1:1
+        fcn_text = strcat (fcn_text([1:times_idx(j)-1]), "&times;", ...
+                           fcn_text([times_idx(j)+1:end]));
+      endfor
+    endif
+
     ## Replace tex literal if exists
     if (is_tex)
       for j = numel (tex):-1:1
