@@ -38,12 +38,20 @@ pkg install "https://github.com/gnu-octave/pkg-octave-doc/archive/refs/heads/mai
 
 ## Usage
 
-Create a function reference for all functions listed in the INDEX file of an
+Generate a function reference for all functions listed in the INDEX file of an
 installed Octave package in the working directory:
 
 ```
 package_texi2html ("pkg-octave-doc")
 ```
+
+If you wish to host the generated documentation on GitHub Pages, you need to create a `/docs` folder at the root of your package's repository hosted at Github (or at least mirrored there), run the above command from inside this folder in Octave to generate all necessary files, push the changes and from the repository's interface at GitHub, go to settings, choose `Pages` on the left hand side list (last item in the `Code and automation` category), and in the `Build and deployment` section of the <b>GitHub Pages</b> select:
+
+<b>Source</b>  ->  Deploy from a branch
+
+<b>Branch</b>  ->  `main` `/docs` and click `Save`.
+
+You only need to do this once, and the package's website will be automatically updated every time you push a new commit into the package's `/docs` folder.
 
 ## Guidelines for TEXIFNO docsstrings
 
