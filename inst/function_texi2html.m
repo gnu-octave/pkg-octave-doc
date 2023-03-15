@@ -104,7 +104,10 @@ function function_texi2html (fcnname, pkgfcns, info)
         tex(j).str = {};
         tex(j).tex = text([tex_beg(j):tex_end(j)]);
         tex(j).rep = {symbols(randi (length (symbols), 1,length (symbols)))};
-        text = strrep (text, tex(j).tex, ["\n",tex(j).rep{:}]);
+        ## now replace only the last occurrance of tex(j).tex in text
+        text1 = text(1:tex_beg(j)-1);
+        text2 = text(tex_end(j)+1:end);
+        text = [text1, "\n", tex(j).rep{:}, text2];
         is_tex = 1;
         ## Keep tex literals
         tex_idx = strfind (tex(j).tex, "$$");
