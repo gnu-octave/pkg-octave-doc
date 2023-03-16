@@ -130,8 +130,10 @@ function function_texi2html (fcnname, pkgfcns, info)
     notex_e = strfind (text, "@end ifnottex") + 12;
     if (is_tex && ! isempty (notex_b) && ! isempty (notex_e))
       for j = numel (notex_b):-1:1
-        ntex = text([notex_b(j):notex_e(j)]);
-        text = strrep (text, ntex, "");
+        ## replace only the last occurrance of current non-tex expression
+        text1 = text(1:notex_b(j)-1);
+        text2 = text(notex_e(j)+1:end);
+        text = [text1, text2];
       endfor
     endif
 
