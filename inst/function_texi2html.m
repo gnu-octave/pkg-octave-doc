@@ -107,19 +107,29 @@ function function_texi2html (fcnname, pkgfcns, info)
         ## now replace only the last occurrance of tex(j).tex in text
         text1 = text(1:tex_beg(j)-1);
         text2 = text(tex_end(j)+1:end);
-        text = [text1, "\n", tex(j).rep{:}, text2];
+        text = [text1, tex(j).rep{:}, text2];
         is_tex = 1;
         ## Keep tex literals
         tex_idx = strfind (tex(j).tex, "$$");
-        if (mod (numel (tex_idx), 2) == 0)
-          tex_num = 0;
+        tex_num = 0;
+        if (numel (tex_idx) > 0) && (mod (numel (tex_idx), 2) == 0)
           for i = 1:2:numel (tex_idx)
             tex_num += 1;
             tex_tmp = [tex(j).tex([tex_idx(i):tex_idx(i+1)+1])];
             #tex_tmp = strrep (tex_tmp, "\\", "\\\\");
             tex(j).str(tex_num) = {tex_tmp};
           endfor
-        else
+        endif
+        tex_idx = strfind (tex(j).tex, "\\(");
+        tex_idx_e = strfind (tex(j).tex, "\\)");
+        if (numel (tex_idx) > 0 && numel (tex_idx) == numel (tex_idx_e))
+          for i = 1:1:numel (tex_idx)
+            tex_num += 1;
+            tex_tmp = [tex(j).tex([tex_idx(i):tex_idx_e(i)+1])];
+            tex(j).str(tex_num) = {tex_tmp};
+          endfor
+        endif
+        if tex_num == 0
           error ("function_texi2html: bad tex format in %s docstring.", ...
                  fcnname);
         endif
@@ -133,6 +143,9 @@ function function_texi2html (fcnname, pkgfcns, info)
         ## replace only the last occurrance of current non-tex expression
         text1 = text(1:notex_b(j)-1);
         text2 = text(notex_e(j)+1:end);
+        if (text2(1) == "\n")
+          text2 = text2(2:end);
+        endif
         text = [text1, text2];
       endfor
     endif
@@ -223,7 +236,7 @@ function function_texi2html (fcnname, pkgfcns, info)
       for j = numel (tex):-1:1
         tex_tmp = [];
         for i = 1:numel (tex(j).str)
-          tex_tmp = strcat (tex_tmp, tex(j).str(i){:}, "\n");
+          tex_tmp = strcat (tex_tmp, tex(j).str(i){:});
         endfor
         fcn_text = strrep (fcn_text, tex(j).rep{:}, tex_tmp);
       endfor
