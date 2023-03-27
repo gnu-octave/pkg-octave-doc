@@ -96,6 +96,18 @@ function pkgfcns = find_GHurls (pkgurl, pkgfcns)
         fcnname = strsplit (pkgfcns{i,1}, filesep){end};
         fcnfilename = [fcnname, ".m"];
         fcn_idx = find (strcmp (fcnurls(:,1), fcnfilename));
+        if numel (fcn_idx) > 1
+          ## More than one hit, get class
+          classname = strsplit (pkgfcns{i,1}, filesep){end-1};
+          for j = 1:numel (fcn_idx)
+            lastdir = strsplit (fcnurls{fcn_idx(j),2}, filesep){end};
+            if length (classname) == length (lastdir) && classname == lastdir
+              fcn_idx = fcn_idx (j);
+              break;
+            endif
+          endfor
+        endif
+
       else
         fcnname = strsplit (pkgfcns{i,1}, filesep){end};
         fcnfilename = [fcnname, ".cc"];
