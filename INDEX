@@ -4,4 +4,5 @@ Documentation
  find_DEMOS
  find_GHurls
  function_texi2html
+ list_packages
  package_texi2html
