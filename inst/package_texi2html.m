@@ -294,7 +294,7 @@ function [varargout] = package_texi2html (pkgname)
 
   ## Write to html file
   fid = fopen ("index.html", "w");
-  fprintf (fid, output_str);
+  fprintf (fid, "%s", output_str);
   fclose (fid);
 
 endfunction
