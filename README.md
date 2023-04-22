@@ -1,5 +1,5 @@
 <img alt="octave-doc logo" width="100"
-     src="https://raw.githubusercontent.com/gnu-octave/pkg-octave-doc/main/doc/icon.png">
+     src="https://raw.githubusercontent.com/gnu-octave/pkg-octave-doc/main/doc/pkg-octave-doc.png">
 
 # pkg-octave-doc
 
