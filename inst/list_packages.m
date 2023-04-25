@@ -20,6 +20,10 @@
 ##
 ## List @qcode{pkg}-installable packages from Octave Packages.
 ##
+## @code{@var{valid_packages} = list_packages () returns a cell array of strings
+## with the available names at Octave Package, which are installable with the
+## @code{pkg} command.
+##
 ## @end deftypefn
 
 function valid_packages = list_packages ()
