@@ -1,5 +1,5 @@
 <img alt="octave-doc logo" width="100"
-     src="https://raw.githubusercontent.com/gnu-octave/pkg-octave-doc/main/doc/icon.png">
+     src="https://raw.githubusercontent.com/gnu-octave/pkg-octave-doc/main/doc/pkg-octave-doc.png">
 
 # pkg-octave-doc
 
@@ -24,7 +24,7 @@ available for packages hosted at GitHub.
 
 ## Installation
 
-To install the latest version (0.4.7) you need Octave (>=7.2.0) installed on your system. You can install it by typing:
+To install the latest version (0.5.0) you need Octave (>=7.2.0) installed on your system. You can install it by typing:
 
 ```
 pkg install -forge pkg-octave-doc
