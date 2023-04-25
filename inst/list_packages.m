@@ -18,7 +18,7 @@
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {@var{valid_packages} =} list_packages ()
 ##
-## List installable packages from Octave Packages.
+## List @qcode{pkg}-installable packages from Octave Packages.
 ##
 ## @end deftypefn
 
