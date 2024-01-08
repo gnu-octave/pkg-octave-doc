@@ -17,8 +17,8 @@ You can find its documentation at [https://gnu-octave.github.io/pkg-octave-doc/]
 [texi2html v1.82](https://www.nongnu.org/texi2html/) software which must be
 be installed and available to $PATH.
 
-* If `git` and an internet connection are available, the functions' generated pages
-also include a URL to their respective repository locations.  This feature is only
+* If `curl`, `tar`, and an internet connection are available, the functions' generated
+pages also include a URL to their respective repository locations.  This feature is only
 available for packages hosted at GitHub.
 
 
