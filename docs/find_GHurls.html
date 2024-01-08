@@ -90,16 +90,16 @@
 <p> <code>find_GHurls</code> returns a cell array, <var>pkgfcns</var>, by appending a third
  column to the input <var>pkgfcns</var> with the URLs to the source code location
  of each individual function listed in the 1st column of <var>pkgfcns</var>.
- <code>find_GHurls</code> relies on <code>git</code>, which must be installed and
- available to the system&rsquo;s <code>$PATH</code>, and an active internet connection to
- clone the targeted repository to a temporary directory.  If <code>git</code> fails
- for any reason, <code>find_GHurls</code> returns a verbatim copy of the input
- <var>pkgfcns</var>.
+ <code>find_GHurls</code> relies on <code>curl</code> and <code>tar</code>, which must be
+ installed and available to the system&rsquo;s <code>$PATH</code>, and an active internet
+ connection to download and extract the targeted repository to a temporary
+ directory.  If either <code>curl</code> or <code>tar</code> fail for any reason,
+ <code>find_GHurls</code> returns a verbatim copy of the input <var>pkgfcns</var>.
 </p>
 <p> Use the following example to obtain a cell array with each function&rsquo;s URL to
  its source code location at GitHub:
 </p>
- <table><tr><td>&nbsp;</td><td><pre class="example"> [pkgfcns, info] = package_texi2html (&quot;statistics&quot;);
+ <table><tr><td>&nbsp;</td><td><pre class="example"> [pkgfcns, info] = package_texi2html (&quot;pkg-octave-doc&quot;);
  pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
  </pre></td></tr></table>
 
