@@ -33,17 +33,17 @@
 ## @code{find_GHurls} returns a cell array, @var{pkgfcns}, by appending a third
 ## column to the input @var{pkgfcns} with the URLs to the source code location
 ## of each individual function listed in the 1st column of @var{pkgfcns}.
-## @code{find_GHurls} relies on @code{git}, which must be installed and
-## available to the system's @code{$PATH}, and an active internet connection to
-## clone the targeted repository to a temporary directory.  If @code{git} fails
-## for any reason, @code{find_GHurls} returns a verbatim copy of the input
-## @var{pkgfcns}.
+## @code{find_GHurls} relies on @code{curl} and @code{tar}, which must be
+## installed and available to the system's @code{$PATH}, and an active internet
+## connection to download and extract the targeted repository to a temporary
+## directory.  If either @code{curl} or @code{tar} fail for any reason,
+## @code{find_GHurls} returns a verbatim copy of the input @var{pkgfcns}.
 ##
 ## Use the following example to obtain a cell array with each function's URL to
 ## its source code location at GitHub:
 ##
 ## @example
-## [pkgfcns, info] = package_texi2html ("statistics");
+## [pkgfcns, info] = package_texi2html ("pkg-octave-doc");
 ## pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
 ## @end example
 ##
@@ -70,18 +70,30 @@ function pkgfcns = find_GHurls (pkgurl, pkgfcns)
     error ("find_sourcecode: package repository must be at GitHub.");
   endif
 
-  ## Clone repository in a temp directory
-  tmpDIR = tempname();
-  [status, ~] = unix (sprintf ("git clone %s.git %s > /dev/null 2>&1", ...
-                               pkgurl, tmpDIR));
+  ## Download repository in a temporary directory
+  tmpDIR1 = tempdir();
+  pkgname = fullfile (tmpDIR1, "package.tar.gz");
+  cmd = sprintf ("curl -L %s/tarball/master -o %s", pkgurl, pkgname);
+  printf ("Downloading from %s\n", pkgurl);
+  [status, ~] = unix (cmd);
   if (status)
-    warning ("package_texi2html: unable to clone %s.git.", pkgurl);
+    warning ("package_texi2html: unable to download from %s", pkgurl);
+    warning ("Link to source code in HTML pages will be omitted.");
+    return;
+  endif
+
+  ## Extract to a new temporary directory
+  tmpDIR2 = tempdir();
+  cmd = sprintf ("tar xf %s -C %s --strip-components=1", pkgname, tmpDIR2);
+  [status, ~] = unix (cmd);
+  if (status)
+    warning ("package_texi2html: unable to extract downloaded tar file.");
     warning ("Link to source code in HTML pages will be omitted.");
     return;
   endif
 
   ## Find files and folders' contents in repository root
-  fcnurls = dir (fullfile (tmpDIR, "**/*.*"));
+  fcnurls = dir (fullfile (tmpDIR1, "**/*.*"));
   fcnurls = struct2cell (fcnurls)';
 
   subforders = true;
