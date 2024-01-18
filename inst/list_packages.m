@@ -22,7 +22,7 @@
 ##
 ## @code{@var{valid_packages} = list_packages ()} returns a cell array of
 ## strings with the available names at Octave Package, which are installable
-## with the @code{pkg} command.
+## with the @code{pkg} command, along with the URL to their latest release.
 ##
 ## @end deftypefn
 
@@ -39,6 +39,9 @@ function valid_packages = list_packages ()
     ## Get dependencies of latest version
     pkg_dep = __pkg__.(pkg_names{i}).versions(1).depends;
 
+    ## Get URL from latest release
+    pkg_url = __pkg__.(pkg_names{i}).versions(1).url;
+
     ## Get all listed dependencies into a cell array
     for c = 1:numel (pkg_dep)
       depends(c) = {pkg_dep(c).name};
@@ -47,11 +50,10 @@ function valid_packages = list_packages ()
     ## Check that there is a 'pkg' dependency
     if (any (strcmp (depends, "pkg")))
       vp += 1;
-      valid_packages(vp) = {pkg_names{i}};
+      valid_packages(vp,:) = {pkg_names{i}, pkg_url};
     endif
     clear depends;
   endfor
-  valid_packages = valid_packages';
 
 endfunction
 
