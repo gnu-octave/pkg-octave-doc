@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Octave Package Documentation: find_DEMOS</title>
+    <title>Octave Package Documentation: classdef_texi2html</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -64,36 +64,64 @@
           <div class="row d-flex flex-wrap align-items-center">
             <div class="col-sm-3 col-md-5 mb-2 mb-sm-0">
               <h3 class="d-inline-block mr-2">
-              Function&nbsp;Reference: <b><code>find_DEMOS</code></b>
+              Function&nbsp;Reference: <b><code>classdef_texi2html</code></b>
               </h3>
             </div>
           </div>
         </div>
         <div class="card-body">
 <dl>
-<dt><u>pkg-octave-doc:</u> <var>demos</var> = <b>find_DEMOS</b><i> (<var>fcnname</var>)</i></dt>
+<dt><u>pkg-octave-doc:</u> <b>classdef_texi2html</b><i> (<var>clsname</var>, <var>pkgfcns</var>, <var>info</var>)</i></dt>
 </dl>
 
-<p> Retrieve the DEMO code blocks from a particular function.
+<p> Generate HTML page for a class definition.
 </p>
 <div class="ms-5">
- <ul>
-<li>
- <var>fcnname</var> is a char string with the function&rsquo;s name.
+<p> <code>function_texi2html</code> requires three input arguments: <var>clsname</var>, a
+ char string with the class&rsquo; name; <var>pkgfcns</var>, a cell array with all
+ available functions of a package; and <var>info</var>, a structure with relevant
+ information about the package, which the function <var>clsname</var> belongs to.
+</p>
+<p> <var>pkgfcns</var> can be either a <math>N&times;2</math> or a <math>N&times;3</math> cell array, whose
+ 1st column list all available function names, the 2nd column list the each
+ function&rsquo;s category, and the 3rd column contains the URL to the function&rsquo;s
+ source code.  <var>pkgfcns</var> is used to relative references to other pages of
+ functions which are listed in the <code>See also</code> tag.  When a 3rd column is
+ present, <code>function_texi2html</code> uses it to add a source code link of the
+ the function in <var>clsname</var>.
+</p>
+<p> The <var>info</var> structure requires at least the following fields:
+</p>
+ <table>
+<thead><tr><th width="20%">Field Name</th><th width="80%">Description</th></tr></thead>
+<tr><td width="20%"><code>PKG_ICON</code></td><td width="80%">The relative reference to the package&rsquo;s logo
+ image which must be either in .svg or .png format and it is located in the
+ newly created <code>assets/</code> folder inside the working directory.</td></tr>
+<tr><td width="20%"><code>PKG_NAME</code></td><td width="80%">The package&rsquo;s name (e.g. &quot;pkg-octave-doc&quot;)</td></tr>
+<tr><td width="20%"><code>PKG_TITLE</code></td><td width="80%">The package&rsquo;s title (e.g. &quot;Octave Package
+ Documentation&quot;)</td></tr>
+<tr><td width="20%"><code>OCTAVE_LOGO</code></td><td width="80%">The relative reference to Octave&rsquo;s logo, also
+ located inside the <code>assets/</code> folder.</td></tr>
+</table>
 
- </li><li>
- <var>demos</var> is cell array with each cell containing a char string with the
- code block of each DEMO available in <var>fcnname</var>.
- </li></ul>
-
+<p> To generate a suitable <math>N&times;2</math> cell array for a specific package, use the
+ <code>package_texi2html</code> function and to populate is with the 3rd column use
+ <code>find_GHurls</code>.  The <var>info</var> structure can also be created with
+ <code>package_texi2html</code>.
+</p>
+<p> <code>function_texi2html</code> depends on the <code>texi2html</code> command line tool
+ version 1.82, which must be installed and available on the system&rsquo;s $PATH,
+ and the generated HTML code is based on the <code>function_template.html</code>
+ and <code>default.html</code> layouts.
+</p>
 <p> <strong>See also: </strong>
-  <a href="build_DEMOS.html">build_DEMOS</a>, 
+  <a href="package_texi2html.html">package_texi2html</a>, 
   <a href="function_texi2html.html">function_texi2html</a>, 
-  <a href="classdef_texi2html.html">classdef_texi2html</a>, 
-  <a href="find_GHurls.html">find_GHurls</a>
+  <a href="find_GHurls.html">find_GHurls</a>, 
+  <a href="build_DEMOS.html">build_DEMOS</a>
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/find_DEMOS.m">find_DEMOS</a>
+  <a href="">classdef_texi2html</a>
 </div>
 
         </div>
