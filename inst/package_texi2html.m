@@ -282,8 +282,13 @@ function [varargout] = package_texi2html (pkgname)
       fcnfirst = get_first_help_sentence (fcnname, 240);
       tmp_fcn = sprintf ("                 <td>%s</td>\n", fcnfirst);
       fcn_list = [fcn_list tmp_fcn tmp_7];
-      ## Build individual function html
-      function_texi2html (fcnname, pkgfcns, info);
+      ## Build individual function of classdef html
+      try
+        MTDS = methods (fcnname);
+        classdef_texi2html (MTDS, pkgfcns, info);
+      catch
+        function_texi2html (fcnname, pkgfcns, info);
+      end_try_catch
     endfor
     fcn_list = [fcn_list tmp_8 tmp_9];
   endfor
