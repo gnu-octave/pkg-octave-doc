@@ -65,7 +65,7 @@ function html_txt = __texi2html__ (fcnname, pkgfcns)
         endfor
       endif
       if tex_num == 0
-        error ("function_texi2html: bad tex format in %s docstring.", ...
+        error ("__texi2html__: bad tex format in %s docstring.", ...
                fcnname);
       endif
     endfor
@@ -88,9 +88,9 @@ function html_txt = __texi2html__ (fcnname, pkgfcns)
   ## Check that 'texi2html' exists in system's PATH
   [status, msg] = unix ("texi2html --version");
   if (status)
-    error ("function_texi2html: 'texi2html' command-line tool is missing.");
+    error ("__texi2html__: 'texi2html' command-line tool is missing.");
   elseif (! strcmp (strtrim (msg), "1.82"))
-    error ("function_texi2html: 'texi2html' version must be exactly 1.82.");
+    error ("__texi2html__: 'texi2html' version must be exactly 1.82.");
   endif
 
   ## Fix texi tags that 'texi2html' cannot process or generates error
@@ -109,7 +109,7 @@ function html_txt = __texi2html__ (fcnname, pkgfcns)
 
   [status, ~] = unix (sprintf ("texi2html %s > /dev/null 2>&1", fcnfile));
   if (status)
-    error ("function_texi2html: unable to convert to html.");
+    error ("__texi2html__: unable to convert to html.");
   endif
 
   ## Read generated html file and erase both html and its source
@@ -125,6 +125,9 @@ function html_txt = __texi2html__ (fcnname, pkgfcns)
 
   ## Remove <body *> tag
   bd_tag = strfind (html_txt, "\n");
+  if (bd_tag(1)+2 > length (html_txt))
+    error ("__texi2html__: no texinfo found.");
+  endif
   html_txt([1:bd_tag(1)+2]) = [];
 
   ## Remove index tags from function syntax
