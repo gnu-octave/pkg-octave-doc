@@ -3,11 +3,14 @@
 
 # pkg-octave-doc
 
-Create a **function reference** from Octave help texts (docstrings)
-from single functions or all functions in a package, which can be installed
+Create online documentation from Octave help texts (docstrings)
+of functions and classes in a package, which can be installed
 with **pkg**. The generated pages follow the template of the Octave Packages at
 GitHub Pages based on bootstrap 5 and they have similar layout to the older
-documentation reference pages at Source Forge.
+documentation reference pages at Source Forge. The documentation also includes
+the demos that are available. Legacy classes (in `@class/` folders) are processed
+as individual functions with separate html pages, `classdef` files are processed
+collectively including their public methods in a single html page.
 
 You can find its documentation at [https://gnu-octave.github.io/pkg-octave-doc/](https://gnu-octave.github.io/pkg-octave-doc/).
 
@@ -24,7 +27,7 @@ feature is only available for packages hosted at GitHub.
 
 ## Installation
 
-To install the latest version (0.5.1) you need Octave (>=7.2.0) installed on your system. You can install it by typing:
+To install the latest version (0.5.2) you need Octave (>=7.2.0) installed on your system. You can install it by typing:
 
 ```
 pkg install -forge pkg-octave-doc
