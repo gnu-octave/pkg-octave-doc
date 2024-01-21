@@ -29,7 +29,7 @@
 ## code block of each DEMO available in @var{fcnname}.
 ## @end itemize
 ##
-## @seealso{build_DEMOS, function_texi2html, find_GHurls}
+## @seealso{build_DEMOS, function_texi2html, classdef_texi2html, find_GHurls}
 ## @end deftypefn
 
 function demos = find_DEMOS (fcnname)

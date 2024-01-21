@@ -29,7 +29,7 @@
 ## @qcode{demos_template.html} layout for every DEMO available in @var{fcnname}.
 ## @end itemize
 ##
-## @seealso{find_DEMOS, function_texi2html, find_GHurls}
+## @seealso{find_DEMOS, function_texi2html, classdef_texi2html, find_GHurls}
 ## @end deftypefn
 
 function html = build_DEMOS (fcnname)
