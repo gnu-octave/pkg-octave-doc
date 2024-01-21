@@ -61,7 +61,7 @@
 ## and the generated HTML code is based on the @qcode{function_template.html}
 ## and @qcode{default.html} layouts.
 ##
-## @seealso{package_texi2html, find_GHurls, build_DEMOS}
+## @seealso{package_texi2html, classdef_texi2html, find_GHurls, build_DEMOS}
 ## @end deftypefn
 
 function function_texi2html (fcnname, pkgfcns, info)
@@ -90,185 +90,8 @@ function function_texi2html (fcnname, pkgfcns, info)
   ## Add try catch to help identify function file that caused an issue
   ## during batch processing all functions in a package with package_texi2html
   try
-    [text, format] = get_help_text (fcnname);
-
-    ## Scan text for @tex and @end tex tags and replace their bodies with
-    ## a random string to be replaced later on, since fprintf will not process
-    ## this corectly
-    is_tex = 0;
-    tex_beg = strfind (text, "@tex");
-    tex_end = strfind (text, "@end tex") + 7;
-    if (! isempty (tex_beg) && ! isempty (tex_end))
-      symbols = ['a':'z' 'A':'Z' '0':'9'];
-      for j = numel (tex_beg):-1:1
-        tex(j).str = {};
-        tex(j).tex = text([tex_beg(j):tex_end(j)]);
-        tex(j).rep = {symbols(randi (length (symbols), 1,length (symbols)))};
-        ## now replace only the last occurrance of tex(j).tex in text
-        text1 = text(1:tex_beg(j)-1);
-        text2 = text(tex_end(j)+1:end);
-        text = [text1, tex(j).rep{:}, text2];
-        is_tex = 1;
-        ## Keep tex literals
-        tex_idx = strfind (tex(j).tex, "$$");
-        tex_num = 0;
-        if (numel (tex_idx) > 0) && (mod (numel (tex_idx), 2) == 0)
-          for i = 1:2:numel (tex_idx)
-            tex_num += 1;
-            tex_tmp = [tex(j).tex([tex_idx(i):tex_idx(i+1)+1])];
-            #tex_tmp = strrep (tex_tmp, "\\", "\\\\");
-            tex(j).str(tex_num) = {tex_tmp};
-          endfor
-        endif
-        tex_idx = strfind (tex(j).tex, "\\(");
-        tex_idx_e = strfind (tex(j).tex, "\\)");
-        if (numel (tex_idx) > 0 && numel (tex_idx) == numel (tex_idx_e))
-          for i = 1:1:numel (tex_idx)
-            tex_num += 1;
-            tex_tmp = [tex(j).tex([tex_idx(i):tex_idx_e(i)+1])];
-            tex(j).str(tex_num) = {tex_tmp};
-          endfor
-        endif
-        if tex_num == 0
-          error ("function_texi2html: bad tex format in %s docstring.", ...
-                 fcnname);
-        endif
-      endfor
-    endif
-
-    notex_b = strfind (text, "@ifnottex");
-    notex_e = strfind (text, "@end ifnottex") + 12;
-    if (is_tex && ! isempty (notex_b) && ! isempty (notex_e))
-      for j = numel (notex_b):-1:1
-        ## replace only the last occurrance of current non-tex expression
-        text1 = text(1:notex_b(j)-1);
-        text2 = text(notex_e(j)+1:end);
-        if (text2(1) == "\n")
-          text2 = text2(2:end);
-        endif
-        text = [text1, text2];
-      endfor
-    endif
-
-    ## Check that 'texi2html' exists in system's PATH
-    [status, msg] = unix ("texi2html --version");
-    if (status)
-      error ("function_texi2html: 'texi2html' command-line tool is missing.");
-    elseif (! strcmp (strtrim (msg), "1.82"))
-      error ("function_texi2html: 'texi2html' version must be exactly 1.82.");
-    endif
-
-    ## Fix texi tags that 'texi2html' cannot process or generates error
-    ## @qcode -> @code
-    text = strrep (text, "@qcode", "@code");
-    ## @abbr  -> @asis
-    text = strrep (text, "@abbr", "@asis");
-
-    ## Fix file separator in function names with @
-    fcnfile = strrep (fcnname, filesep, "_");
-
-    ## Save text to file
-    fid = fopen (fcnfile, "w");
-    fprintf (fid, "%s", text);
-    fclose (fid);
-
-    [status, ~] = unix (sprintf ("texi2html %s > /dev/null 2>&1", fcnfile));
-    if (status)
-      error ("function_texi2html: unable to convert to html.");
-    endif
-
-    ## Read generated html file and erase both html and its source
-    fid = fopen ([fcnfile ".html"]);
-    fcn_text = fscanf (fid, "%c", Inf);
-    fclose (fid);
-    delete (fcnfile, [fcnfile ".html"]);
-
-    ## Remove content before <body> tag and after <hr size="1">
-    txt_beg = strfind (fcn_text, "<body ");
-    txt_end = strfind (fcn_text, "<hr size=""1"">") - 1;
-    fcn_text = fcn_text([txt_beg:txt_end]);
-
-    ## Remove <body *> tag
-    bd_tag = strfind (fcn_text, "\n");
-    fcn_text([1:bd_tag(1)+2]) = [];
-
-    ## Remove index tags from function syntax
-    dta_idx = strfind (fcn_text, "<dt><a name=""");
-    dt_aidx = strfind (fcn_text, "</a>");
-    for i = numel (dta_idx):-1:1
-      fcn_text([dta_idx(i)+5:dt_aidx(i)+4]) = [];
-    endfor
-
-    ## Fix </dd></dl> positions and add left margin after 1st sentence
-    fcn_text = strrep (fcn_text, "<dd>", "</dl>\n");
-    pbeg_idx = strfind (fcn_text, "<p>");
-    pend_idx = strfind (fcn_text, "</p>");
-    tmp_str1 = fcn_text([pbeg_idx(1):pend_idx(1)+4]);
-    fcn_text = strrep (fcn_text, tmp_str1, [tmp_str1, "<div class=""ms-5"">\n"]);
-
-    ## Replace <em> and </em> tags with <math> and </math>, respectively.
-    ## Evaluate each case whether it conforms to size dimensions and replace
-    ## 'x' or '*' with '&times;'.
-    ## alphanumeric chars
-    fcn_text = strrep (fcn_text, "<em>", "<math>");
-    fcn_text = strrep (fcn_text, "</em>", "</math>");
-    math_beg = strfind (fcn_text, "<math>") + 6;
-    math_end = strfind (fcn_text, "</math>") - 1;
-    if (! isempty (math_beg) && ! isempty (math_end))
-      times_idx = [];
-      for j = numel (math_beg):-1:1
-        math_txt = fcn_text([math_beg(j):math_end(j)]);
-        char_idx = [strchr(math_txt, "x") strchr(math_txt, "*")];
-        if (! isempty (char_idx))
-          char_idx = math_beg(j) + char_idx - 1;
-          times_idx = [times_idx char_idx];
-        endif
-      endfor
-      times_idx = sort (times_idx);
-      for j = numel (times_idx):-1:1
-        fcn_text = strcat (fcn_text([1:times_idx(j)-1]), "&times;", ...
-                           fcn_text([times_idx(j)+1:end]));
-      endfor
-    endif
-
-    ## Replace tex literal if exists
-    if (is_tex)
-      for j = numel (tex):-1:1
-        tex_tmp = [];
-        for i = 1:numel (tex(j).str)
-          tex_tmp = strcat (tex_tmp, tex(j).str(i){:});
-        endfor
-        fcn_text = strrep (fcn_text, tex(j).rep{:}, tex_tmp);
-      endfor
-    endif
-
-    ## Fix @seealso tag if it exists
-    see_idx = strfind (fcn_text, "@seealso{");
-    if (! isempty (see_idx))
-      seealso = fcn_text([see_idx:end]);
-      new_see = ["<strong>See also: </strong>\n"];
-      fnames = seealso([10:strfind(seealso, "}")-1]);
-      fnames = strsplit (fnames, ",");
-      fnames = strtrim (fnames);
-      f_num = numel (fnames);
-      for i = 1:f_num
-        str = fnames{i};
-        if (any (strcmp (pkgfcns(:,1), str)))
-          str1 = strrep (str, filesep, "_");
-          new_str = ["  <a href=""",str1,".html"">",str,"</a>"];
-        else
-          new_str = str;
-        endif
-        if (i < f_num)
-          new_see = [new_see, new_str, (", \n")];
-        else
-          new_see = [new_see, new_str, "\n</p>\n</div>"];
-        endif
-      endfor
-      fcn_text = strrep (fcn_text, seealso, new_see);
-    else
-      fcn_text = strrep (fcn_text, "</dd></dl>", "\n</div>");
-    endif
+    ## Get HTML code from function's texinfo
+    fcn_text = __texi2html__ (fcnname, pkgfcns);
 
     ## Find the function's category
     fcn_idx = find (strcmp (pkgfcns(:,1), fcnname));
@@ -302,6 +125,9 @@ function function_texi2html (fcnname, pkgfcns, info)
     TITLE = sprintf ("%s: %s", info.PKG_TITLE, fcnname);
     output_str = strrep (output_str, "{{TITLE}}", TITLE);
     output_str = strrep (output_str, "{{BODY}}", fnc_template);
+
+    ## Fix file separator in function names with @
+    fcnfile = strrep (fcnname, filesep, "_");
 
     ## Write html to file
     fid = fopen ([fcnfile ".html"], "w");
