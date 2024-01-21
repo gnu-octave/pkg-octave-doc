@@ -1,6 +1,7 @@
 pkg-octave-doc >> Octave Package Documentation
 Documentation
  build_DEMOS
+ classdef_texi2html
  find_DEMOS
  find_GHurls
  function_texi2html
