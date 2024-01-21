@@ -285,7 +285,7 @@ function [varargout] = package_texi2html (pkgname)
       ## Build individual function of classdef html
       try
         MTDS = methods (fcnname);
-        classdef_texi2html (MTDS, pkgfcns, info);
+        classdef_texi2html (fcnname, pkgfcns, info);
       catch
         function_texi2html (fcnname, pkgfcns, info);
       end_try_catch
