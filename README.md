@@ -14,6 +14,18 @@ collectively including their public methods in a single html page.
 
 You can find its documentation at [https://gnu-octave.github.io/pkg-octave-doc/](https://gnu-octave.github.io/pkg-octave-doc/).
 
+**Note** that prior to Octave 9.1, the `methods` function used internally to derive the
+available methods of a class does not differentiate between public and private methods,
+hence all methods are listed. As a result, any method in the classdef that has a
+valid texinfo docstring will be included in the generated HTML documentation.
+Moreover, the `get_help_text` function does not return the help docstring from the
+classdef's method when it shadows a parent method derived from a superclass which
+the classdef is derived from. See [bug #65220](https://savannah.gnu.org/bugs/?65220)
+for more information. As a workaround, `pkg-octave-doc (>=0.5.3)`, parses the
+texinfo docstrings directly from the classdef file. As a result, parent methods
+that are not documented in the classdef will not be included in the generated HTML
+documentation.
+
 ## Requirements
 
 * The function `function_texi2html` relies on the
@@ -27,7 +39,7 @@ feature is only available for packages hosted at GitHub.
 
 ## Installation
 
-To install the latest version (0.5.2) you need Octave (>=7.2.0) installed on your system. You can install it by typing:
+To install the latest version (0.5.3) you need Octave (>=7.2.0) installed on your system. You can install it by typing:
 
 ```
 pkg install -forge pkg-octave-doc
