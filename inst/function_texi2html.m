@@ -1,4 +1,4 @@
-## Copyright (C) 2023 Andreas Bertsatos <abertsatos@biol.uoa.gr>
+## Copyright (C) 2023-2024 Andreas Bertsatos <abertsatos@biol.uoa.gr>
 ##
 ## This file is part of the statistics package for GNU Octave.
 ##
@@ -90,8 +90,11 @@ function function_texi2html (fcnname, pkgfcns, info)
   ## Add try catch to help identify function file that caused an issue
   ## during batch processing all functions in a package with package_texi2html
   try
-    ## Get HTML code from function's texinfo
-    fcn_text = __texi2html__ (fcnname, pkgfcns);
+    ## Get help text from function
+    [text, format] = get_help_text (fcnname);
+
+    ## Build HTML code from function's texinfo
+    fcn_text = __texi2html__ (text, fcnname, pkgfcns);
 
     ## Find the function's category
     fcn_idx = find (strcmp (pkgfcns(:,1), fcnname));

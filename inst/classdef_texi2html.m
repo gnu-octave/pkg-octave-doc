@@ -97,8 +97,11 @@ function classdef_texi2html (clsname, pkgfcns, info)
   ## Add try catch to help identify classdef file that caused an issue
   ## during batch processing all functions in a package with package_texi2html
   try
+    ## Get help text from constructor
+    [text, format] = get_help_text (MTDS{1});
+
     ## Build the HTML code for class constructor
-    cls_text = __texi2html__ (MTDS{1}, pkgfcns);
+    cls_text = __texi2html__ (text, MTDS{1}, pkgfcns);
 
     ## Find the category the classdef belongs to
     fcn_idx = find (strcmp (pkgfcns(:,1), clsname));
@@ -120,7 +123,14 @@ function classdef_texi2html (clsname, pkgfcns, info)
   for m = 2:numel (MTDS)
     method_name = [clsname "." MTDS{m}];
     try
-      mtds_text = __texi2html__ (method_name, pkgfcns);
+      ## Use custom get_help_text to get help text from methods contained in
+      ## the classdef file, because core get_help_text returns help text from
+      ## parrent class methods instead of the shadowing methods in the classdef
+      text = get_methods_texinfo (clsname, MTDS{m});
+
+      ## Build the HTML code for class method
+      mtds_text = __texi2html__ (text, method_name, pkgfcns);
+
       ## Load methods template
       mtds_template = fileread (fullfile ("_layouts", "method_template.html"));
       mtds_template = strrep (mtds_template, "{{METHOD_NAME}}", MTDS{m});

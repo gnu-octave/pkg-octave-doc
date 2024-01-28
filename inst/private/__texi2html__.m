@@ -16,16 +16,13 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {pkg-octave-doc} {@var{html_txt} =} __texi2html__ (@var{fcnname}, @var{pkgfcns})
+## @deftypefn  {pkg-octave-doc} {@var{html_txt} =} __texi2html__ (@var{text}, @var{fcnname}, @var{pkgfcns})
 ##
 ## Private function to generate HTML text from texinfo.
 ##
 ## @end deftypefn
 
-function html_txt = __texi2html__ (fcnname, pkgfcns)
-
-  ## Get help text
-  [text, format] = get_help_text (fcnname);
+function html_txt = __texi2html__ (text, fcnname, pkgfcns)
 
   ## Scan text for @tex and @end tex tags and replace their bodies with
   ## a random string to be replaced later on, since fprintf will not process
