@@ -64,8 +64,8 @@ function text = get_methods_texinfo (class, method);
     text = "\n";
     for i = 1:numel (nl_idx)
       txt_line = helptext([begidx:nl_idx(i)]);
-      txt_line(strfind (txt_line, "#")) = [];
       txt_line = strtrim (txt_line);
+      txt_line(strfind (txt_line, "#")) = [];
       begidx = nl_idx(i) + 1;
       text = sprintf ("%s%s\n", text, txt_line);
     endfor
