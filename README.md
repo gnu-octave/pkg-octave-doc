@@ -30,7 +30,7 @@ documentation.
 
 * The function `function_texi2html` relies on the
 [texi2html v1.82](https://www.nongnu.org/texi2html/) software which must be
-be installed and available to $PATH.
+installed and available to $PATH.
 
 * If `curl` and `tar` are installed and available to $PATH, and an internet connection are available,
 the functions' generated pages also include a URL to their respective repository locations.  This
@@ -137,10 +137,13 @@ in order to be properly formatted in final HTML code.
 
 ## TODO
 
-1. Implement functionality for listing alphabetically all functions available
-from every package in Octave Packages that can be installed with `pkg`.
-2. Implement functionality for building similar documentation reference for
-Octave core functions.
+1. Write a C++ implemetaion for parsing texinfo to html to relax the
+dependency on the rather outdated `texi2html` software.
+3. Rewrite `build_DEMOS` function so that DEMO documentation includes
+the console output and generated figures just after the line of code
+that produces the output instead of accumulating all the output and
+figures after the DEMO code block. This should help larger DEMO blocks
+to be more intuitively presented in the generated documentation.
 
 
 ## Further notes
