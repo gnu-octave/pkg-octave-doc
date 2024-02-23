@@ -137,7 +137,7 @@ in order to be properly formatted in final HTML code.
 
 ## TODO
 
-1. Write a C++ implemetaion for parsing texinfo to html to relax the
+1. Write a C++ implementation for parsing texinfo to html to relax the
 dependency on the rather outdated `texi2html` software.
 3. Rewrite `build_DEMOS` function so that DEMO documentation includes
 the console output and generated figures just after the line of code
