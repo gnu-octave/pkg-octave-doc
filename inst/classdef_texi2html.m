@@ -94,6 +94,11 @@ function classdef_texi2html (clsname, pkgfcns, info)
     error ("classdef_texi2html: %s is not classdef name", clsname);
   end_try_catch
 
+  ## Compensate for change in behavior of get_help_text prior and after Octave 9
+  if (! verLessThan ("Octave", "9") && ! strcmp (clsname, MTDS{1}))
+    MTDS = [clsname; MTDS];
+  endif
+
   ## Add try catch to help identify classdef file that caused an issue
   ## during batch processing all functions in a package with package_texi2html
   try
