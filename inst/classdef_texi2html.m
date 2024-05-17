@@ -94,7 +94,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
     error ("classdef_texi2html: %s is not classdef name", clsname);
   end_try_catch
 
-  ## Compensate for change in behavior of get_help_text prior and after Octave 9
+  ## Compensate for changes in behavior of `methods` function after Octave 9
   if (! verLessThan ("Octave", "9") && ! strcmp (clsname, MTDS{1}))
     MTDS = [clsname; MTDS];
   endif
