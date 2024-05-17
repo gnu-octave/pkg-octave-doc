@@ -36,18 +36,26 @@
       </div>
     </div>
     <div class="container-xl my-4">
-      <div class="card rounded">
-        <div class="card-header card-header-mod">
-          <div class="row d-flex flex-wrap align-items-center">
-            <div class="col-sm-3 col-md-5 mb-2 mb-sm-0">
-              <h3 class="d-inline-block mr-2">
-              Class&nbsp;Definition: <b><code>{{CLS_NAME}}</code></b>
-              </h3>
+      <div class="row flex-nowrap" style="min-height:0">
+        <div class="col-md-2 bg-light" style="overflow-y: scroll; width: 250px;">
+          <div class="p-2" style="text-align: center;">
+            <h3>Function List</h3>
+          </div>
+{{FCN_LIST}}
+			  </div>
+			  <div class="col-md-10">
+          <div class="card rounded">
+            <div class="card-header card-header-mod">
+              <div class="row d-flex flex-wrap align-items-center">
+                <h3 class="d-inline-block mr-2">
+                Class&nbsp;Definition: <b><code>{{CLS_NAME}}</code></b>
+                </h3>
+              </div>
+            </div>
+            <div class="card-body">
+{{CLS_TEXT}}
             </div>
           </div>
-        </div>
-        <div class="card-body">
-{{CLS_TEXT}}
         </div>
       </div>
     </div>
