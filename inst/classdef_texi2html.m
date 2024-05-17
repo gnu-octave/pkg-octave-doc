@@ -147,6 +147,54 @@ function classdef_texi2html (clsname, pkgfcns, info)
   demo_txt = build_DEMOS (clsname);
   cls_text = [cls_text "\n" demo_txt];
 
+  ## Templates for side bar
+  divcat = ["			<div class=""row"">\n", ...
+            "				<input id=""togList%d"" type=""checkbox""%s>\n", ...
+            "				<label for=""togList%d"">\n", ...
+            "					<span><h5>%s</h5></span>\n", ...
+            "					<span><h5>%s</h5></span>\n", ...
+            "				</label>\n", ...
+            "				<div class=""list"">"];
+  ul_cat = ["				<ul style=""list-style-type: none; padding-", ...
+            "left: 20px;"">"];
+  li_fcn = ["					<li><a href=""%s.html"" class=""text-", ...
+            "decoration-none"">%s</a></li>"];
+  li_fcn_active = ["					<li><a href=""%s.html"" class=""te", ...
+                   "xt-decoration-none fw-bolder"">%s</a></li>"];
+
+  ## Build side bar function list
+  fcn_list = "";
+  cat_name = unique (pkgfcns(:,2));
+  for i = 1:numel (cat_name)
+    ## Expand current category
+    if (strcmpi (cat_name{i}, catname))
+      checkbox = " checked ";
+    else
+      checkbox = "";
+    endif
+    tmpcat = sprintf (divcat, i, checkbox, i, cat_name{i}, cat_name{i});
+    fcn_list = [fcn_list, tmpcat, "\n"];
+    fcn_list = [fcn_list, ul_cat, "\n"];
+    ## Get functions for this category
+    fcn_idx = find (strcmp (pkgfcns(:,2), cat_name{i}));
+    for j = 1:numel (fcn_idx)
+      fcn_name = pkgfcns{fcn_idx(j),1};
+      fcn_file = strrep (fcn_name, filesep, "_");
+      ## Make active function bolder
+      if (strcmpi (fcn_name, clsname))
+        tmpfcn = sprintf (li_fcn_active, fcn_file, fcn_name);
+        fcn_list = [fcn_list, tmpfcn, "\n"];
+      else
+        tmpfcn = sprintf (li_fcn, fcn_file, fcn_name);
+        fcn_list = [fcn_list, tmpfcn, "\n"];
+      endif
+    endfor
+    ## Close ul and li tags and add empty line to separate categories
+    fcn_list = [fcn_list "				</ul>\n"];
+    fcn_list = [fcn_list "			</div>\n"];
+    fcn_list = [fcn_list "			</div>\n"];
+  endfor
+
   ## Populate function template with package info
   fnc_template = fileread (fullfile ("_layouts", "classdef_template.html"));
   fnc_template = strrep (fnc_template, "{{PKG_ICON}}", info.PKG_ICON);
@@ -154,6 +202,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
   fnc_template = strrep (fnc_template, "{{PKG_TITLE}}", info.PKG_TITLE);
   fnc_template = strrep (fnc_template, "{{CAT_NAME}}", catname);
   fnc_template = strrep (fnc_template, "{{OCTAVE_LOGO}}", info.OCTAVE_LOGO);
+  fnc_template = strrep (fnc_template, "{{FCN_LIST}}", fcn_list);
   fnc_template = strrep (fnc_template, "{{CLS_NAME}}", clsname);
   fnc_template = strrep (fnc_template, "{{CLS_TEXT}}", cls_text);
 
