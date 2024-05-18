@@ -1,0 +1,9 @@
+>> a = 3;
+>> w = 3
+w = 3
+>> r = a - w
+r = 0
+>> [status, diaryfile] = diary
+status = 1
+diaryfile = diary
+>> diary off
