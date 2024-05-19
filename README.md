@@ -39,7 +39,7 @@ feature is only available for packages hosted at GitHub.
 
 ## Installation
 
-To install the latest version (0.5.4) you need Octave (>=7.2.0) installed on your system. You can install it by typing:
+To install the latest version (0.5.5) you need Octave (>=7.2.0) installed on your system. You can install it by typing:
 
 ```
 pkg install -forge pkg-octave-doc
