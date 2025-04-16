@@ -1,4 +1,4 @@
-## Copyright (C) 2024 Andreas Bertsatos <abertsatos@biol.uoa.gr>
+## Copyright (C) 2024-2025 Andreas Bertsatos <abertsatos@biol.uoa.gr>
 ##
 ## This file is part of the statistics package for GNU Octave.
 ##
@@ -126,9 +126,16 @@ function classdef_texi2html (clsname, pkgfcns, info)
     return;
   end_try_catch
 
-  ## Add collapsible cards with properties texinfo (if any)
+  ## Add collapsible rows with public properties
   props = properties (clsname);
   if (! isempty (props))
+    ## Add header for properties
+    prop_header = strcat ("        <h4 class=""d-inline-block my-3"">\n", ...
+                          "          Properties\n        </h4>\n");
+    cls_text = [cls_text "\n" prop_header];
+    ## Load property template
+    filename = fullfile ("_layouts", "property_template.html");
+    template = fileread (filename);
     for p = 1:numel (props)
       ## Get help text from property
       prop_name = [clsname "." props{p}];
@@ -138,26 +145,35 @@ function classdef_texi2html (clsname, pkgfcns, info)
         try
           ## Build the HTML code for class constructor
           prop_text = __texi2html__ (text, prop_name, pkgfcns);
-          ## Remove header
+          ## Remove texinfo header
           idx = strfind (prop_text, "</dl>");
-          idx = idx(1) + 5;
+          if (isempty (idx))
+            idx = 1;
+          else
+            idx = idx(1) + 5;
+          endif
           prop_text = prop_text(idx:end);
-          ## Load and populate property template
-          filename = fullfile ("_layouts", "property_template.html");
-          prop_template = fileread (filename);
-          prop_template = strrep (prop_template, "{{PROPERTY_NAME}}", props{p});
-          prop_num = sprintf ("collapse%d", p);
-          prop_template = strrep (prop_template, "{{PROPERTY_NUMBER}}", prop_num);
-          prop_template = strrep (prop_template, "{{PROPERTY_HELP}}", prop_text);
         catch
-          prop_template = "";
-          printf ("Unable to process property '%s' of class '%s':\n %s\n", ...
+          prop_text = "";
+          printf ("Unusable texinfo in property '%s' of class '%s':\n %s\n", ...
                   props{p}, clsname, lasterr);
         end_try_catch
-        cls_text = [cls_text "\n" prop_template];
+      else
+        prop_text = text;
       endif
+      ## Populate property template
+      prop_template = strrep (template, "{{PROPERTY_NAME}}", props{p});
+      prop_num = sprintf ("collapseProperty%d", p);
+      prop_template = strrep (prop_template, "{{PROPERTY_NUMBER}}", prop_num);
+      prop_template = strrep (prop_template, "{{PROPERTY_HELP}}", prop_text);
+      cls_text = [cls_text "\n" prop_template];
     endfor
   endif
+
+  ## Add header for methods
+  meth_header = strcat ("        <h4 class=""d-inline-block my-3"">\n", ...
+                        "          Methods\n        </h4>\n");
+  cls_text = [cls_text "\n" meth_header];
 
   ## Build HTML code for constructor
   cntr_name = [clsname "." clsname];
@@ -168,42 +184,55 @@ function classdef_texi2html (clsname, pkgfcns, info)
     try
       ## Build the HTML code for class constructor
       cntr_text = __texi2html__ (text, cntr_name, pkgfcns);
+      ## Grab first sentence
+      cntr_fs = get_text_first_sentence (cntr_text);
       ## Load constructor template
       filename = fullfile ("_layouts", "constructor_template.html");
       cntr_template = fileread (filename);
+      ## Populate constructor template
       cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_NAME}}", clsname);
+      cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_FS}}", cntr_fs);
       cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_HELP}}", cntr_text);
     catch
       cntr_template = "";
-      printf ("Unable to process constructor of class '%s':\n %s\n", ...
+      printf ("Unusable texinfo in constructor of class '%s':\n %s\n", ...
               clsname, lasterr);
     end_try_catch
     cls_text = [cls_text "\n" cntr_template];
   endif
 
   ## Build HTML code for available methods
+  template = fileread (fullfile ("_layouts", "method_template.html"));
   for m = 1:numel (MTDS)
     method_name = [clsname "." MTDS{m}];
-    ## Use custom get_help_text to get help text from methods contained in
-    ## the classdef file, because core get_help_text returns help text from
-    ## parrent class methods instead of the shadowing methods in the classdef
-    text = get_methods_texinfo (clsname, MTDS{m});
-    if (! isempty (text))
+    ## Methods listed in MTDS are already ensure to be present in classdef file
+    ## and not inherited from a parent class. 'get_methods_texinfo' is obsolete.
+    [text, format] = get_help_text (method_name);
+    ## Only if texinfo is available
+    if (strcmp (format, "texinfo"))
       try
         ## Build the HTML code for class method
         mtds_text = __texi2html__ (text, method_name, pkgfcns);
-
-        ## Load method template
-        mtds_template = fileread (fullfile ("_layouts", "method_template.html"));
-        mtds_template = strrep (mtds_template, "{{METHOD_NAME}}", MTDS{m});
-        mtds_template = strrep (mtds_template, "{{METHOD_HELP}}", mtds_text);
+        ## Grab first sentence
+        mtds_fs = get_text_first_sentence (mtds_text);
       catch
-        mtds_template = "";
-        printf ("Unable to process method '%s' of class '%s':\n %s\n", ...
+        mtds_text = "";
+        mtds_fs = "";
+        printf ("Unusable texinfo in method '%s' of class '%s':\n %s\n", ...
                 MTDS{m}, clsname, lasterr);
       end_try_catch
-      cls_text = [cls_text "\n" mtds_template];
+    elseif (isempty (text))
+      mtds_text = sprintf ("<b><code>%s</code></b> is not documented.", ...
+                           method_name);
+      mtds_fs = "undocumented";
     endif
+    ## Populate method template
+    mtds_template = strrep (template, "{{METHOD_NAME}}", MTDS{m});
+    mtds_num = sprintf ("collapseMethod%d", m);
+    mtds_template = strrep (mtds_template, "{{METHOD_NUMBER}}", mtds_num);
+    mtds_template = strrep (mtds_template, "{{METHOD_FS}}", mtds_fs);
+    mtds_template = strrep (mtds_template, "{{METHOD_HELP}}", mtds_text);
+    cls_text = [cls_text "\n" mtds_template];
   endfor
 
   ## Add DEMOS (if applicable)
