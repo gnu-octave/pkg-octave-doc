@@ -1,4 +1,4 @@
-## Copyright (C) 2024 Andreas Bertsatos <abertsatos@biol.uoa.gr>
+## Copyright (C) 2024-2025 Andreas Bertsatos <abertsatos@biol.uoa.gr>
 ##
 ## This file is part of the statistics package for GNU Octave.
 ##
@@ -16,7 +16,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {pkg-octave-doc} {@var{text} =} get_methods_help_text (@var{class}, @var{method})
+## @deftypefn  {pkg-octave-doc} {@var{text} =} get_methods_texinfo (@var{class}, @var{method})
 ##
 ## Private function to parse a method texinfo from a classdef file.
 ##
