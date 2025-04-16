@@ -1,6 +1,6 @@
 name: pkg-octave-doc
-version: 0.5.5
-date: 2024-05-19
+version: 0.6.0
+date: 2025-04-16
 author: Andreas Bertsatos
 maintainer: Andreas Bertsatos <abertsatos@biol.uoa.gr>
 title: Octave Package Documentation
@@ -10,6 +10,6 @@ description: This package provides functions for generating HTML pages that
  the respective functions' HTML pages. The default layout is based on boootstrap
  5 and it follows the design of the Octave Packages GitHub page.
 categories: package
-Depends: octave (>= 7.2.0)
+Depends: octave (>= 9.1.0)
 License: GPLv3+
 Url: https://github.com/gnu-octave/pkg-octave-doc
