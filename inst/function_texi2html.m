@@ -130,7 +130,7 @@ function function_texi2html (fcnname, pkgfcns, info)
 
     ## Build side bar function list
     fcn_list = "";
-    cat_name = unique (pkgfcns(:,2));
+    cat_name = unique (pkgfcns(:,2), "stable");
     for i = 1:numel (cat_name)
       ## Expand current category
       if (strcmpi (cat_name{i}, catname))
