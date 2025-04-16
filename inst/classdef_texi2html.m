@@ -28,10 +28,10 @@
 ## @var{pkgfcns} can be either a @math{Nx2} or a @math{Nx3} cell array, whose
 ## 1st column list all available function names, the 2nd column list the each
 ## function's category, and the 3rd column contains the URL to the function's
-## source code.  @var{pkgfcns} is used to relative references to other pages of
-## functions which are listed in the @qcode{See also} tag.  When a 3rd column is
-## present, @code{function_texi2html} uses it to add a source code link of the
-## the function in @var{clsname}.
+## source code.  @var{pkgfcns} is used to create relative references to other
+## pages of functions which are listed in the @qcode{seealso} tag.  When a third
+## column is present, @code{function_texi2html} uses it to add a source code
+## link of the the function in @var{clsname}.
 ##
 ## The @var{info} structure requires at least the following fields:
 ##
@@ -87,26 +87,28 @@ function classdef_texi2html (clsname, pkgfcns, info)
     print_usage ();
   endif
 
-  ## Check is clsname is an actual classdef
+  ## Check if clsname is an actual classdef
   try
     MTDS = methods (clsname);
   catch
-    error ("classdef_texi2html: %s is not classdef name", clsname);
+    error ("classdef_texi2html: '%s' is not classdef name", clsname);
   end_try_catch
 
-  ## Compensate for changes in behavior of `methods` function after Octave 9
-  if (! verLessThan ("Octave", "9") && ! strcmp (clsname, MTDS{1}))
-    MTDS = [clsname; MTDS];
-  endif
+  ## Remove constructor name from methods list
+  idx = find (cellfun (@(x) ! isempty(x), strfind (MTDS, clsname)));
+  MTDS(idx) = [];
+
+  ## Order methods according to the order they appear in classdef file
+  MTDS = get_methods_ordered (clsname, MTDS);
 
   ## Add try catch to help identify classdef file that caused an issue
   ## during batch processing all functions in a package with package_texi2html
   try
-    ## Get help text from constructor
-    [text, format] = get_help_text (MTDS{1});
+    ## Get help text from class definition
+    [text, format] = get_help_text (clsname);
 
-    ## Build the HTML code for class constructor
-    cls_text = __texi2html__ (text, MTDS{1}, pkgfcns);
+    ## Build the HTML code for class definition
+    cls_text = __texi2html__ (text, clsname, pkgfcns);
 
     ## Find the category the classdef belongs to
     fcn_idx = find (strcmp (pkgfcns(:,1), clsname));
@@ -120,32 +122,88 @@ function classdef_texi2html (clsname, pkgfcns, info)
       cls_text = strrep (cls_text, "</div>", url_text);
     endif
   catch
-    printf ("Unable to process class constructor %s:\n %s\n", MTDS{1}, lasterr);
+    printf ("Unable to process classdef '%s':\n %s\n", clsname, lasterr);
     return;
   end_try_catch
 
-  ## Build HTML code for remaining methods
-  for m = 2:numel (MTDS)
-    method_name = [clsname "." MTDS{m}];
+  ## Add collapsible cards with properties texinfo (if any)
+  props = properties (clsname);
+  if (! isempty (props))
+    for p = 1:numel (props)
+      ## Get help text from property
+      prop_name = [clsname "." props{p}];
+      [text, format] = get_help_text (prop_name);
+      ## Only if texinfo is available
+      if (strcmp (format, "texinfo"))
+        try
+          ## Build the HTML code for class constructor
+          prop_text = __texi2html__ (text, prop_name, pkgfcns);
+          ## Remove header
+          idx = strfind (prop_text, "</dl>");
+          idx = idx(1) + 5;
+          prop_text = prop_text(idx:end);
+          ## Load and populate property template
+          filename = fullfile ("_layouts", "property_template.html");
+          prop_template = fileread (filename);
+          prop_template = strrep (prop_template, "{{PROPERTY_NAME}}", props{p});
+          prop_num = sprintf ("collapse%d", p);
+          prop_template = strrep (prop_template, "{{PROPERTY_NUMBER}}", prop_num);
+          prop_template = strrep (prop_template, "{{PROPERTY_HELP}}", prop_text);
+        catch
+          prop_template = "";
+          printf ("Unable to process property '%s' of class '%s':\n %s\n", ...
+                  props{p}, clsname, lasterr);
+        end_try_catch
+        cls_text = [cls_text "\n" prop_template];
+      endif
+    endfor
+  endif
+
+  ## Build HTML code for constructor
+  cntr_name = [clsname "." clsname];
+  [text, format] = get_help_text (cntr_name);
+
+  ## Only if texinfo is available
+  if (strcmp (format, "texinfo"))
     try
-      ## Use custom get_help_text to get help text from methods contained in
-      ## the classdef file, because core get_help_text returns help text from
-      ## parrent class methods instead of the shadowing methods in the classdef
-      text = get_methods_texinfo (clsname, MTDS{m});
-
-      ## Build the HTML code for class method
-      mtds_text = __texi2html__ (text, method_name, pkgfcns);
-
-      ## Load methods template
-      mtds_template = fileread (fullfile ("_layouts", "method_template.html"));
-      mtds_template = strrep (mtds_template, "{{METHOD_NAME}}", MTDS{m});
-      mtds_template = strrep (mtds_template, "{{METHOD_HELP}}", mtds_text);
+      ## Build the HTML code for class constructor
+      cntr_text = __texi2html__ (text, cntr_name, pkgfcns);
+      ## Load constructor template
+      filename = fullfile ("_layouts", "constructor_template.html");
+      cntr_template = fileread (filename);
+      cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_NAME}}", clsname);
+      cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_HELP}}", cntr_text);
     catch
-      mtds_template = "";
-      printf ("Unable to process method %s of class %s:\n %s\n", ...
-              MTDS{m}, clsname, lasterr);
+      cntr_template = "";
+      printf ("Unable to process constructor of class '%s':\n %s\n", ...
+              clsname, lasterr);
     end_try_catch
-    cls_text = [cls_text "\n" mtds_template];
+    cls_text = [cls_text "\n" cntr_template];
+  endif
+
+  ## Build HTML code for available methods
+  for m = 1:numel (MTDS)
+    method_name = [clsname "." MTDS{m}];
+    ## Use custom get_help_text to get help text from methods contained in
+    ## the classdef file, because core get_help_text returns help text from
+    ## parrent class methods instead of the shadowing methods in the classdef
+    text = get_methods_texinfo (clsname, MTDS{m});
+    if (! isempty (text))
+      try
+        ## Build the HTML code for class method
+        mtds_text = __texi2html__ (text, method_name, pkgfcns);
+
+        ## Load method template
+        mtds_template = fileread (fullfile ("_layouts", "method_template.html"));
+        mtds_template = strrep (mtds_template, "{{METHOD_NAME}}", MTDS{m});
+        mtds_template = strrep (mtds_template, "{{METHOD_HELP}}", mtds_text);
+      catch
+        mtds_template = "";
+        printf ("Unable to process method '%s' of class '%s':\n %s\n", ...
+                MTDS{m}, clsname, lasterr);
+      end_try_catch
+      cls_text = [cls_text "\n" mtds_template];
+    endif
   endfor
 
   ## Add DEMOS (if applicable)
@@ -170,7 +228,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
 
   ## Build side bar function list
   fcn_list = "";
-  cat_name = unique (pkgfcns(:,2));
+  cat_name = unique (pkgfcns(:,2), "stable");
   for i = 1:numel (cat_name)
     ## Expand current category
     if (strcmpi (cat_name{i}, catname))
@@ -201,7 +259,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
     fcn_list = [fcn_list "			</div>\n"];
   endfor
 
-  ## Populate function template with package info
+  ## Populate classdef template with package info
   fnc_template = fileread (fullfile ("_layouts", "classdef_template.html"));
   fnc_template = strrep (fnc_template, "{{PKG_ICON}}", info.PKG_ICON);
   fnc_template = strrep (fnc_template, "{{PKG_NAME}}", info.PKG_NAME);
