@@ -14,7 +14,7 @@ collectively including their public methods in a single html page.
 
 You can find its documentation at [https://gnu-octave.github.io/pkg-octave-doc/](https://gnu-octave.github.io/pkg-octave-doc/).
 
-**Note** that since `pkg-octave-doc (>=0.6.0)` release Octave (>=9.1) is required.
+**Note** that since `pkg-octave-doc (>=0.6.0)` release, Octave (>=9.1) is required.
 Moreover, the categories and function files in the side bar are following the same
 order in the documented package's INDEX file and the classdef HTML page layout
 includes collapsible documentation for all class properties return by calling
