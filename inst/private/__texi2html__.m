@@ -177,6 +177,58 @@ function html_txt = __texi2html__ (text, fcnname, pkgfcns)
     endfor
   endif
 
+  ## References @ref, @xref, and @pxref (@seealso handled seprately at end)
+  ## If a legacy class member is referred to, it has to be entered with a
+  ## double '@@', like, e.g. @xref{@@class/member} in order to avoid errors
+  ## in makeinfo.
+
+  ref_strings = {"@xref{","@pxref{","@ref{"};
+  new_ref = {"See ","see ",""};
+  ref_len = zeros (1, length(ref_strings));
+  ref_regexp = "(";
+  for i = 1:length (ref_strings)
+    if (i == 1)
+      sep = "";
+    else
+      sep = "|";
+    endif
+    ref_len(i) = length (ref_strings{i});
+    ref_regexp = [ ref_regexp, sep, ref_strings{i} ];
+  endfor
+  ref_regexp = [ ref_regexp, ")" ];
+
+  [ref_idx,~,~,matched_strings] = regexp (html_txt, ref_regexp);
+  for i = length(ref_idx):-1:1
+    text_idx = ref_idx(i);                      # index in help text
+    matched_idx = find (strcmp (ref_strings, matched_strings{i}))(1); # matched ref index
+    text_from_ref = html_txt([text_idx:end]);   # get all text from ref on
+    ref_text = new_ref{matched_idx};            # get the new ref text
+    remaining = strfind(text_from_ref, "}")(1); # get closing brace
+    remaining_text = text_from_ref([remaining+1:end]);  # get text after closing brace
+    fnames = text_from_ref([ref_len(matched_idx)+1:remaining-1]); # get referred function names
+    fnames = strrep (fnames, "@@", "@");        # restore correct class character
+    fnames = strsplit (fnames, ",");
+    fnames = strtrim (fnames);
+    f_num = numel (fnames);
+    ## Create html links for all functions
+    for j = 1:f_num
+      str = fnames{j};
+      if (any (strcmp (pkgfcns(:,1), str)))
+        str1 = strrep (str, filesep, "_");
+        new_str = ["<a href=""",str1,".html"">",str,"</a>"];
+      else
+        new_str = str;
+      endif
+      if (j < f_num)
+        ref_text = [ref_text, new_str, (", \n")];
+      else
+        ref_text = [ref_text, new_str];
+      endif
+    endfor
+    ## Replace the ref-command by the html code including links
+    html_txt = strrep (html_txt, text_from_ref, [ref_text, remaining_text]);
+  endfor
+
   ## Fix @seealso tag if it exists
   see_idx = strfind (html_txt, "@seealso{");
   if (! isempty (see_idx))

@@ -103,9 +103,11 @@ function function_texi2html (fcnname, pkgfcns, info)
     ## Add link to function's source code (if applicable)
     if (size (pkgfcns, 2) == 3)
       url = pkgfcns{fcn_idx, 3};
-      url_text = strcat (["<p><strong>Source Code: </strong>\n"], ...
-                         ["  <a href=""", url, """>", fcnname, "</a>\n</div>"]);
+      if (! isempty (url))
+        url_text = strcat (["<p><strong>Source Code: </strong>\n"], ...
+                           ["  <a href=""", url, """>", fcnname, "</a>\n</div>"]);
       fcn_text = strrep (fcn_text, "</div>", url_text);
+      endif
     endif
 
     ## Add DEMOS (if applicable)
