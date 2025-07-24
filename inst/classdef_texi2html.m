@@ -160,6 +160,9 @@ function classdef_texi2html (clsname, pkgfcns, info)
             idx = idx(1) + 5;
           endif
           prop_text = prop_text(idx:end);
+          ## Add DEMOS for properties (if applicable)
+          demo_txt = build_DEMOS (prop_name);
+          prop_text = [prop_text "\n" demo_txt];
         catch
           prop_text = "";
           prop_fs = "";
