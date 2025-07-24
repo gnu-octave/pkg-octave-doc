@@ -150,6 +150,8 @@ function classdef_texi2html (clsname, pkgfcns, info)
         try
           ## Build the HTML code for property
           prop_text = __texi2html__ (text, prop_name, pkgfcns);
+          ## Grab first sentence
+          prop_fs = get_text_first_sentence (prop_text);
           ## Remove texinfo header
           idx = strfind (prop_text, "</dl>");
           if (isempty (idx))
@@ -160,16 +162,20 @@ function classdef_texi2html (clsname, pkgfcns, info)
           prop_text = prop_text(idx:end);
         catch
           prop_text = "";
+          prop_fs = "";
           printf ("Unusable texinfo in property '%s' of class '%s':\n %s\n", ...
                   PROPS{p}, clsname, lasterr);
         end_try_catch
       else
-        prop_text = text;
+        prop_text = sprintf ("<b><code>%s</code></b> is not documented.", ...
+                             prop_name);
+        prop_fs = "undocumented";
       endif
       ## Populate property template
       prop_template = strrep (template, "{{PROPERTY_NAME}}", PROPS{p});
       prop_num = sprintf ("collapseProperty%d", p);
       prop_template = strrep (prop_template, "{{PROPERTY_NUMBER}}", prop_num);
+      prop_template = strrep (prop_template, "{{PROPERTY_FS}}", prop_fs);
       prop_template = strrep (prop_template, "{{PROPERTY_HELP}}", prop_text);
       cls_text = [cls_text "\n" prop_template];
     endfor
