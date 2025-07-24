@@ -16,14 +16,14 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {pkg-octave-doc} {@var{MTDS} =} get_methods_ordered (@var{class}, @var{MTDS})
+## @deftypefn  {pkg-octave-doc} {@var{MTHDS} =} get_methods_ordered (@var{class}, @var{MTHDS})
 ##
 ## Private function to order methods according to their order of appearance in
 ## the classdef file.
 ##
 ## @end deftypefn
 
-function MTDS = get_methods_ordered (class, MTDS);
+function MTHDS = get_methods_ordered (class, MTHDS);
 
   ## Get the path to the classdef
   pathname = which (class);
@@ -66,7 +66,7 @@ function MTDS = get_methods_ordered (class, MTDS);
       fcn_name = fcn_name(beg_line:end);
       fcn_name = strtrim (fcn_name);
       ## Search for valid methods
-      method_idx = find (strcmp (MTDS, fcn_name));
+      method_idx = find (strcmp (MTHDS, fcn_name));
       ## Keep only those available in public methods
       if (! isempty (method_idx))
         index = [index, method_idx];
@@ -74,7 +74,7 @@ function MTDS = get_methods_ordered (class, MTDS);
     endif
   endfor
 
-  ## Reorder methods in MTDS cell array
-  MTDS = MTDS(index);
+  ## Reorder methods in MTHDS cell array
+  MTHDS = MTHDS(index);
 
 endfunction
