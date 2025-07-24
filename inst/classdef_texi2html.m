@@ -87,19 +87,19 @@ function classdef_texi2html (clsname, pkgfcns, info)
     print_usage ();
   endif
 
-  ## Check if clsname is an actual classdef
+  ## Get methods while checking if clsname is an actual classdef
   try
-    MTDS = methods (clsname);
+    MTHDS = methods (clsname);
   catch
     error ("classdef_texi2html: '%s' is not classdef name", clsname);
   end_try_catch
 
   ## Remove constructor name from methods list
-  idx = find (cellfun (@(x) ! isempty(x), strfind (MTDS, clsname)));
-  MTDS(idx) = [];
+  idx = find (cellfun (@(x) ! isempty(x), strfind (MTHDS, clsname)));
+  MTHDS(idx) = [];
 
   ## Order methods according to the order they appear in classdef file
-  MTDS = get_methods_ordered (clsname, MTDS);
+  MTHDS = get_methods_ordered (clsname, MTHDS);
 
   ## Add try catch to help identify classdef file that caused an issue
   ## during batch processing all functions in a package with package_texi2html
@@ -126,9 +126,14 @@ function classdef_texi2html (clsname, pkgfcns, info)
     return;
   end_try_catch
 
-  ## Add collapsible rows with public properties
-  props = properties (clsname);
-  if (! isempty (props))
+  ## Get properties
+  PROPS = properties (clsname);
+
+  ## Order properties according to the order they appear in classdef file
+  PROPS = get_properties_ordered (clsname, PROPS);
+
+  ## Build HTML code for available properties
+  if (! isempty (PROPS))
     ## Add header for properties
     prop_header = strcat ("        <h4 class=""d-inline-block my-3"">\n", ...
                           "          Properties\n        </h4>\n");
@@ -136,14 +141,14 @@ function classdef_texi2html (clsname, pkgfcns, info)
     ## Load property template
     filename = fullfile ("_layouts", "property_template.html");
     template = fileread (filename);
-    for p = 1:numel (props)
+    for p = 1:numel (PROPS)
       ## Get help text from property
-      prop_name = [clsname "." props{p}];
+      prop_name = [clsname "." PROPS{p}];
       [text, format] = get_help_text (prop_name);
       ## Only if texinfo is available
       if (strcmp (format, "texinfo"))
         try
-          ## Build the HTML code for class constructor
+          ## Build the HTML code for property
           prop_text = __texi2html__ (text, prop_name, pkgfcns);
           ## Remove texinfo header
           idx = strfind (prop_text, "</dl>");
@@ -156,13 +161,13 @@ function classdef_texi2html (clsname, pkgfcns, info)
         catch
           prop_text = "";
           printf ("Unusable texinfo in property '%s' of class '%s':\n %s\n", ...
-                  props{p}, clsname, lasterr);
+                  PROPS{p}, clsname, lasterr);
         end_try_catch
       else
         prop_text = text;
       endif
       ## Populate property template
-      prop_template = strrep (template, "{{PROPERTY_NAME}}", props{p});
+      prop_template = strrep (template, "{{PROPERTY_NAME}}", PROPS{p});
       prop_num = sprintf ("collapseProperty%d", p);
       prop_template = strrep (prop_template, "{{PROPERTY_NUMBER}}", prop_num);
       prop_template = strrep (prop_template, "{{PROPERTY_HELP}}", prop_text);
@@ -186,6 +191,18 @@ function classdef_texi2html (clsname, pkgfcns, info)
       cntr_text = __texi2html__ (text, cntr_name, pkgfcns);
       ## Grab first sentence
       cntr_fs = get_text_first_sentence (cntr_text);
+    catch
+      cntr_text = "";
+      cntr_fs = "";
+      printf ("Unusable texinfo in constructor of class '%s':\n %s\n", ...
+              clsname, lasterr);
+    end_try_catch
+    if (isempty (cntr_text) && isempty (cntr_fs))
+      cls_text = [cls_text "\n"];
+    else
+      ## Add DEMOS for constructor (if applicable)
+      demo_txt = build_DEMOS (cntr_name);
+      cntr_text = [cntr_text "\n" demo_txt];
       ## Load constructor template
       filename = fullfile ("_layouts", "constructor_template.html");
       cntr_template = fileread (filename);
@@ -193,19 +210,15 @@ function classdef_texi2html (clsname, pkgfcns, info)
       cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_NAME}}", clsname);
       cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_FS}}", cntr_fs);
       cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_HELP}}", cntr_text);
-    catch
-      cntr_template = "";
-      printf ("Unusable texinfo in constructor of class '%s':\n %s\n", ...
-              clsname, lasterr);
-    end_try_catch
-    cls_text = [cls_text "\n" cntr_template];
+      cls_text = [cls_text "\n" cntr_template];
+    endif
   endif
 
   ## Build HTML code for available methods
   template = fileread (fullfile ("_layouts", "method_template.html"));
-  for m = 1:numel (MTDS)
-    method_name = [clsname "." MTDS{m}];
-    ## Methods listed in MTDS are already ensure to be present in classdef file
+  for m = 1:numel (MTHDS)
+    method_name = [clsname "." MTHDS{m}];
+    ## Methods listed in MTHDS are already ensured to exist in the classdef file
     ## and not inherited from a parent class. 'get_methods_texinfo' is obsolete.
     [text, format] = get_help_text (method_name);
     ## Only if texinfo is available
@@ -219,15 +232,18 @@ function classdef_texi2html (clsname, pkgfcns, info)
         mtds_text = "";
         mtds_fs = "";
         printf ("Unusable texinfo in method '%s' of class '%s':\n %s\n", ...
-                MTDS{m}, clsname, lasterr);
+                MTHDS{m}, clsname, lasterr);
       end_try_catch
+      ## Add DEMOS for individual methods (if available)
+      demo_txt = build_DEMOS (method_name);
+      mtds_text = [mtds_text "\n" demo_txt];
     elseif (isempty (text))
       mtds_text = sprintf ("<b><code>%s</code></b> is not documented.", ...
                            method_name);
       mtds_fs = "undocumented";
     endif
     ## Populate method template
-    mtds_template = strrep (template, "{{METHOD_NAME}}", MTDS{m});
+    mtds_template = strrep (template, "{{METHOD_NAME}}", MTHDS{m});
     mtds_num = sprintf ("collapseMethod%d", m);
     mtds_template = strrep (mtds_template, "{{METHOD_NUMBER}}", mtds_num);
     mtds_template = strrep (mtds_template, "{{METHOD_FS}}", mtds_fs);
@@ -235,7 +251,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
     cls_text = [cls_text "\n" mtds_template];
   endfor
 
-  ## Add DEMOS (if applicable)
+  ## Add DEMOS from classdef file (if applicable)
   demo_txt = build_DEMOS (clsname);
   cls_text = [cls_text "\n" demo_txt];
 
