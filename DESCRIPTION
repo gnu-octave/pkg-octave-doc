@@ -1,6 +1,6 @@
 name: pkg-octave-doc
-version: 0.6.1
-date: 2025-07-02
+version: 0.6.2
+date: 2025-07-24
 author: Andreas Bertsatos
 maintainer: Andreas Bertsatos <abertsatos@biol.uoa.gr>
 title: Octave Package Documentation
@@ -13,3 +13,4 @@ categories: package
 Depends: octave (>= 9.1.0)
 License: GPLv3+
 Url: https://github.com/gnu-octave/pkg-octave-doc
+Tracker: https://github.com/gnu-octave/pkg-octave-doc/issues
