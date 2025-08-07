@@ -160,6 +160,24 @@ function classdef_texi2html (clsname, pkgfcns, info)
             idx = idx(1) + 5;
           endif
           prop_text = prop_text(idx:end);
+          ## Remove first sentence from text body
+          idx = strfind (prop_text, prop_fs);
+          if (! isempty (idx))
+            idx = idx(1);
+            len = length (prop_fs) + 1;
+            prop_text(idx:idx+len) = [];
+          endif
+          ## Remove '<div class="ms-5">' and '</div>' from html text body
+          idx = strfind (prop_text, '<div class="ms-5">');
+          if (! isempty (idx))
+            idx = idx(1);
+            prop_text(idx:idx+19) = [];
+          endif
+          idx = strfind (prop_text, '</div>');
+          if (! isempty (idx))
+            idx = idx(1);
+            prop_text(idx:idx+7) = [];
+          endif
           ## Add DEMOS for properties (if applicable)
           demo_txt = build_DEMOS (prop_name);
           prop_text = [prop_text "\n" demo_txt];
@@ -237,6 +255,24 @@ function classdef_texi2html (clsname, pkgfcns, info)
         mtds_text = __texi2html__ (text, method_name, pkgfcns);
         ## Grab first sentence
         mtds_fs = get_text_first_sentence (mtds_text);
+        ## Remove first sentence from text body
+        idx = strfind (mtds_text, mtds_fs);
+        if (! isempty (idx))
+          idx = idx(1);
+          len = length (mtds_fs) + 1;
+          mtds_text(idx:idx+len) = [];
+        endif
+        ## Remove '<div class="ms-5">' and '</div>' from html text body
+        idx = strfind (mtds_text, '<div class="ms-5">');
+        if (! isempty (idx))
+          idx = idx(1);
+          mtds_text(idx:idx+19) = [];
+        endif
+        idx = strfind (mtds_text, '</div>');
+        if (! isempty (idx))
+          idx = idx(1);
+          mtds_text(idx:idx+7) = [];
+        endif
       catch
         mtds_text = "";
         mtds_fs = "";
