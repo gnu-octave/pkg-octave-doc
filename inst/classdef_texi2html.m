@@ -176,7 +176,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
           idx = strfind (prop_text, '</div>');
           if (! isempty (idx))
             idx = idx(1);
-            prop_text(idx:idx+6) = [];
+            prop_text(idx:end) = [];
           endif
           ## Add DEMOS for properties (if applicable)
           demo_txt = build_DEMOS (prop_name);
@@ -271,7 +271,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
         idx = strfind (mtds_text, '</div>');
         if (! isempty (idx))
           idx = idx(1);
-          mtds_text(idx:idx+6) = [];
+          mtds_text(idx:end) = [];
         endif
       catch
         mtds_text = "";
