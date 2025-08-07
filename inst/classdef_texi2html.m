@@ -164,19 +164,19 @@ function classdef_texi2html (clsname, pkgfcns, info)
           idx = strfind (prop_text, prop_fs);
           if (! isempty (idx))
             idx = idx(1);
-            len = length (prop_fs) + 1;
+            len = length (prop_fs);
             prop_text(idx:idx+len) = [];
           endif
           ## Remove '<div class="ms-5">' and '</div>' from html text body
           idx = strfind (prop_text, '<div class="ms-5">');
           if (! isempty (idx))
             idx = idx(1);
-            prop_text(idx:idx+19) = [];
+            prop_text(idx:idx+18) = [];
           endif
           idx = strfind (prop_text, '</div>');
           if (! isempty (idx))
             idx = idx(1);
-            prop_text(idx:idx+7) = [];
+            prop_text(idx:idx+6) = [];
           endif
           ## Add DEMOS for properties (if applicable)
           demo_txt = build_DEMOS (prop_name);
@@ -259,19 +259,19 @@ function classdef_texi2html (clsname, pkgfcns, info)
         idx = strfind (mtds_text, mtds_fs);
         if (! isempty (idx))
           idx = idx(1);
-          len = length (mtds_fs) + 1;
+          len = length (mtds_fs);
           mtds_text(idx:idx+len) = [];
         endif
         ## Remove '<div class="ms-5">' and '</div>' from html text body
         idx = strfind (mtds_text, '<div class="ms-5">');
         if (! isempty (idx))
           idx = idx(1);
-          mtds_text(idx:idx+19) = [];
+          mtds_text(idx:idx+18) = [];
         endif
         idx = strfind (mtds_text, '</div>');
         if (! isempty (idx))
           idx = idx(1);
-          mtds_text(idx:idx+7) = [];
+          mtds_text(idx:idx+6) = [];
         endif
       catch
         mtds_text = "";
