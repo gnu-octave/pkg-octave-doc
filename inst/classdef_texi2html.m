@@ -218,6 +218,24 @@ function classdef_texi2html (clsname, pkgfcns, info)
       cntr_text = __texi2html__ (text, cntr_name, pkgfcns);
       ## Grab first sentence
       cntr_fs = get_text_first_sentence (cntr_text);
+      ## Remove first sentence from text body
+      idx = strfind (cntr_text, cntr_fs);
+      if (! isempty (idx))
+        idx = idx(1);
+        len = length (cntr_fs);
+        cntr_text(idx:idx+len) = [];
+      endif
+      ## Remove '<div class="ms-5">' and '</div>' from html text body
+      idx = strfind (cntr_text, '<div class="ms-5">');
+      if (! isempty (idx))
+        idx = idx(1);
+        cntr_text(idx:idx+18) = [];
+      endif
+      idx = strfind (cntr_text, '</div>');
+      if (! isempty (idx))
+        idx = idx(1);
+        cntr_text(idx:end) = [];
+      endif
     catch
       cntr_text = "";
       cntr_fs = "";
