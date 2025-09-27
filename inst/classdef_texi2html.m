@@ -376,6 +376,8 @@ function classdef_texi2html (clsname, pkgfcns, info)
                 dline = strtrim (dline(3:end));
                 demo_description = [demo_description, " ", dline];
                 s_idx = e_idx + 1;
+              elseif (numel (dline) == 0);
+                s_idx = e_idx + 1;
               else
                 break;
               endif
