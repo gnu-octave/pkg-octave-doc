@@ -47,6 +47,7 @@ To install the latest development version type:
 pkg install "https://github.com/gnu-octave/pkg-octave-doc/archive/refs/heads/main.zip"
 ```
 
+
 ## Usage
 
 Generate a function reference for all functions listed in the INDEX file of an
@@ -129,6 +130,14 @@ in order to be properly formatted in final HTML code.
 * At the moment, `function_texi2html` can handle a signle `@seealso{}` tag. Make sure that there is only one `@seealso{}` tag inside each function's docstring located at the very end just before the `@end deftypefn` texinfo closing statement. Functions listed therein that belong to the same package are also linked to their individual function pages.
 
 * `@tex` tags must only contain latex mathematical expressions enclosed with `$$` identifiers, such as in `$$ ... $$`. Math delimiters `\(...\)` are also processed in `@tex` blocks.
+
+
+## Guidelines for classdef documentation
+Classdef documentation and demos are handled separately in more specialized manner. For each classdef file, a single HTML page is generated containing collapsible items for the documentation of each public property and methods as well as any demos that may be present in the classdef file. Class properties, methods (including the constructor), and demos are grouped together and they follow the same order as they appear in the classdef file.
+
+The first sentence in the docstring of a property or a method is used as a short description in the collapsible item. The respective description for class demos is taken from the top comment lines of each demo block (is available), otherwise the command line for calling the particular demo is used as a default.
+
+Any demos documenting the functionality of a property or method have to be saved in an external file in order to be included inside the respective collapsible item after the help documentation in the same manner it is done for functions. For this feature to work, you must be able to call the particular demos with the same typing convention as you do with the help docstrings.
 
 
 ## TODO
