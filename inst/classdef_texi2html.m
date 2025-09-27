@@ -383,13 +383,16 @@ function classdef_texi2html (clsname, pkgfcns, info)
               s_idx = e_idx + 1;
             endif
           endfor
+          ## Remove top comment lines from the demo block before evaluation
+          demo_code = demo_code(s_idx:end);
+
           ## Add default value if no description is available
           if (isempty (demo_description))
             demo_description = sprintf ("demo&nbsp;%s&nbsp;%d", clsname, d);
           endif
 
           ## Format HTML string with demo code
-          demo_html = [demo_pre1 demo_code(2:end-1) tmp_3 tmp_4];
+          demo_html = [demo_pre1 demo_code(1:end-1) tmp_3 tmp_4];
 
           ## Evaluate DEMO code
           diary (diary_file);
