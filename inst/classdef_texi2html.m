@@ -118,9 +118,9 @@ function classdef_texi2html (clsname, pkgfcns, info)
     ## inside the <dl></dl> tags with more appropriate formatting
     end_DL = strfind (cls_text, "</dl>")(1) + 5;
     cls_text(1:end_DL) = [];
-    clssig = sprintf ("<dl><code><h5 class=""fs"">%s: %s</h5></code></dl>\n", ...
-                      info.PKG_NAME, clsname);
-    cls_text = [clssig cls_text];
+    html_tag = "<dl><code><h5 class=""description"">%s: %s</h5></code></dl>\n";
+    classsig = sprintf (html_tag, info.PKG_NAME, clsname);
+    cls_text = [classsig cls_text];
 
     ## Add link to classdef's source code (if applicable)
     if (size (pkgfcns, 2) == 3)

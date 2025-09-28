@@ -261,7 +261,7 @@ function html_txt = __texi2html__ (text, fcnname, pkgfcns)
   ## <dt><u>pkg:</u> <var>B</var> = <b>fcnname</b><i> (<var>A</var>)</i></dt>
   ## to:
   ## <h5><code>pkg: <var>B</var> = <b>fcnname</b> (<var>A</var>)</code></h5>
-  html_txt = strrep (html_txt, "<dt><u>", "<dt><code><h5 class=""fs"">");
+  html_txt = strrep (html_txt, "<dt><u>", "<dt><code><h5 class=""description"">");
   html_txt = strrep (html_txt, ":</u>", ":");
   html_txt = strrep (html_txt, "</b><i>", "</b>");
   html_txt = strrep (html_txt, "</i></dt>", "</code></h5></dt>");
