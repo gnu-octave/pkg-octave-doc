@@ -23,12 +23,32 @@
       });
     </script>
     <style>
+    h5.fs {
+    margin-top: -0.15em;
+    margin-bottom: -0.15em;
+    }
     h6:hover {
       color: gray;
     }
+    code {
+    font-family: Consolas, "Courier New", monospace;
+    border-radius: 0.3em;
+    white-space: nowrap;
+    color: gray;
+    }
+    code.description {
+    font-family: Consolas, "Courier New", monospace;
+    border-radius: 0.3em;
+    white-space: normal;
+    font-size:1.2em;
+    color: gray;
+    }
     var {
-      font-style: italics;
-      font-weight: bold;
+    font-family: Consolas, "Courier New", monospace;
+    border-radius: 0.3em;
+    font-style: normal;
+    font-weight: bold;
+    color: gray;
     }
     td {
       vertical-align: top;
@@ -123,7 +143,7 @@
             </div>
             <div class="card-body">
 <dl>
-<dt><u>pkg-octave-doc:</u> <var>demos</var> = <b>find_DEMOS</b><i> (<var>fcnname</var>)</i></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <var>demos</var> = <b>find_DEMOS</b> (<var>fcnname</var>)</code></h5></dt>
 </dl>
 
 <p> Retrieve the DEMO code blocks from a particular function.
