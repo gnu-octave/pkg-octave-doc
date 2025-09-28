@@ -83,14 +83,14 @@ function pkgfcns = find_GHurls (pkgurl, pkgfcns)
   endif
 
   ## Extract to a newly created folder inside the temporary directory
-  status = mkdir (tmpDIR1, "octave_package");
-  newDIR = fullfile (tmpDIR1, "octave_package");
-  if (status)
+  success = mkdir (tmpDIR1, "octave_package");
+  newDIR1 = fullfile (tmpDIR1, "octave_package");
+  if (! success)
     warning ("package_texi2html: unable to create temporary directory.");
     warning ("Link to source code in HTML pages will be omitted.");
     return;
   endif
-  cmd = sprintf ("tar xf %s -C %s --strip-components=1", pkgname, newDIR);
+  cmd = sprintf ("tar xf %s -C %s --strip-components=1", pkgname, newDIR1);
   [status, ~] = unix (cmd);
   if (status)
     warning ("package_texi2html: unable to extract downloaded tar file.");
@@ -99,7 +99,7 @@ function pkgfcns = find_GHurls (pkgurl, pkgfcns)
   endif
 
   ## Find files and folders' contents in repository root
-  fcnurls = dir (fullfile (newDIR, "**/*.*"));
+  fcnurls = dir (fullfile (newDIR1, "**/*.*"));
   fcnurls = struct2cell (fcnurls)';
 
   subforders = true;
