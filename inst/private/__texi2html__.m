@@ -257,11 +257,12 @@ function html_txt = __texi2html__ (text, fcnname, pkgfcns)
     html_txt = strrep (html_txt, "</dd></dl>", "\n</div>");
   endif
 
-  ## Replace tags in function syntax list from:
-  ## <dt><u>pkg:</u> <var>B</var> = <b>fcnname</b><i> (<var>A</var>)</i></dt>
+  ## Replace HTML tags in function syntax list from:
+  ## <dt><u>\w:</u> <var>\w</var> = <b>\w</b><i> (<var>\w</var>)</i></dt>
   ## to:
-  ## <h5><code>pkg: <var>B</var> = <b>fcnname</b> (<var>A</var>)</code></h5>
-  html_txt = strrep (html_txt, "<dt><u>", "<dt><code><h5 class=""description"">");
+  ## <dt><h5 class="fs"><code>\w: <var>\w</var> = <b>\w</b> (<var>\w</var>)</code></h5></dt>
+  ## where \w represents a valid Octave name
+  html_txt = strrep (html_txt, "<dt><u>", "<dt><code><h5 class=""fs"">");
   html_txt = strrep (html_txt, ":</u>", ":");
   html_txt = strrep (html_txt, "</b><i>", "</b>");
   html_txt = strrep (html_txt, "</i></dt>", "</code></h5></dt>");
