@@ -134,17 +134,8 @@ function html_txt = __texi2html__ (text, fcnname, pkgfcns)
     html_txt([dta_idx(i)+5:dt_aidx(i)+4]) = [];
   endfor
 
-  ## Fix </dd></dl> positions and replace tags in function syntax list from:
-  ## <dt><u>pkg:</u> <var>B</var> = <b>fcnname</b><i> (<var>A</var>)</i></dt>
-  ## to:
-  ## <h5><code>pkg: <var>B</var> = <b>fcnname</b> (<var>A</var>)</code></h5>
+  ## Fix </dd></dl> positions and add left margin after 1st sentence
   html_txt = strrep (html_txt, "<dd>", "</dl>\n");
-  html_txt = strrep (html_txt, "<dt><u>", "<h5 class=""fs""><code>");
-  html_txt = strrep (html_txt, "</u>", "");
-  html_txt = strrep (html_txt, "<i>", "");
-  html_txt = strrep (html_txt, "</i></dt>", "</code></h5>");
-
-  ## Add left margin after 1st sentence
   pbeg_idx = strfind (html_txt, "<p>");
   pend_idx = strfind (html_txt, "</p>");
   tmp_str1 = html_txt([pbeg_idx(1):pend_idx(1)+4]);
@@ -265,5 +256,14 @@ function html_txt = __texi2html__ (text, fcnname, pkgfcns)
   else
     html_txt = strrep (html_txt, "</dd></dl>", "\n</div>");
   endif
+
+  ## Replace tags in function syntax list from:
+  ## <dt><u>pkg:</u> <var>B</var> = <b>fcnname</b><i> (<var>A</var>)</i></dt>
+  ## to:
+  ## <h5><code>pkg: <var>B</var> = <b>fcnname</b> (<var>A</var>)</code></h5>
+  html_txt = strrep (html_txt, "<dt><u>", "<dt><code><h5 class=""fs"">");
+  html_txt = strrep (html_txt, ":</u>", ":");
+  html_txt = strrep (html_txt, "</b><i>", "</b>");
+  html_txt = strrep (html_txt, "</i></dt>", "</code></h5></dt>");
 
 endfunction

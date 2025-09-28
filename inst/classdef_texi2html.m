@@ -114,11 +114,15 @@ function classdef_texi2html (clsname, pkgfcns, info)
     fcn_idx = find (strcmp (pkgfcns(:,1), clsname));
     catname = pkgfcns{fcn_idx, 2};
 
+    ## Fix HTML tags in 'Class: classname' caused by __texi2html__
+    cls_text = strrep (cls_text, "</b></dt>", "</b></h5></code></dt>");
+
     ## Add link to classdef's source code (if applicable)
     if (size (pkgfcns, 2) == 3)
       url = pkgfcns{fcn_idx, 3};
-      url_text = strcat (["<p><strong>Source Code: </strong>\n"], ...
-                         ["  <a href=""", url, """>", clsname, "</a>\n</div>"]);
+      url_text = strcat (["<p><strong>Source Code: </strong>\n", ...
+                          "  <a href=""", url, """>", clsname, ...
+                          "</a>\n</p>\n</div>"]);
       cls_text = strrep (cls_text, "</div>", url_text);
     endif
   catch
