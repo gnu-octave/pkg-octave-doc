@@ -114,8 +114,13 @@ function classdef_texi2html (clsname, pkgfcns, info)
     fcn_idx = find (strcmp (pkgfcns(:,1), clsname));
     catname = pkgfcns{fcn_idx, 2};
 
-    ## Fix HTML tags in 'Class: classname' caused by __texi2html__
-    cls_text = strrep (cls_text, "</b></dt>", "</b></h5></code></dt>");
+    ## Replace class signature at the beginning of the HTML code
+    ## inside the <dl></dl> tags with more appropriate formatting
+    end_DL = strfind (cls_text, "</dl>")(1) + 5;
+    cls_text(1:end_DL) = [];
+    clssig = sprintf ("<dl><code><h5 class=""fs"">%s: %s</h5></code></dl>\n", ...
+                      info.PKG_NAME, clsname);
+    cls_text = [clssig cls_text];
 
     ## Add link to classdef's source code (if applicable)
     if (size (pkgfcns, 2) == 3)
