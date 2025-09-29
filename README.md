@@ -68,6 +68,20 @@ You only need to do this once, and the package's website will be automatically u
 ## Guidelines for TEXIFNO docsstrings
 
 
+* `@deftypefn` must be used at the beggining of functions and class methods to describe the function's syntax. Consecutive lines with alternative syntaxes must use `@deftypefnx`. Both tags should stricktly follow the pattern showns in the example below in order to be correctly parsed and generate the appropriate HTML code.
+     ```
+     ## -*- texinfo -*-
+     ## @deftypefn  {} {} function_name ()
+     ## @deftypefnx {package_name} {} function_name ()
+     ## @deftypefnx {package_name} {@var{out} =} function_name ()
+     ## @deftypefnx {package_name} {@var{out} =} function_name (@var{in})
+     ## @deftypefnx {package_name} {[@var{out}, @dots{}] =} function_name (@var{in}, @dots{})
+     ...
+     ## @end deftypefn
+     ```
+     **Note** that even when a function does not accept any input arguments, the parentheses `()` after the function name are mandatory.
+     Also the two sets of curly brackets `{}` before the function name are also mandatory. The first contains the package name (which may be omitted) and the second contains the function's output arguments (including the equal sign operator).
+  
 * `@qcode` is converted to `@code` before texi2html processing, so if you want to display a char string it is best to use @qcode{"somestring"}, which will be displayed properly both on Octave's command window and on HTML output. Keep in mind that `@code{}` encloses the content in single quotes in the command window, although they are not displayed in HTML code.
 
 * fields of structures: it is best practice to write them as `@var{structure_name}.@qcode{field_name}` which appears in the command window as `structure_name.field_name` and in HTML as <var>structure_name</var>.<code>field_name</code>. In bootstrap 5, the `<code>` tag is not highlighted and it looks better than here :smiley:.
@@ -87,7 +101,7 @@ can be converted to
 @item text @tab @tab text
 ````
 
-* Make sure that `@deftypefn` and `@deftypefnx` tags have a space before them.  This is especially important for help strings in oct files (in .cc code) where we don't use ## for initiating a comment line.
+* Make sure that `@deftypefn` and `@deftypefnx` tags have a white space before them.  This is especially important for help strings in oct files (in .cc code) where we don't use ## for initiating a comment line.
 For example:
 
 in .m files
@@ -135,7 +149,35 @@ in order to be properly formatted in final HTML code.
 ## Guidelines for classdef documentation
 Classdef documentation and demos are handled separately in more specialized manner. For each classdef file, a single HTML page is generated containing collapsible items for the documentation of each public property and methods as well as any demos that may be present in the classdef file. Class properties, methods (including the constructor), and demos are grouped together and they follow the same order as they appear in the classdef file.
 
-The first sentence in the docstring of a property or a method is used as a short description in the collapsible item. The respective description for class demos is taken from the top comment lines of each demo block (is available), otherwise the command line for calling the particular demo is used as a default.
+Top level classdef documentation and classdef properties should use the `@deftp` tag for name declaration instead of the `@deftypefn` tag used in syntax declaration of functions and class methods. Only a single line should be used for name declaration as shown in the example below.
+
+     ```
+     classdef class_name
+       ## -*- texinfo -*-
+       ## @deftp {package_name} class_name
+       ## 
+       ## A class that does something.
+       ## 
+       ## More info about it...
+       ##
+       ## @end deftp
+       
+       properties
+         ## -*- texinfo -*-
+         ## @deftp {class_name} {property} property_name
+         ##
+         ## Property short description
+         ##
+         ## More info about it...
+         ##
+         ## @end deftp
+         property_name = []
+       endproperties
+       
+     endclassdef
+     ```
+
+The first sentence in the docstring of a property or a method is used as a short description in the collapsible item. The respective description for class demos is taken from the top comment lines of each demo block (if available), otherwise the command line for calling the particular demo is used as a default.
 
 Any demos documenting the functionality of a property or method have to be saved in an external file in order to be included inside the respective collapsible item after the help documentation in the same manner it is done for functions. For this feature to work, you must be able to call the particular demos with the same typing convention as you do with the help docstrings.
 
