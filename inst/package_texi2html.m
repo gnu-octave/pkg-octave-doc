@@ -161,9 +161,19 @@ function [varargout] = package_texi2html (pkgname)
     pkg_icon = [pkgname, ".svg"];
     icon_exists = true;
   else
-    sd = fullfile (file_in_loadpath ("pkg.png"));
-    pkg_icon = [pkgname, ".png"];
-    icon_exists = false;
+    ## Check for alternative name after the root directory of the repository
+    root_dir_name = strsplit (pkg_info{1}.url, '/'){end};
+    if (exist (fullfile (sd, [root_dir_name, ".png"])) == 2)
+      pkg_icon = [root_dir_name, ".png"];
+      icon_exists = true;
+    elseif (exist (fullfile (sd, [root_dir_name, ".svg"])) == 2)
+      pkg_icon = [root_dir_name, ".svg"];
+      icon_exists = true;
+    else
+      sd = fullfile (file_in_loadpath ("pkg.png"));
+      pkg_icon = [pkgname, ".png"];
+      icon_exists = false;
+    endif
   endif
 
   ## Copy specific info for other functions
