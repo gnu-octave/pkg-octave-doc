@@ -95,7 +95,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
   end_try_catch
 
   ## Remove constructor name from methods list
-  idx = find (cellfun (@(x) ! isempty(x), strfind (MTHDS, clsname)));
+  idx = strcmp (MTHDS, clsname);
   MTHDS(idx) = [];
 
   ## Order methods according to the order they appear in classdef file
