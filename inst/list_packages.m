@@ -28,7 +28,10 @@
 
 function valid_packages = list_packages ()
   ## Get package index
-  __pkg__ = package_index_resolve ();
+  [list, ok] = urlread ("https://gnu-octave.github.io/packages/packages.json");
+  if (ok)
+    __pkg__ = jsondecode (list, "makeValidName", false);
+  endif
 
   ## Initialize count for valid packages
   vp = 0;
@@ -54,14 +57,4 @@ function valid_packages = list_packages ()
     endif
     clear depends;
   endfor
-
-endfunction
-
-function __pkg__ = package_index_resolve ()
-  data = urlread ("https://gnu-octave.github.io/packages/packages/")(6:end);
-  data = strrep (data, "&gt;",  ">");
-  data = strrep (data, "&lt;",  "<");
-  data = strrep (data, "&amp;", "&");
-  data = strrep (data, "&#39;", "'");
-  eval (data);
 endfunction
