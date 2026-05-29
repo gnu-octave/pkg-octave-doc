@@ -56,7 +56,7 @@
 ## @code{find_GHurls}.  The @var{info} structure can also be created with
 ## @code{package_texi2html}.
 ##
-## @code{function_texi2html} depends on the @qcode{texi2html} command line tool
+## @code{classdef_texi2html} depends on the @qcode{texi2html} command line tool
 ## version 1.82, which must be installed and available on the system's $PATH,
 ## and the generated HTML code is based on the @qcode{function_template.html}
 ## and @qcode{default.html} layouts.
