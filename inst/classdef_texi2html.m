@@ -20,7 +20,7 @@
 ##
 ## Generate HTML page for a class definition.
 ##
-## @code{function_texi2html} requires three input arguments: @var{clsname}, a
+## @code{classdef_texi2html} requires three input arguments: @var{clsname}, a
 ## char string with the class' name; @var{pkgfcns}, a cell array with all
 ## available functions of a package; and @var{info}, a structure with relevant
 ## information about the package, which the function @var{clsname} belongs to.
@@ -30,7 +30,7 @@
 ## function's category, and the 3rd column contains the URL to the function's
 ## source code.  @var{pkgfcns} is used to create relative references to other
 ## pages of functions which are listed in the @qcode{seealso} tag.  When a third
-## column is present, @code{function_texi2html} uses it to add a source code
+## column is present, @code{classdef_texi2html} uses it to add a source code
 ## link of the the function in @var{clsname}.
 ##
 ## The @var{info} structure requires at least the following fields:
