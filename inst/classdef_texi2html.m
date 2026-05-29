@@ -1,6 +1,6 @@
 ## Copyright (C) 2024-2025 Andreas Bertsatos <abertsatos@biol.uoa.gr>
 ##
-## This file is part of the statistics package for GNU Octave.
+## This file is part of the pkg-octave-doc package for GNU Octave.
 ##
 ## This program is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@
 ##
 ## Generate HTML page for a class definition.
 ##
-## @code{function_texi2html} requires three input arguments: @var{clsname}, a
+## @code{classdef_texi2html} requires three input arguments: @var{clsname}, a
 ## char string with the class' name; @var{pkgfcns}, a cell array with all
 ## available functions of a package; and @var{info}, a structure with relevant
 ## information about the package, which the function @var{clsname} belongs to.
@@ -30,7 +30,7 @@
 ## function's category, and the 3rd column contains the URL to the function's
 ## source code.  @var{pkgfcns} is used to create relative references to other
 ## pages of functions which are listed in the @qcode{seealso} tag.  When a third
-## column is present, @code{function_texi2html} uses it to add a source code
+## column is present, @code{classdef_texi2html} uses it to add a source code
 ## link of the the function in @var{clsname}.
 ##
 ## The @var{info} structure requires at least the following fields:
@@ -56,7 +56,7 @@
 ## @code{find_GHurls}.  The @var{info} structure can also be created with
 ## @code{package_texi2html}.
 ##
-## @code{function_texi2html} depends on the @qcode{texi2html} command line tool
+## @code{classdef_texi2html} depends on the @qcode{texi2html} command line tool
 ## version 1.82, which must be installed and available on the system's $PATH,
 ## and the generated HTML code is based on the @qcode{function_template.html}
 ## and @qcode{default.html} layouts.

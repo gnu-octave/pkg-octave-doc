@@ -18,7 +18,7 @@ You can find its documentation at [https://gnu-octave.github.io/pkg-octave-doc/]
 Moreover, the categories and function files in the side bar are following the same
 order in the documented package's INDEX file and the classdef HTML page layout
 includes collapsible documentation for all class properties return by calling
-`methods ('classname') as well as collapsible documentation only for the methods
+`methods ('classname')` as well as collapsible documentation only for the methods
 (including the constructor) that are present in the classdef file (inherited methods
 are ignored).
 
