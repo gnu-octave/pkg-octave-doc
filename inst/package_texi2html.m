@@ -43,10 +43,6 @@
 ## available, the source code link is omitted and the functions' HTML pages are
 ## generated without it.
 ##
-## For the @code{package_texi2html} to work, the @qcode{texi2html} command line
-## tool, version 1.82, must be installed and available to the system's
-## @code{$PATH}.
-##
 ## Optionally, @code{package_texi2html} can return two output arguments, namely
 ## @var{pkgfcns} and @var{info}, which are necessary for the @code{find_GHurls}
 ## and @code{function_texi2html} functions.  In such case, the HTML pages
