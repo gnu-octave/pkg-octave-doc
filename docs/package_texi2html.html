@@ -146,7 +146,6 @@
 <dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2html</b> (<var>pkgname</var>)</code></h5></dt>
 <dt><code><h5 class="fs">pkg-octave-doc: [<var>pkgfcns</var>, <var>info</var>] = <b>package_texi2html</b> (<var>pkgname</var>)</code></h5></dt>
 </dl>
-
 <p> Generate HTML pages for an entire package.
 </p>
 <div class="ms-5">
@@ -172,10 +171,6 @@
  available, the source code link is omitted and the functions&rsquo; HTML pages are
  generated without it.
 </p>
-<p> For the <code>package_texi2html</code> to work, the <code>texi2html</code> command line
- tool, version 1.82, must be installed and available to the system&rsquo;s
- <code>$PATH</code>.
-</p>
 <p> Optionally, <code>package_texi2html</code> can return two output arguments, namely
  <var>pkgfcns</var> and <var>info</var>, which are necessary for the <code>find_GHurls</code>
  and <code>function_texi2html</code> functions.  In such case, the HTML pages
@@ -184,22 +179,20 @@
 </p>
 <p> Examples:
 </p>
- <table><tr><td>&nbsp;</td><td><pre class="example"> [pkgfcns, info] = package_texi2html (&quot;pkg-octave-doc&quot;);
+<table><tr><td>&nbsp;</td><td><pre class="example"> [pkgfcns, info] = package_texi2html (&quot;pkg-octave-doc&quot;);
  pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
  function_texi2html (&quot;find_GHurls&quot;, pkgfcns, info);
- </pre></td></tr></table>
+</pre></td></tr></table>
 
 <p> Returning arguments:
 </p>
- <ul>
+<ul>
 <li>
  <var>pkgfcns</var> is a Nx2 cell array containing the package&rsquo;s available
  functions (1st column) and their respective category (2nd column).
-
- </li><li>
+</li><li>
  <var>info</var> is a structure with the following fields:
-
- <table>
+<table>
 <thead><tr><th width="20%">Field Name</th><th width="80%">Description</th></tr></thead>
 <tr><td width="20%"><code>PKG_URL</code></td><td width="80%">The URL to the package&rsquo;s repository at GitHub.</td></tr>
 <tr><td width="20%"><code>PKG_ICON</code></td><td width="80%">The relative reference to the package&rsquo;s logo
@@ -211,6 +204,8 @@
 <tr><td width="20%"><code>OCTAVE_LOGO</code></td><td width="80%">The relative reference to Octave&rsquo;s logo, also
  located inside the <code>assets/</code> folder.</td></tr>
 </table>
+
+
 </li></ul>
 
 <p> <strong>See also: </strong>
