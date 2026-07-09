@@ -145,22 +145,60 @@
 <dl>
 <dt><code><h5 class="fs">pkg-octave-doc: <var>html</var> = <b>build_DEMOS</b> (<var>fcnname</var>)</code></h5></dt>
 </dl>
-<p> Generate HTML code from the available DEMOS of a particular function.
+<p> Build notebook-style HTML for the DEMO blocks of a function or class member.
 </p>
 <div class="ms-5">
+<p> <code>build_DEMOS</code> collects every <code>%!demo</code> block of <var>fcnname</var> and
+ returns <var>html</var>, a char string with the generated HTML for all of them.
+ <var>fcnname</var> is a char string with the name of a function or, for a class
+ member, a <code>&quot;class/method&quot;</code> path.  Each demo is wrapped in the
+ <code>demos_template.html</code> card layout and titled <code>Example: N</code>.  When
+ <var>fcnname</var> has no demos, <var>html</var> is returned empty.
+</p>
+<p>  Notebook layout
+</p>
+<p> Each demo is rendered as an interleaved <em>notebook</em> instead of a single
+ code block trailed by its aggregated output.  The demo is split into cells
+ and laid out as a vertical stack of boxes:
+</p>
 <ul>
-<li>
- <var>fcnname</var> is a char string with the function&rsquo;s name.
-</li><li>
- <var>html</var> is a char string with the generated HTML code based on the
- <code>demos_template.html</code> layout for every DEMO available in <var>fcnname</var>.
+<li> <strong>Comment</strong> lines become prose (see the Markdown subset below).
+</li><li> <strong>Code</strong> statements become input boxes.  Consecutive statements
+ that print nothing are merged into a single box, so muted setup code reads as
+ one block.
+</li><li> <strong>Output</strong> produced by a statement is shown in an output box
+ directly beneath it, rather than at the end of the demo.  A statement prints
+ when it is left unterminated by a semicolon or when it calls <code>disp</code>,
+ <code>printf</code>, and the like.
+</li><li> <strong>Figures</strong> are saved as PNG images under the <code>assets/</code>
+ folder of the working directory, shown right after the code that drew them.
 </li></ul>
 
+<p>  Markdown in comments
+</p>
+<p> Comment text uses a small subset of <strong>Markdown</strong>, <em>not</em> texinfo, so
+ that the same demo stays readable in the terminal when it is run with the
+ <code>demo</code> command.  The supported constructs are:
+</p>
+<ul>
+<li> inline code <code>`code`</code> rendered as <code>&lt;code&gt;</code>;
+</li><li> bold <code>**text**</code> and italic <code>*text*</code> emphasis;
+</li><li> links <code>[text](url)</code>;
+</li><li> paragraphs, separated by a blank comment line;
+</li><li> unordered lists, whose items start with a <code>- </code> or <code>* </code>
+ marker, and ordered lists, whose items start with a <code>1. </code> marker.
+</li></ul>
+
+<p> All comment text is HTML-escaped before the markup is applied.  The following
+ are deliberately <em>not</em> supported: any texinfo markup; underscore
+ emphasis <code>_text_</code>, which would mangle identifier names such as
+ <code>a_b_c</code>; and <code>#</code> headings, which would clash with the Octave
+ comment marker.
+</p>
 <p> <strong>See also: </strong>
   <a href="find_DEMOS.html">find_DEMOS</a>, 
   <a href="function_texi2html.html">function_texi2html</a>, 
-  <a href="classdef_texi2html.html">classdef_texi2html</a>, 
-  <a href="find_GHurls.html">find_GHurls</a>
+  <a href="classdef_texi2html.html">classdef_texi2html</a>
 </p>
 <p><strong>Source Code: </strong>
   <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/build_DEMOS.m">build_DEMOS</a>

@@ -180,8 +180,45 @@
  <code>find_GHurls</code>.  The <var>info</var> structure can also be created with
  <code>package_texi2html</code>.
 </p>
-<p> The generated HTML code is based on the <code>function_template.html</code>
- and <code>default.html</code> layouts.
+<p>  Layout: grouped vs. lumped methods
+</p>
+<p> The class is rendered in one of two layouts, chosen automatically from the
+ class source:
+</p>
+<ul>
+<li> A <strong>lumped</strong> classdef (the default) becomes a <em>single</em> page:
+ the class help and its properties, then the constructor and one collapsible
+ block per public method, each holding that method&rsquo;s help and demos.
+</li><li> A <strong>grouped</strong> classdef &ndash; one whose methods are organised into
+ named groups by banner comment blocks (see below) &ndash; becomes a main page with
+ the class help, the properties, and one collapsible block per <em>group</em>.
+ Each group lists its methods, each with a one-line description, linking to a
+ standalone <code><var>Class</var>.<var>method</var>.html</code> page.  Every public method
+ (the constructor included) gets such a page, laid out like a function page
+ but with a class-scoped sidebar (the groups and their methods) and a
+ breadcrumb back to the package index and the class page; its source-code link
+ points to the class source file.
+</li></ul>
+
+<p> A class counts as grouped when &ndash; and only when &ndash; its source holds at least
+ one method-group <strong>banner</strong>; this is never decided by the class&rsquo; size or
+ line count.  A banner is a comment block of the form
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example"> ################################################################
+ ##                     ** Group Name **                       ##
+ ################################################################
+</pre></td></tr></table>
+
+<p> placed before a <code>methods</code> block, matching the convention used by the
+ datatypes package.  Each public method is assigned to the most recent banner
+ above its definition; groups whose methods are all non-public (<code>Hidden</code>
+ or private) are omitted, and any public method before the first banner is
+ collected under an <code>&quot;Other&quot;</code> group.
+</p>
+<p> The generated HTML is based on the <code>classdef_template.html</code> and
+ <code>default.html</code> layouts; a grouped classdef additionally uses
+ <code>group_template.html</code> for the method groups and
+ <code>methodpage_template.html</code> for the per-method pages.
 </p>
 <p> <strong>See also: </strong>
   <a href="package_texi2html.html">package_texi2html</a>, 
