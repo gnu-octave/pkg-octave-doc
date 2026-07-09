@@ -329,137 +329,28 @@ function classdef_texi2html (clsname, pkgfcns, info)
                           "          Examples\n        </h4>\n");
     cls_text = [cls_text "\n" demo_header];
     ## Load classdemo template
-    filename = fullfile ("_layouts", "classdemo_template.html");
-    template = fileread (filename);
-    ## Fixed HTML strings
-    tmp_c = strcat ([" style=""display: block; overflow-x: scroll;", ...
-                     " white-space: nowrap;border: 1px solid black;", ...
-                     " width:100%; background-color: #D6EEEE"""]);
-    tmp_s = strcat ([" style=""display: block; overflow-x: scroll;", ...
-                     " white-space: nowrap;"""]);
-    tmp_0 = "                  <table%s><tr>\n";
-    tmp_1 = "                    <td>&nbsp;</td>\n";
-    tmp_2 = "                    <td><pre class=""example"">\n";
-    tmp_3 = "</pre></td></tr>\n";
-    tmp_4 = "                  </table>\n";
-    tmp_5 = "                  <div class=""text-center"">\n";
-    tmp_6 = "                    <img src=""";
-    tmp_7 = """ class=""rounded img-thumbnail""";
-    tmp_8 = " alt=""plotted figure"">\n";
-    tmp_9 = "                  </div><p></p>\n";
+    template = fileread (fullfile ("_layouts", "classdemo_template.html"));
     ## For each demo
     for d = 1:numel (DEMOS)
       try
-        ## Initialize HTML string for this demo
-        demo_pre1 = sprintf ([tmp_0 tmp_1 tmp_2], tmp_c);
-        demo_pre2 = sprintf ([tmp_0 tmp_1 tmp_2], tmp_s);
-
-        ## Prepare environment variables
-        close all
-        diary_file = "__diary__.txt";
-        if (exist (diary_file, "file"))
-          delete (diary_file);
+        ## Split the leading comment run off as the collapsible label; the
+        ## remaining source is rendered as an interleaved notebook.
+        [demo_description, body_block] = get_demo_label (DEMOS{d});
+        if (isempty (demo_description))
+          demo_description = sprintf ("demo&nbsp;%s&nbsp;%d", clsname, d);
         endif
-        unwind_protect
-          ## Get current values
-          dfv = get (0, "defaultfigurevisible");
-          set (0, "defaultfigurevisible", "off");
-          oldpager = PAGER('/dev/null');
-          oldpso = page_screen_output(1);
 
-          ## Get demo code and keep top comment lines as description
-          demo_code = DEMOS{d};
-          new_lines = strfind (demo_code, "\n");
-          demo_description = "";
-          s_idx = 1;
-          for idx = 1:numel (new_lines)
-            e_idx = new_lines(idx);
-            ## If line is not empty
-            if (e_idx - s_idx)
-              ## Trim leading spaces
-              dline = strtrim (demo_code(s_idx:e_idx));
-              ## Check for ## at the beggining of a comment line
-              if (strcmp (dline(1:2), "##"))
-                dline = strtrim (dline(3:end));
-                demo_description = [demo_description, " ", dline];
-                s_idx = e_idx + 1;
-              elseif (numel (dline) == 0);
-                s_idx = e_idx + 1;
-              else
-                break;
-              endif
-            else
-              s_idx = e_idx + 1;
-            endif
-          endfor
-          ## Remove top comment lines from the demo block before evaluation
-          demo_code = demo_code(s_idx:end);
+        ## Render the notebook HTML for the demo body
+        demo_html = __demo_notebook__ (body_block, clsname, d * 100);
 
-          ## Add default value if no description is available
-          if (isempty (demo_description))
-            demo_description = sprintf ("demo&nbsp;%s&nbsp;%d", clsname, d);
-          endif
-
-          ## Format HTML string with demo code
-          demo_html = [demo_pre1 demo_code(1:end-1) tmp_3 tmp_4];
-
-          ## Evaluate DEMO code
-          diary (diary_file);
-          eval (demo_code);
-          diary ("off");
-
-          ## Read __diary__.txt
-          fid = fopen (diary_file);
-          demo_text = fscanf (fid, "%c", Inf);
-          fclose (fid);
-
-          ## Replace '<' and '>' with '&lt;' and '&gt;' respectively
-          demo_text = strrep (demo_text, "<", "&lt;");
-          demo_text = strrep (demo_text, ">", "&gt;");
-
-          ## Format HTML string with demo output
-          demo_html = [demo_html demo_pre2 demo_text(1:end-1) tmp_3 tmp_4];
-
-          ## Save figures
-          images = {};
-          figure_num = d * 100;
-          while (! isempty (get (0, "currentfigure")))
-            figure_num = figure_num + 1;
-            fig = gcf ();
-            name = sprintf ("%s_%d.png", clsname, figure_num);
-            fullpath = fullfile ("assets", name);
-            print (fig, fullpath);
-            images{end+1} = fullpath;
-            close (fig);
-          endwhile
-
-          ## Reverse image list, since we got them latest-first
-          images = images (end:-1:1);
-
-          ## Add reference to image (if applicable)
-          if (! isempty (images))
-            for i = 1:numel (images)
-              demo_html = [demo_html tmp_5 tmp_6];
-              demo_html = [demo_html sprintf("%s", images{i})];
-              demo_html = [demo_html tmp_7 tmp_8 tmp_9];
-            endfor
-          endif
-
-          ## Populate demo template
-          demo_template = strrep (template, "{{DEMO_NUMBER}}", ...
-                                  sprintf ("collapseDemo%d", d));
-          demo_template = strrep (demo_template, "{{DEMO_DESCRIPTION}}", ...
-                                  sprintf ("%s", demo_description));
-          demo_template = strrep (demo_template, "{{DEMO_CODE}}", ...
-                                  sprintf ("%s", demo_html));
-          demo_template = [demo_template "\n"];
-          cls_text = [cls_text "\n" demo_template];
-        unwind_protect_cleanup
-          delete (diary_file);
-          set (0, "defaultfigurevisible", dfv);
-          PAGER(oldpager);
-          page_screen_output(oldpso);
-        end_unwind_protect
+        ## Populate demo template
+        demo_template = strrep (template, "{{DEMO_NUMBER}}", ...
+                                sprintf ("collapseDemo%d", d));
+        demo_template = strrep (demo_template, "{{DEMO_DESCRIPTION}}", ...
+                                demo_description);
+        demo_template = strrep (demo_template, "{{DEMO_CODE}}", demo_html);
+        demo_template = [demo_template "\n"];
+        cls_text = [cls_text "\n" demo_template];
       catch
         printf ("Unable to process demo %d from %s:\n %s\n", ...
                 d, clsname, lasterr);
@@ -543,6 +434,31 @@ function classdef_texi2html (clsname, pkgfcns, info)
     printf ("Unable to process class %s:\n %s\n", clsname, lasterr);
   end_try_catch
 
+endfunction
+
+## Split off the leading comment run of a demo block: return it (marker-stripped
+## and HTML-escaped) as the collapsible label DESC, and the remaining source as
+## BODY to be rendered by __demo_notebook__.
+function [desc, body] = get_demo_label (block)
+  lines = strsplit (block, "\n", "collapsedelimiters", false);
+  desc = "";
+  k = 1;
+  while (k <= numel (lines))
+    t = strtrim (lines{k});
+    if (isempty (t))
+      k += 1;
+    elseif (t(1) == "#" || t(1) == "%")
+      desc = [desc, " ", regexprep(t, "^[#%]+ ?", "")];
+      k += 1;
+    else
+      break;
+    endif
+  endwhile
+  desc = strtrim (desc);
+  desc = strrep (desc, "&", "&amp;");
+  desc = strrep (desc, "<", "&lt;");
+  desc = strrep (desc, ">", "&gt;");
+  body = strjoin (lines(k:end), "\n");
 endfunction
 
 %!error classdef_texi2html (1)
