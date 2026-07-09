@@ -56,8 +56,49 @@
 ## @code{find_GHurls}.  The @var{info} structure can also be created with
 ## @code{package_texi2html}.
 ##
-## The generated HTML code is based on the @qcode{function_template.html}
-## and @qcode{default.html} layouts.
+## @subsubheading Layout: grouped vs.@ lumped methods
+##
+## The class is rendered in one of two layouts, chosen automatically from the
+## class source:
+##
+## @itemize
+## @item A @strong{lumped} classdef (the default) becomes a @emph{single} page:
+## the class help and its properties, then the constructor and one collapsible
+## block per public method, each holding that method's help and demos.
+##
+## @item A @strong{grouped} classdef -- one whose methods are organised into
+## named groups by banner comment blocks (see below) -- becomes a main page with
+## the class help, the properties, and one collapsible block per @emph{group}.
+## Each group lists its methods, each with a one-line description, linking to a
+## standalone @qcode{@var{Class}.@var{method}.html} page.  Every public method
+## (the constructor included) gets such a page, laid out like a function page
+## but with a class-scoped sidebar (the groups and their methods) and a
+## breadcrumb back to the package index and the class page; its source-code link
+## points to the class source file.
+## @end itemize
+##
+## A class counts as grouped when -- and only when -- its source holds at least
+## one method-group @strong{banner}; this is never decided by the class' size or
+## line count.  A banner is a comment block of the form
+##
+## @example
+## @group
+## ################################################################
+## ##                     ** Group Name **                       ##
+## ################################################################
+## @end group
+## @end example
+##
+## placed before a @code{methods} block, matching the convention used by the
+## datatypes package.  Each public method is assigned to the most recent banner
+## above its definition; groups whose methods are all non-public (@code{Hidden}
+## or private) are omitted, and any public method before the first banner is
+## collected under an @qcode{"Other"} group.
+##
+## The generated HTML is based on the @qcode{classdef_template.html} and
+## @qcode{default.html} layouts; a grouped classdef additionally uses
+## @qcode{group_template.html} for the method groups and
+## @qcode{methodpage_template.html} for the per-method pages.
 ##
 ## @seealso{package_texi2html, function_texi2html, find_GHurls, build_DEMOS}
 ## @end deftypefn
@@ -98,6 +139,17 @@ function classdef_texi2html (clsname, pkgfcns, info)
 
   ## Order methods according to the order they appear in classdef file
   MTHDS = get_methods_ordered (clsname, MTHDS);
+
+  ## A "large" classdef groups its methods with banner comment blocks.  When
+  ## such groups are found, the class is rendered with per-group collapsibles on
+  ## the main page and a standalone page per method; otherwise the ordinary
+  ## single-page layout (one collapsible per method) is used.  The constructor
+  ## is included in group detection so that, for a large classdef, it is listed
+  ## within its banner group rather than floating above the groups.
+  MTHDS_grp = MTHDS;
+  MTHDS_grp{end+1} = clsname;
+  groups = get_method_groups (clsname, MTHDS_grp);
+  is_large = ! isempty (groups);
 
   ## Add try catch to help identify classdef file that caused an issue
   ## during batch processing all functions in a package with package_texi2html
@@ -141,9 +193,10 @@ function classdef_texi2html (clsname, pkgfcns, info)
 
   ## Build HTML code for available properties
   if (! isempty (PROPS))
-    ## Add header for properties
-    prop_header = strcat ("        <h4 class=""d-inline-block my-3"">\n", ...
-                          "          Properties\n        </h4>\n");
+    ## Add a one-line lead-in for the properties block
+    prop_header = sprintf (strcat ("        <p class=""lead my-3"">The", ...
+                                   " <code>%s</code> class contains the", ...
+                                   " following properties:</p>\n"), clsname);
     cls_text = [cls_text "\n" prop_header];
     ## Load property template
     filename = fullfile ("_layouts", "property_template.html");
@@ -209,17 +262,20 @@ function classdef_texi2html (clsname, pkgfcns, info)
     endfor
   endif
 
-  ## Add header for methods
-  meth_header = strcat ("        <h4 class=""d-inline-block my-3"">\n", ...
-                        "          Methods\n        </h4>\n");
+  ## Add a one-line lead-in for the methods block
+  meth_header = sprintf (strcat ("        <p class=""lead my-3"">The", ...
+                                 " <code>%s</code> class offers the", ...
+                                 " following public methods:</p>\n"), clsname);
   cls_text = [cls_text "\n" meth_header];
 
-  ## Build HTML code for constructor
+  ## Build HTML code for constructor.  In a large classdef the constructor is
+  ## listed within its banner group (as a method page), so it is rendered inline
+  ## here only for ordinary classdefs.
   cntr_name = [clsname "." clsname];
   [text, format] = get_help_text (cntr_name);
 
   ## Only if texinfo is available
-  if (strcmp (format, "texinfo"))
+  if (! is_large && strcmp (format, "texinfo"))
     try
       ## Build the HTML code for class constructor
       cntr_text = __texi2html__ (text, cntr_name, pkgfcns);
@@ -267,59 +323,100 @@ function classdef_texi2html (clsname, pkgfcns, info)
   endif
 
   ## Build HTML code for available methods
-  template = fileread (fullfile ("_layouts", "method_template.html"));
-  for m = 1:numel (MTHDS)
-    method_name = [clsname "." MTHDS{m}];
-    ## Methods listed in MTHDS are already ensured to exist in the classdef file
-    ## and not inherited from a parent class. 'get_methods_texinfo' is obsolete.
-    [text, format] = get_help_text (method_name);
-    ## Only if texinfo is available
-    if (strcmp (format, "texinfo"))
-      try
-        ## Build the HTML code for class method
-        mtds_text = __texi2html__ (text, method_name, pkgfcns);
-        ## Grab first sentence
-        mtds_fs = get_text_first_sentence (mtds_text);
-        ## Remove first sentence from text body
-        idx = strfind (mtds_text, mtds_fs);
-        if (! isempty (idx))
-          idx = idx(1);
-          len = length (mtds_fs);
-          mtds_text(idx:idx+len) = [];
+  if (! is_large)
+    ## Ordinary classdef: one collapsible per method on the single page
+    template = fileread (fullfile ("_layouts", "method_template.html"));
+    for m = 1:numel (MTHDS)
+      method_name = [clsname "." MTHDS{m}];
+      ## Methods listed in MTHDS are already ensured to exist in the classdef
+      ## file and not inherited from a parent class.
+      [text, format] = get_help_text (method_name);
+      ## Only if texinfo is available
+      if (strcmp (format, "texinfo"))
+        try
+          ## Build the HTML code for class method
+          mtds_text = __texi2html__ (text, method_name, pkgfcns);
+          ## Grab first sentence
+          mtds_fs = get_text_first_sentence (mtds_text);
+          ## Remove first sentence from text body
+          idx = strfind (mtds_text, mtds_fs);
+          if (! isempty (idx))
+            idx = idx(1);
+            len = length (mtds_fs);
+            mtds_text(idx:idx+len) = [];
+          endif
+          ## Remove '<div class="ms-5">' and '</div>' from html text body
+          idx = strfind (mtds_text, '<div class="ms-5">');
+          if (! isempty (idx))
+            idx = idx(1);
+            mtds_text(idx:idx+18) = [];
+          endif
+          idx = strfind (mtds_text, '</div>');
+          if (! isempty (idx))
+            idx = idx(1);
+            mtds_text(idx:end) = [];
+          endif
+        catch
+          mtds_text = "";
+          mtds_fs = "";
+          printf ("Unusable texinfo in method '%s' of class '%s':\n %s\n", ...
+                  MTHDS{m}, clsname, lasterr);
+        end_try_catch
+        ## Add DEMOS for individual methods (if available)
+        demo_txt = build_DEMOS (method_name);
+        mtds_text = [mtds_text "\n" demo_txt];
+      elseif (isempty (text))
+        mtds_text = sprintf ("<b><code>%s</code></b> is not documented.", ...
+                             method_name);
+        mtds_fs = "undocumented";
+      endif
+      ## Populate method template
+      mtds_template = strrep (template, "{{METHOD_NAME}}", MTHDS{m});
+      mtds_num = sprintf ("collapseMethod%d", m);
+      mtds_template = strrep (mtds_template, "{{METHOD_NUMBER}}", mtds_num);
+      mtds_template = strrep (mtds_template, "{{METHOD_FS}}", mtds_fs);
+      mtds_template = strrep (mtds_template, "{{METHOD_HELP}}", mtds_text);
+      cls_text = [cls_text "\n" mtds_template];
+    endfor
+  else
+    ## Large classdef: one collapsible per method GROUP listing its methods
+    ## (each linking to a standalone page), then emit those method pages.
+    grp_template = fileread (fullfile ("_layouts", "group_template.html"));
+    for gi = 1:numel (groups)
+      ## Build a table of the group's methods: linked name + first sentence
+      grp_methods = strcat (["                  <table class=""table ", ...
+                             "table-striped"">\n                    ", ...
+                             "<tbody>\n"]);
+      for mm = 1:numel (groups(gi).methods)
+        mname = groups(gi).methods{mm};
+        mfile = [strrep(clsname, filesep, "_") "." mname];
+        [fs, st] = get_first_help_sentence ([clsname "." mname], 240);
+        if (st != 0)
+          fs = "";
         endif
-        ## Remove '<div class="ms-5">' and '</div>' from html text body
-        idx = strfind (mtds_text, '<div class="ms-5">');
-        if (! isempty (idx))
-          idx = idx(1);
-          mtds_text(idx:idx+18) = [];
-        endif
-        idx = strfind (mtds_text, '</div>');
-        if (! isempty (idx))
-          idx = idx(1);
-          mtds_text(idx:end) = [];
-        endif
-      catch
-        mtds_text = "";
-        mtds_fs = "";
-        printf ("Unusable texinfo in method '%s' of class '%s':\n %s\n", ...
-                MTHDS{m}, clsname, lasterr);
-      end_try_catch
-      ## Add DEMOS for individual methods (if available)
-      demo_txt = build_DEMOS (method_name);
-      mtds_text = [mtds_text "\n" demo_txt];
-    elseif (isempty (text))
-      mtds_text = sprintf ("<b><code>%s</code></b> is not documented.", ...
-                           method_name);
-      mtds_fs = "undocumented";
-    endif
-    ## Populate method template
-    mtds_template = strrep (template, "{{METHOD_NAME}}", MTHDS{m});
-    mtds_num = sprintf ("collapseMethod%d", m);
-    mtds_template = strrep (mtds_template, "{{METHOD_NUMBER}}", mtds_num);
-    mtds_template = strrep (mtds_template, "{{METHOD_FS}}", mtds_fs);
-    mtds_template = strrep (mtds_template, "{{METHOD_HELP}}", mtds_text);
-    cls_text = [cls_text "\n" mtds_template];
-  endfor
+        row = sprintf (["                      <tr>\n", ...
+          "                        <td><b><code>", ...
+          "<a href=""%s.html"">%s</a></code></b></td>\n", ...
+          "                        <td>%s</td>\n", ...
+          "                      </tr>\n"], mfile, mname, fs);
+        grp_methods = [grp_methods row];
+      endfor
+      grp_methods = [grp_methods, "                    </tbody>\n", ...
+                     "                  </table>\n"];
+      ## Populate the group template
+      gt = strrep (grp_template, "{{GROUP_NAME}}", groups(gi).name);
+      gt = strrep (gt, "{{GROUP_NUMBER}}", sprintf ("collapseGroup%d", gi));
+      gt = strrep (gt, "{{GROUP_METHODS}}", grp_methods);
+      cls_text = [cls_text "\n" gt];
+    endfor
+    ## Emit a standalone page for every public method
+    for gi = 1:numel (groups)
+      for mm = 1:numel (groups(gi).methods)
+        method_texi2html (clsname, groups(gi).methods{mm}, groups, ...
+                          pkgfcns, info);
+      endfor
+    endfor
+  endif
 
   ## Add DEMOS from classdef file (if applicable)
   DEMOS = find_DEMOS (clsname);
