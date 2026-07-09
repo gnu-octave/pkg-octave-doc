@@ -31,7 +31,7 @@ feature is only available for packages hosted at GitHub.
 
 ## Installation
 
-To install the latest version you need Octave (>=7.2.0) installed on your system. You can install it by typing:
+To install the latest version you need Octave (>=9.1) installed on your system. You can install it by typing:
 
 ```
 pkg install -forge pkg-octave-doc
@@ -176,15 +176,6 @@ Top level classdef documentation and classdef properties should use the `@deftp`
 The first sentence in the docstring of a property or a method is used as a short description in the collapsible item. The respective description for class demos is taken from the top comment lines of each demo block (if available), otherwise the command line for calling the particular demo is used as a default.
 
 Any demos documenting the functionality of a property or method have to be saved in an external file in order to be included inside the respective collapsible item after the help documentation in the same manner it is done for functions. For this feature to work, you must be able to call the particular demos with the same typing convention as you do with the help docstrings.
-
-
-## TODO
-
-1. Rewrite `build_DEMOS` function so that DEMO documentation includes
-the console output and generated figures just after the line of code
-that produces the output instead of accumulating all the output and
-figures after the DEMO code block. This should help larger DEMO blocks
-to be more intuitively presented in the generated documentation.
 
 
 ## Further notes
