@@ -113,6 +113,11 @@ function html = build_DEMOS (fcnname)
       printf ("Unable to process demo %d from %s:\n %s\n", ...
               demo_num, fcnname, lasterr);
     end_try_catch
+
+    ## Reset classdef dispatch state so a demo cannot poison the ones that
+    ## follow it (all demos of a package build share one Octave process).  See
+    ## https://octave.discourse.group/t/octave-core-classdef-dispatch-bug/7633
+    __reset_classes__ ();
   endfor
 
 endfunction

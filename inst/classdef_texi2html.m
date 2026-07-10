@@ -233,9 +233,12 @@ function classdef_texi2html (clsname, pkgfcns, info)
             idx = idx(1);
             prop_text(idx:idx+18) = [];
           endif
+          ## Strip the wrapper's closing tag: use the LAST </div> so inner
+          ## divs in the body (e.g. a table's "table-responsive" wrapper) stay
+          ## balanced -- otherwise everything after them nests inside them.
           idx = strfind (prop_text, '</div>');
           if (! isempty (idx))
-            idx = idx(1);
+            idx = idx(end);
             prop_text(idx:end) = [];
           endif
           ## Add DEMOS for properties (if applicable)
@@ -296,7 +299,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
       endif
       idx = strfind (cntr_text, '</div>');
       if (! isempty (idx))
-        idx = idx(1);
+        idx = idx(end);
         cntr_text(idx:end) = [];
       endif
     catch
@@ -353,7 +356,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
           endif
           idx = strfind (mtds_text, '</div>');
           if (! isempty (idx))
-            idx = idx(1);
+            idx = idx(end);
             mtds_text(idx:end) = [];
           endif
         catch
@@ -452,6 +455,11 @@ function classdef_texi2html (clsname, pkgfcns, info)
         printf ("Unable to process demo %d from %s:\n %s\n", ...
                 d, clsname, lasterr);
       end_try_catch
+
+      ## Reset classdef dispatch state so a demo cannot poison the ones that
+      ## follow it (all demos of a package build share one Octave process).  See
+      ## https://octave.discourse.group/t/octave-core-classdef-dispatch-bug/7633
+      __reset_classes__ ();
     endfor
   endif
 
