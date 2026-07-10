@@ -595,7 +595,8 @@ function [html, i] = i_parse_multitable (lines, i, pkgfcns)
   endif
   i += 1;
   N = numel (lines);
-  html = "<table>\n";
+  html = ["<div class=\"table-responsive\">\n", ...
+          "<table class=\"table table-striped table-bordered table-sm\">\n"];
   rowlines = {};
   is_head = false;
   have_row = false;
@@ -653,7 +654,7 @@ function [html, i] = i_parse_multitable (lines, i, pkgfcns)
   if (have_row)
     html = [html, i_mt_row(rowlines, is_head, widths, pkgfcns)];
   endif
-  html = [html, "</table>\n\n"];
+  html = [html, "</table>\n</div>\n\n"];
 endfunction
 
 function h = i_mt_row (rowlines, is_head, widths, pkgfcns)
@@ -677,7 +678,7 @@ function h = i_mt_row (rowlines, is_head, widths, pkgfcns)
   endif
   h = "";
   if (is_head)
-    h = "<thead>";
+    h = "<thead class=\"table-primary\">";
   endif
   h = [h, "<tr>"];
   for c = 1:ncell
@@ -854,8 +855,11 @@ function out = i_render (cmd, content, pkgfcns)
     case {"code", "qcode", "command", "option", "env", "file", "kbd"}
       out = ["<code>", i_inline(content,pkgfcns,true), "</code>"];
     case "math"
+      ## Inside @math{...}, multiplication is written with an asterisk and is
+      ## rendered as the times sign; the letter "x" is left untouched so it can
+      ## be used as a variable name (e.g. @math{exp (-2 * x)}).  Authors must use
+      ## "*" for multiplication -- a bare "x" is NOT treated as a times sign.
       inner = i_inline (content, pkgfcns, true);
-      inner = strrep (inner, "x", "&times;");
       inner = strrep (inner, "*", "&times;");
       out = ["<math>", inner, "</math>"];
     case "strong"

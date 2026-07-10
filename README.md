@@ -112,7 +112,7 @@ DEFUN_DLD (libsvmread, args, nargout,
 This function ...
 ````
 
-* `@math{}` texi tags are converted to `<math></math>` tags in HTML and their contents are scanned for `x` and `*` characters, which are replaced by `&times;` in order to properly display the multiplication symbol. Make sure that lower case `x` within the `@math{}` tags is explicitly used for denoting multiplication and it is not used for anything else (e.g. variable name).  This feature, introduced in release 0.4.7, only affects the contents of `@math{}` texi tags. 
+* `@math{}` texi tags are converted to `<math></math>` tags in HTML and their contents are scanned for the `*` character, which is replaced by `&times;` in order to properly display the multiplication symbol. Use `*` to denote multiplication inside `@math{}` tags; the letter `x` is left untouched so it can be used freely as a variable name (for example `@math{exp (-2 * x)}` renders as `exp (-2 × x)`). This scanning only affects the contents of `@math{}` texi tags. (Note: release 0.4.7 also converted a lower-case `x` to `&times;`, but that clobbered variable names and identifiers such as `exp`, `max`, and `index`; the `x` conversion has since been removed and only `*` is converted.)
 
 * At the moment, `function_texi2html` can handle a single `@seealso{}` tag. Make sure that there is only one `@seealso{}` tag inside each function's docstring located at the very end just before the `@end deftypefn` texinfo closing statement. Functions listed therein that belong to the same package are also linked to their individual function pages.
 
