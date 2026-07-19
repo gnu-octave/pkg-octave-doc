@@ -131,9 +131,9 @@ endfunction
 
 ## Save figure FIG as assets/PREFIX_N.png and return the relative path.
 function path = __snap_fig__ (fig, prefix, n)
-  name = sprintf ("%s_%d.png", prefix, n);
+  name = sprintf ("%s_%d.svg", prefix, n);
   path = fullfile ("assets", name);
-  print (fig, path);
+  print (fig, path, "-F:14","-S480,360");
 endfunction
 
 %!error <Invalid call> __eval_demo__ ()
