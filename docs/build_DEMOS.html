@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
     <script type="text/javascript" async
-      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML">
+      src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML">
     </script>
     <script type="text/javascript">
       window.addEventListener("load", () => {
@@ -19,6 +19,32 @@
           tog.onclick = () => tog.classList.toggle("show");
           i.parentElement.removeChild(i.previousSibling);
           i.parentElement.insertBefore(tog, i);
+        }
+      });
+      // Open the collapsible demo an "#example" link points to, then scroll to
+      // it.  getElementById (not querySelector) matches ids that contain a dot,
+      // e.g. "Class.method-example1".
+      function openHashTarget () {
+        if (! window.location.hash) { return; }
+        let el = document.getElementById (
+          decodeURIComponent (window.location.hash.slice (1)));
+        if (! el) { return; }
+        if (el.classList.contains ("collapse") &&
+            ! el.classList.contains ("show")) {
+          bootstrap.Collapse.getOrCreateInstance (el).show ();
+        }
+        el.scrollIntoView ();
+      }
+      window.addEventListener ("DOMContentLoaded", openHashTarget);
+      window.addEventListener ("hashchange", openHashTarget);
+      // When the collapsible named by the current URL fragment is collapsed,
+      // drop the fragment (replaceState: no scroll, no history entry).  Otherwise
+      // the fragment would still equal this id, so clicking the same #example
+      // link again fires no "hashchange" and the example would not re-expand.
+      document.addEventListener ("hide.bs.collapse", (e) => {
+        if (e.target.id && window.location.hash === "#" + e.target.id) {
+          history.replaceState (null, "",
+            window.location.pathname + window.location.search);
         }
       });
     </script>
@@ -144,6 +170,7 @@
             <div class="card-body">
 <dl>
 <dt><code><h5 class="fs">pkg-octave-doc: <var>html</var> = <b>build_DEMOS</b> (<var>fcnname</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <var>html</var> = <b>build_DEMOS</b> (<var>fcnname</var>, <var>collapsed</var>)</code></h5></dt>
 </dl>
 <p> Build notebook-style HTML for the DEMO blocks of a function or class member.
 </p>
@@ -152,8 +179,22 @@
  returns <var>html</var>, a char string with the generated HTML for all of them.
  <var>fcnname</var> is a char string with the name of a function or, for a class
  member, a <code>&quot;class/method&quot;</code> path.  Each demo is wrapped in the
- <code>demos_template.html</code> card layout and titled <code>Example: N</code>.  When
- <var>fcnname</var> has no demos, <var>html</var> is returned empty.
+ <code>demos_template.html</code> card, titled <code>Example: N</code> and given the HTML
+ anchor <code><var>fcnname</var>-exampleN</code> (with every non-alphanumeric character of
+ <var>fcnname</var>, such as the <code>.</code> of a <code>&quot;Class.method&quot;</code> name, mapped
+ to <code>_</code> so the id is safe in a CSS selector).  A docstring can therefore
+ link to one of its own demos with the
+ short form <code>@url{#exampleN}</code>: the HTML converter expands the bare
+ <code>#exampleN</code> fragment to this fully-qualified anchor, which keeps the
+ reference readable in the command-line <code>help</code> while staying unique on a
+ page that carries several members&rsquo; demos.
+</p>
+<p> The optional <var>collapsed</var> is a logical scalar.  When <code>true</code>, each
+ example card renders collapsed by default (used for lumped classdef members to
+ keep the page short); a viewer expands it with the card header, and a
+ <code>#exampleN</code> link opens it automatically.  When omitted or <code>false</code>,
+ the card renders expanded.  When <var>fcnname</var> has no demos, <var>html</var> is
+ returned empty.
 </p>
 <p>  Notebook layout
 </p>
