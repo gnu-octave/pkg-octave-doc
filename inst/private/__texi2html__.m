@@ -129,6 +129,16 @@ function html_txt = __texi2html__ (text, fcnname, pkgfcns)
     html_txt = strrep (html_txt, texkeys{i}, texvals{i});
   endfor
 
+  ## Expand short intra-page example references.  A docstring may link to one of
+  ## its own demos with @url{#exampleN}; build_DEMOS anchors each demo card as
+  ## "<fcnname>-exampleN" so that several members' demos coexist on one page
+  ## without colliding.  Rewrite the bare "#exampleN" fragment to that qualified
+  ## anchor for this owner, so the link resolves in the generated HTML while the
+  ## source (and command-line help) keeps the short, self-evident "#exampleN".
+  base = strrep (fcnname, filesep, "_");
+  html_txt = regexprep (html_txt, "(href=\")#example([0-9]+)\"", ...
+                        ["$1#", base, "-example$2\""]);
+
 endfunction
 
 ## ================================================================= helpers

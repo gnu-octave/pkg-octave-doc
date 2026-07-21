@@ -2,13 +2,18 @@
           <div class="card-header card-header-mod">
             <div class="row d-flex flex-wrap align-items-center">
               <div class="col-sm-3 col-md-5 mb-2 mb-sm-0">
-                <h4 class="d-inline-block mr-2">
-                <a name="example{{NUMBER}}">Example: {{NUMBER}}</a>
-                </h4>
+                <button class="btn btn-link fs-4 fw-normal d-inline-block mr-2 p-0 text-reset text-decoration-none"
+                  type="button" data-bs-toggle="collapse"
+                  data-bs-target="#{{ANCHOR}}" aria-expanded="{{EXPANDED}}"
+                  aria-controls="{{ANCHOR}}">
+                Example: {{NUMBER}}
+                </button>
               </div>
             </div>
           </div>
-          <div class="card-body">
+          <div class="collapse{{SHOW}}" id="{{ANCHOR}}">
+            <div class="card-body">
 {{DEMO}}
+            </div>
           </div>
         </div>

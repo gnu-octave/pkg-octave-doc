@@ -17,6 +17,7 @@
 
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {@var{html} =} build_DEMOS (@var{fcnname})
+## @deftypefnx {pkg-octave-doc} {@var{html} =} build_DEMOS (@var{fcnname}, @var{collapsed})
 ##
 ## Build notebook-style HTML for the DEMO blocks of a function or class member.
 ##
@@ -24,8 +25,20 @@
 ## returns @var{html}, a char string with the generated HTML for all of them.
 ## @var{fcnname} is a char string with the name of a function or, for a class
 ## member, a @qcode{"class/method"} path.  Each demo is wrapped in the
-## @qcode{demos_template.html} card layout and titled @qcode{Example: N}.  When
-## @var{fcnname} has no demos, @var{html} is returned empty.
+## @qcode{demos_template.html} card, titled @qcode{Example: N} and given the HTML
+## anchor @qcode{@var{fcnname}-exampleN} (with any file separator replaced by an
+## underscore).  A docstring can therefore link to one of its own demos with the
+## short form @code{@@url@{#exampleN@}}: the HTML converter expands the bare
+## @qcode{#exampleN} fragment to this fully-qualified anchor, which keeps the
+## reference readable in the command-line @code{help} while staying unique on a
+## page that carries several members' demos.
+##
+## The optional @var{collapsed} is a logical scalar.  When @qcode{true}, each
+## example card renders collapsed by default (used for lumped classdef members to
+## keep the page short); a viewer expands it with the card header, and a
+## @qcode{#exampleN} link opens it automatically.  When omitted or @qcode{false},
+## the card renders expanded.  When @var{fcnname} has no demos, @var{html} is
+## returned empty.
 ##
 ## @subsubheading Notebook layout
 ##
@@ -77,13 +90,19 @@
 ## @seealso{find_DEMOS, function_texi2html, classdef_texi2html}
 ## @end deftypefn
 
-function html = build_DEMOS (fcnname)
+function html = build_DEMOS (fcnname, collapsed)
 
-  if (nargin != 1)
+  if (nargin < 1 || nargin > 2)
     print_usage ();
   endif
 
   if (! ischar (fcnname))
+    print_usage ();
+  endif
+
+  if (nargin < 2)
+    collapsed = false;
+  elseif (! (islogical (collapsed) && isscalar (collapsed)))
     print_usage ();
   endif
 
@@ -96,7 +115,17 @@ function html = build_DEMOS (fcnname)
   endif
 
   ## For @class methods: clean up the file prefix used for figure file names
+  ## and for the per-example anchor id (which must not contain a file separator)
   fcnfile = strrep (fcnname, filesep, "_");
+
+  ## Collapse state: a collapsed card starts closed, an expanded one open
+  if (collapsed)
+    show_cls = "";
+    expanded = "false";
+  else
+    show_cls = " show";
+    expanded = "true";
+  endif
 
   ## Load demos template
   demos_template = fileread (fullfile ("_layouts", "demos_template.html"));
@@ -105,8 +134,12 @@ function html = build_DEMOS (fcnname)
   for demo_num = 1:numel (demos)
     try
       demo_html = __demo_notebook__ (demos{demo_num}, fcnfile, demo_num * 100);
-      full_demo_html = strrep (demos_template, "{{NUMBER}}", ...
+      anchor = sprintf ("%s-example%d", fcnfile, demo_num);
+      full_demo_html = strrep (demos_template, "{{ANCHOR}}", anchor);
+      full_demo_html = strrep (full_demo_html, "{{NUMBER}}", ...
                                sprintf ("%d", demo_num));
+      full_demo_html = strrep (full_demo_html, "{{SHOW}}", show_cls);
+      full_demo_html = strrep (full_demo_html, "{{EXPANDED}}", expanded);
       full_demo_html = strrep (full_demo_html, "{{DEMO}}", demo_html);
       html = [html full_demo_html "\n"];
     catch
@@ -125,3 +158,4 @@ endfunction
 %!error build_DEMOS ()
 %!error build_DEMOS (1)
 %!error build_DEMOS ("function_texi2html", 1)
+%!error build_DEMOS ("function_texi2html", true, 1)

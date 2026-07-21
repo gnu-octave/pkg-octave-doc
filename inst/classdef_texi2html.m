@@ -241,8 +241,8 @@ function classdef_texi2html (clsname, pkgfcns, info)
             idx = idx(end);
             prop_text(idx:end) = [];
           endif
-          ## Add DEMOS for properties (if applicable)
-          demo_txt = build_DEMOS (prop_name);
+          ## Add DEMOS for properties (if applicable), collapsed by default
+          demo_txt = build_DEMOS (prop_name, true);
           prop_text = [prop_text "\n" demo_txt];
         catch
           prop_text = "";
@@ -311,8 +311,8 @@ function classdef_texi2html (clsname, pkgfcns, info)
     if (isempty (cntr_text) && isempty (cntr_fs))
       cls_text = [cls_text "\n"];
     else
-      ## Add DEMOS for constructor (if applicable)
-      demo_txt = build_DEMOS (cntr_name);
+      ## Add DEMOS for constructor (if applicable), collapsed by default
+      demo_txt = build_DEMOS (cntr_name, true);
       cntr_text = [cntr_text "\n" demo_txt];
       ## Load constructor template
       filename = fullfile ("_layouts", "constructor_template.html");
@@ -365,8 +365,8 @@ function classdef_texi2html (clsname, pkgfcns, info)
           printf ("Unusable texinfo in method '%s' of class '%s':\n %s\n", ...
                   MTHDS{m}, clsname, lasterr);
         end_try_catch
-        ## Add DEMOS for individual methods (if available)
-        demo_txt = build_DEMOS (method_name);
+        ## Add DEMOS for individual methods (if available), collapsed by default
+        demo_txt = build_DEMOS (method_name, true);
         mtds_text = [mtds_text "\n" demo_txt];
       elseif (isempty (text))
         mtds_text = sprintf ("<b><code>%s</code></b> is not documented.", ...
@@ -443,9 +443,12 @@ function classdef_texi2html (clsname, pkgfcns, info)
         ## Render the notebook HTML for the demo body
         demo_html = __demo_notebook__ (body_block, clsname, d * 100);
 
-        ## Populate demo template
+        ## Populate demo template.  Anchor the collapse as "<class>-exampleN"
+        ## (matching build_DEMOS' scheme) so the class docstring can link to a
+        ## class-level demo with @url{#exampleN} and have it auto-open.
         demo_template = strrep (template, "{{DEMO_NUMBER}}", ...
-                                sprintf ("collapseDemo%d", d));
+                                sprintf ("%s-example%d", ...
+                                         strrep (clsname, filesep, "_"), d));
         demo_template = strrep (demo_template, "{{DEMO_DESCRIPTION}}", ...
                                 demo_description);
         demo_template = strrep (demo_template, "{{DEMO_CODE}}", demo_html);
