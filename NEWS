@@ -1,0 +1,23 @@
+Summary of important user-visible changes for pkg-octave-doc 0.7.3:
+-------------------------------------------------------------------
+
+ ** Demo figures are now saved as SVG instead of PNG and drawn at a reduced
+    size, for sharper and lighter documentation pages.
+
+ ** Each demo is rendered as a collapsible "Example" card.  On classdef pages
+    the cards start collapsed to keep long pages short, while function pages
+    and grouped-classdef method pages keep them expanded.
+
+ ** Examples can be cross-referenced from within a docstring: write
+    `@url{#exampleN}` and it links to that demo's card on the same page,
+    automatically expanding and scrolling to it when followed.  The short
+    reference is expanded to a unique per-owner anchor, so references never
+    collide even when several members' demos share one page.
+
+ ** Restored math rendering by loading MathJax from a live CDN; the formerly
+    used `cdn.mathjax.org` was retired in 2017, so `@tex` / `$$` display math
+    had silently stopped rendering on generated pages.
+
+ ** Updated the README documentation guidelines to cover example
+    cross-references and the collapsible demo cards.
+
