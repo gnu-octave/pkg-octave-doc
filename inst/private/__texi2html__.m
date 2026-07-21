@@ -135,7 +135,7 @@ function html_txt = __texi2html__ (text, fcnname, pkgfcns)
   ## without colliding.  Rewrite the bare "#exampleN" fragment to that qualified
   ## anchor for this owner, so the link resolves in the generated HTML while the
   ## source (and command-line help) keeps the short, self-evident "#exampleN".
-  base = strrep (fcnname, filesep, "_");
+  base = regexprep (fcnname, "[^A-Za-z0-9]", "_");
   html_txt = regexprep (html_txt, "(href=\")#example([0-9]+)\"", ...
                         ["$1#", base, "-example$2\""]);
 

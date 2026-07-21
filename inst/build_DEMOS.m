@@ -26,8 +26,10 @@
 ## @var{fcnname} is a char string with the name of a function or, for a class
 ## member, a @qcode{"class/method"} path.  Each demo is wrapped in the
 ## @qcode{demos_template.html} card, titled @qcode{Example: N} and given the HTML
-## anchor @qcode{@var{fcnname}-exampleN} (with any file separator replaced by an
-## underscore).  A docstring can therefore link to one of its own demos with the
+## anchor @qcode{@var{fcnname}-exampleN} (with every non-alphanumeric character of
+## @var{fcnname}, such as the @qcode{.} of a @qcode{"Class.method"} name, mapped
+## to @qcode{_} so the id is safe in a CSS selector).  A docstring can therefore
+## link to one of its own demos with the
 ## short form @code{@@url@{#exampleN@}}: the HTML converter expands the bare
 ## @qcode{#exampleN} fragment to this fully-qualified anchor, which keeps the
 ## reference readable in the command-line @code{help} while staying unique on a
@@ -114,9 +116,13 @@ function html = build_DEMOS (fcnname, collapsed)
     return;
   endif
 
-  ## For @class methods: clean up the file prefix used for figure file names
-  ## and for the per-example anchor id (which must not contain a file separator)
-  fcnfile = strrep (fcnname, filesep, "_");
+  ## Sanitise the name into a prefix used both for figure file names and for the
+  ## per-example anchor id.  Every non-alphanumeric character (a file separator,
+  ## and crucially the "." in a "Class.method" member name) becomes "_": a "." in
+  ## an id breaks Bootstrap's collapse toggle, which resolves data-bs-target with
+  ## querySelector and would read "#Class.method-example1" as id "Class" + class
+  ## "method-example1".
+  fcnfile = regexprep (fcnname, "[^A-Za-z0-9]", "_");
 
   ## Collapse state: a collapsed card starts closed, an expanded one open
   if (collapsed)
