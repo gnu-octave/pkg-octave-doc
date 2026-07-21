@@ -118,6 +118,14 @@ This function ...
 
 * `@tex` tags must only contain latex mathematical expressions enclosed with `$$` identifiers, such as in `$$ ... $$`. Math delimiters `\(...\)` are also processed in `@tex` blocks.
 
+* You can cross-reference a specific **example** from within the docstring. Every `%!demo` block is rendered as a numbered *Example* card on the same page as the help text, where `<N>` is the demo's position in the source file (the first `%!demo` is example 1, the second example 2, and so on). Link to one with the `@url{}` tag, using the short in-page fragment `#example<N>` as the target:
+````
+See @url{#example2, the second example} for a worked case with weights.
+````
+  Write the reference in this **short form** — it stays clean and self-evident in the command-line `help` output (where it plainly means "example 2 of *this* function/method"). When the page is generated, the converter automatically **expands** the bare `#example<N>` fragment to the fully-qualified anchor of the current owner — `#function_name-example2` on a function page, `#Class.method-example2` inside a method's docstring, and so on. Because every anchor is thus qualified by its owner, the fragments never collide even on a *lumped* classdef page where the constructor and several members' demos share one page. (This automatic expansion applies to `#example<N>` fragments only; to link to an example on a *different* page, write the full target yourself, e.g. `@url{function_name.html#function_name-example1, ...}`.)
+
+* On **classdef** pages, example cards are **collapsed by default** (this keeps long lumped-class pages short); a reader expands one with its header, and — importantly — following an `#example<N>` link **auto-expands** the target card and scrolls to it. On function pages and on the standalone method pages of a *grouped* classdef, example cards render **expanded**. This includes class-level demos (those written in the classdef body): they too are anchored as `#example<N>` relative to the class, so the class's own docstring can link to them.
+
 
 ## Guidelines for classdef documentation
 Classdef documentation and demos are handled separately in a more specialized manner, and a class is rendered in one of two layouts, chosen automatically from its source.
