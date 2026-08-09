@@ -171,6 +171,7 @@
 <dl>
 <dt><code><h5 class="fs">pkg-octave-doc: <var>html</var> = <b>build_DEMOS</b> (<var>fcnname</var>)</code></h5></dt>
 <dt><code><h5 class="fs">pkg-octave-doc: <var>html</var> = <b>build_DEMOS</b> (<var>fcnname</var>, <var>collapsed</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <var>html</var> = <b>build_DEMOS</b> (&hellip;, <var>Name</var>, <var>Value</var>)</code></h5></dt>
 </dl>
 <p> Build notebook-style HTML for the DEMO blocks of a function or class member.
 </p>
@@ -196,6 +197,21 @@
  the card renders expanded.  When <var>fcnname</var> has no demos, <var>html</var> is
  returned empty.
 </p>
+<p>  Optional Name/Value pairs
+</p>
+<div class="table-responsive">
+<table class="table table-striped table-bordered table-sm">
+<thead class="table-primary"><tr><th width="20%"><var>Name</var></th><th width="80%"><var>Value</var></th></tr></thead>
+<tr><td width="20%"><code>'figformat'</code></td><td width="80%">The file format the demo figures are printed
+ in, either <code>'png'</code> (default) or <code>'svg'</code>.  <code>'png'</code> is
+ printed at twice the nominal size so it stays sharp on a high-density
+ display.  <code>'svg'</code> keeps the figures resolution independent, at the cost
+ of very large files for figures rich in filled areas.</td></tr>
+</table>
+<p><strong>Source Code: </strong>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/build_DEMOS.m">build_DEMOS</a>
+</div>
+
 <p>  Notebook layout
 </p>
 <p> Each demo is rendered as an interleaved <em>notebook</em> instead of a single
@@ -211,8 +227,14 @@
  directly beneath it, rather than at the end of the demo.  A statement prints
  when it is left unterminated by a semicolon or when it calls <code>disp</code>,
  <code>printf</code>, and the like.
-</li><li> <strong>Figures</strong> are saved as PNG images under the <code>assets/</code>
- folder of the working directory, shown right after the code that drew them.
+</li><li> <strong>Figures</strong> are saved under the <code>assets/</code> folder of the
+ working directory, shown right after the code that drew them.  They are named
+ after their owner as its HTML page is, so the figures of
+ <code>prob.NormalDistribution.pdf</code> are <code>prob.NormalDistribution.pdf-N</code>
+ beside <code>prob.NormalDistribution.pdf.html</code>.  The figure number is
+ separated with a <code>-</code>, since <code>_</code> already stands for the file
+ separator of an old-style <code>&quot;@class/method&quot;</code> name and a function name
+ may itself contain one.
 </li></ul>
 
 <p>  Markdown in comments

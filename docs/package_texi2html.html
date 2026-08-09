@@ -170,6 +170,7 @@
             <div class="card-body">
 <dl>
 <dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2html</b> (<var>pkgname</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2html</b> (<var>pkgname</var>, <var>Name</var>, <var>Value</var>)</code></h5></dt>
 <dt><code><h5 class="fs">pkg-octave-doc: [<var>pkgfcns</var>, <var>info</var>] = <b>package_texi2html</b> (<var>pkgname</var>)</code></h5></dt>
 </dl>
 <p> Generate HTML pages for an entire package.
@@ -184,7 +185,9 @@
  automatically generated during the package&rsquo;s installation, it is best
  practice to include one in the package&rsquo;s source so there is full comtrol of
  the categorization among the functions.  Individual functions HTML pages area
- generated with <code>function_texi2html</code>.
+ generated with <code>function_texi2html</code>.  Note that every existing HTML file
+ matching an <code>'.html'</code> extension as well as an <code>/assets</code> named
+ folder inside the current working path are purged.
 </p>
 <p> The generated pages follow the template of the Octave Packages GitHub Pages
  based on bootstrap 5 and the generated HTML code is based on the
@@ -237,6 +240,23 @@
 
 
 </li></ul>
+
+<p>  Optional Name/Value pairs
+</p>
+<div class="table-responsive">
+<table class="table table-striped table-bordered table-sm">
+<thead class="table-primary"><tr><th width="20%"><var>Name</var></th><th width="80%"><var>Value</var></th></tr></thead>
+<tr><td width="20%"><code>'figformat'</code></td><td width="80%">The file format the demo figures are printed
+ in, either <code>'png'</code> (default) or <code>'svg'</code>.  It is passed on to
+ every page the build generates.  <code>'png'</code> is printed at twice the
+ nominal size, so it stays sharp on a high-density display, and keeps the
+ documentation small.  <code>'svg'</code> keeps the figures resolution independent,
+ but a figure rich in filled areas can cost tens of MB and, on a large
+ package, exhaust the memory of the graphics back end.</td></tr>
+</table>
+<p><strong>Source Code: </strong>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/package_texi2html.m">package_texi2html</a>
+</div>
 
 <p> <strong>See also: </strong>
   <a href="function_texi2html.html">function_texi2html</a>, 
