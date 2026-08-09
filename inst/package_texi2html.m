@@ -30,7 +30,9 @@
 ## automatically generated during the package's installation, it is best
 ## practice to include one in the package's source so there is full comtrol of
 ## the categorization among the functions.  Individual functions HTML pages area
-## generated with @code{function_texi2html}.
+## generated with @code{function_texi2html}.  Note that every existing HTML file
+## matching an @qcode{'.html'} extension as well as an @qcode{/assets} named
+## folder inside the current working path are purged.
 ##
 ## The generated pages follow the template of the Octave Packages GitHub Pages
 ## based on bootstrap 5 and the generated HTML code is based on the
@@ -191,6 +193,12 @@ function [varargout] = package_texi2html (pkgname)
     endif
     return;
   endif
+
+  ## Remove any existing html files to avoid left overs from functions that have
+  ## been removed or renamed. Only html files are affected so that other files
+  ## such as the .nojekyll file used for allowing __name__.html files to be
+  ## displayed in GitHub pages.
+  delete ('*.html');
 
   ## Create "assets" folder (if it exists, remove it and create new)
   if (exist (asset) == 7)
