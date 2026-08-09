@@ -465,7 +465,7 @@ function classdef_texi2html (clsname, pkgfcns, info, varargin)
         endif
 
         ## Render the notebook HTML for the demo body
-        demo_html = __demo_notebook__ (body_block, clsname, d * 100);
+        demo_html = __demo_notebook__ (body_block, clsname, d * 100, figformat);
 
         ## Populate demo template.  Anchor the collapse as "<class>-exampleN"
         ## (matching build_DEMOS' scheme) so the class docstring can link to a
