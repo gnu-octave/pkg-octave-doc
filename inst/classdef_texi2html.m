@@ -17,6 +17,7 @@
 
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {} classdef_texi2html (@var{clsname}, @var{pkgfcns}, @var{info})
+## @deftypefnx {pkg-octave-doc} {} classdef_texi2html (@dots{}, @var{Name}, @var{Value})
 ##
 ## Generate HTML page for a class definition.
 ##
@@ -100,14 +101,35 @@
 ## @qcode{group_template.html} for the method groups and
 ## @qcode{methodpage_template.html} for the per-method pages.
 ##
+## @subsubheading Optional Name/Value pairs
+##
+## @multitable @columnfractions 0.2 0.8
+## @headitem @var{Name} @tab @var{Value}
+##
+## @item @qcode{'figformat'} @tab The file format the demo figures are printed
+## in, either @qcode{'png'} (default) or @qcode{'svg'}.  It applies to the demo
+## figures of the class page and of every per-method page alike.
+## @end multitable
+##
 ## @seealso{package_texi2html, function_texi2html, find_GHurls, build_DEMOS}
 ## @end deftypefn
 
-function classdef_texi2html (clsname, pkgfcns, info)
+function classdef_texi2html (clsname, pkgfcns, info, varargin)
 
-  if (nargin != 3)
+  if (nargin < 3)
     print_usage ();
   endif
+
+  ## Parse optional Name/Value paired arguments
+  [opts, args] = parse_pairs ({'figformat'}, {'png'}, varargin);
+  if (! isempty (args))
+    print_usage ();
+  endif
+  figformat = opts.figformat;
+  if (! (ischar (figformat) && any (strcmpi (figformat, {'png', 'svg'}))))
+    error ("classdef_texi2html: FIGFORMAT must be 'png' or 'svg'.");
+  endif
+  figformat = lower (figformat);
 
   if (! ischar (clsname))
     print_usage ();
@@ -244,7 +266,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
             prop_text(idx:end) = [];
           endif
           ## Add DEMOS for properties (if applicable), collapsed by default
-          demo_txt = build_DEMOS (prop_name, true);
+          demo_txt = __build_demos__ (prop_name, true, figformat);
           prop_text = [prop_text "\n" demo_txt];
         catch
           prop_text = "";
@@ -314,7 +336,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
       cls_text = [cls_text "\n"];
     else
       ## Add DEMOS for constructor (if applicable), collapsed by default
-      demo_txt = build_DEMOS (cntr_name, true);
+      demo_txt = __build_demos__ (cntr_name, true, figformat);
       cntr_text = [cntr_text "\n" demo_txt];
       ## Load constructor template
       filename = fullfile ("_layouts", "constructor_template.html");
@@ -368,7 +390,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
                   MTHDS{m}, clsname, lasterr);
         end_try_catch
         ## Add DEMOS for individual methods (if available), collapsed by default
-        demo_txt = build_DEMOS (method_name, true);
+        demo_txt = __build_demos__ (method_name, true, figformat);
         mtds_text = [mtds_text "\n" demo_txt];
       elseif (isempty (text))
         mtds_text = sprintf ("<b><code>%s</code></b> is not documented.", ...
@@ -418,7 +440,7 @@ function classdef_texi2html (clsname, pkgfcns, info)
     for gi = 1:numel (groups)
       for mm = 1:numel (groups(gi).methods)
         method_texi2html (clsname, groups(gi).methods{mm}, groups, ...
-                          pkgfcns, info);
+                          pkgfcns, info, figformat);
       endfor
     endfor
   endif
@@ -580,3 +602,6 @@ endfunction
 %! "PKG_NAME", {""}, "PKG_TITLE", {""}, "OCTAVE_LOGO", {""}))
 %!error classdef_texi2html ("find_GHurls", cell (2) , struct("field", {""}, ...
 %! "PKG_NAME", {""}, "PKG_TITLE", {""}, "OCTAVE_LOGO", {""}))
+%!error <classdef_texi2html: FIGFORMAT must be 'png' or 'svg'.>
+%! classdef_texi2html ("find_GHurls", cell (2), struct (), 'figformat', 'gif');
+%!error <Invalid call> classdef_texi2html ("find_GHurls", cell (2), struct (), 'nosuch', 1)

@@ -16,7 +16,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {pkg-octave-doc} {} method_texi2html (@var{clsname}, @var{method}, @var{groups}, @var{pkgfcns}, @var{info})
+## @deftypefn  {pkg-octave-doc} {} method_texi2html (@var{clsname}, @var{method}, @var{groups}, @var{pkgfcns}, @var{info}, @var{figformat})
 ##
 ## Generate a standalone HTML page for a single method of a large classdef.
 ##
@@ -28,16 +28,19 @@
 ##
 ## @var{method} is the method name, @var{groups} the struct array from
 ## @code{parse_method_groups}, and @var{pkgfcns}/@var{info} the package function
-## list and info structure (as for @code{function_texi2html}).  The source-code
-## link, when available, points to the class source file.
+## list and info structure (as for @code{function_texi2html}).  @var{figformat}
+## is the file format the demo figures are printed in, either @qcode{'png'} or
+## @qcode{'svg'}, already validated by the caller.  The source-code link, when
+## available, points to the class source file.
 ##
 ## @seealso{classdef_texi2html, build_class_sidebar, function_texi2html}
 ## @end deftypefn
 
-function method_texi2html (clsname, method, groups, pkgfcns, info)
+function method_texi2html (clsname, method, groups, pkgfcns, info, figformat)
 
-  if (nargin != 5 || ! ischar (clsname) || ! ischar (method) ...
-      || ! isstruct (groups) || ! iscell (pkgfcns) || ! isstruct (info))
+  if (nargin != 6 || ! ischar (clsname) || ! ischar (method) ...
+      || ! isstruct (groups) || ! iscell (pkgfcns) || ! isstruct (info) ...
+      || ! ischar (figformat))
     print_usage ();
   endif
 
@@ -68,7 +71,7 @@ function method_texi2html (clsname, method, groups, pkgfcns, info)
     endif
 
     ## Add DEMOS (if applicable)
-    demo_txt = build_DEMOS (method_name);
+    demo_txt = __build_demos__ (method_name, false, figformat);
     fcn_text = [fcn_text "\n" demo_txt];
 
     ## Class-scoped sidebar (groups -> methods) with this method active

@@ -17,6 +17,7 @@
 
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {} package_texi2html (@var{pkgname})
+## @deftypefnx {pkg-octave-doc} {} package_texi2html (@var{pkgname}, @var{Name}, @var{Value})
 ## @deftypefnx {pkg-octave-doc} {[@var{pkgfcns}, @var{info}] =} package_texi2html (@var{pkgname})
 ##
 ## Generate HTML pages for an entire package.
@@ -87,10 +88,28 @@
 ## @end multitable
 ## @end itemize
 ##
+## @subsubheading Optional Name/Value pairs
+##
+## @multitable @columnfractions 0.2 0.8
+## @headitem @var{Name} @tab @var{Value}
+##
+## @item @qcode{'figformat'} @tab The file format the demo figures are printed
+## in, either @qcode{'png'} (default) or @qcode{'svg'}.  It is passed on to
+## every page the build generates.  @qcode{'png'} is printed at twice the
+## nominal size, so it stays sharp on a high-density display, and keeps the
+## documentation small.  @qcode{'svg'} keeps the figures resolution independent,
+## but a figure rich in filled areas can cost tens of MB and, on a large
+## package, exhaust the memory of the graphics back end.
+## @end multitable
+##
 ## @seealso{function_texi2html, find_GHurls, build_DEMOS}
 ## @end deftypefn
 
-function [varargout] = package_texi2html (pkgname)
+function [varargout] = package_texi2html (pkgname, varargin)
+
+  if (nargin < 1)
+    print_usage ();
+  endif
 
   if (! ischar (pkgname))
     print_usage ();
@@ -99,6 +118,17 @@ function [varargout] = package_texi2html (pkgname)
   if (nargout != 0 && nargout != 2)
     print_usage ();
   endif
+
+  ## Parse optional Name/Value paired arguments
+  [opts, args] = parse_pairs ({'figformat'}, {'png'}, varargin);
+  if (! isempty (args))
+    print_usage ();
+  endif
+  figformat = opts.figformat;
+  if (! (ischar (figformat) && any (strcmpi (figformat, {'png', 'svg'}))))
+    error ("package_texi2html: FIGFORMAT must be 'png' or 'svg'.");
+  endif
+  figformat = lower (figformat);
 
   ## Check package exists and it is loaded
   pkg_loaded = 0;
@@ -301,9 +331,9 @@ function [varargout] = package_texi2html (pkgname)
       ## Build individual function of classdef html
       try
         MTDS = methods (fcnname);
-        classdef_texi2html (fcnname, pkgfcns, info);
+        classdef_texi2html (fcnname, pkgfcns, info, 'figformat', figformat);
       catch
-        function_texi2html (fcnname, pkgfcns, info);
+        function_texi2html (fcnname, pkgfcns, info, 'figformat', figformat);
       end_try_catch
     endfor
     fcn_list = [fcn_list tmp_8 tmp_9];
@@ -335,3 +365,6 @@ endfunction
 %!error [out1, out2, out3] = package_texi2html ("statistics")
 %!error [pkgfcns, info] = package_texi2html ("st@t1st1cs")
 %!error package_texi2html ("st@t1st1cs")
+%!error <package_texi2html: FIGFORMAT must be 'png' or 'svg'.>
+%! package_texi2html ("st@t1st1cs", 'figformat', 'gif');
+%!error <Invalid call> package_texi2html ("st@t1st1cs", 'nosuch', 1)

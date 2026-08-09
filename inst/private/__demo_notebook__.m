@@ -16,13 +16,15 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {pkg-octave-doc} {@var{html} =} __demo_notebook__ (@var{block}, @var{imgprefix}, @var{imgbase})
+## @deftypefn  {pkg-octave-doc} {@var{html} =} __demo_notebook__ (@var{block}, @var{imgprefix}, @var{imgbase}, @var{figformat})
 ##
 ## Render a single DEMO block as notebook-style HTML.
 ##
 ## @var{block} is the source of one DEMO block, @var{imgprefix} the file-name
-## prefix for figures saved under @qcode{assets/}, and @var{imgbase} the
-## starting figure number.  The block is evaluated cell by cell by
+## prefix for figures saved under @qcode{assets/}, @var{imgbase} the starting
+## figure number, and @var{figformat} the file format the figures are printed
+## in, either @qcode{'png'} or @qcode{'svg'}.  The block is evaluated cell by
+## cell by
 ## @code{__eval_demo__} and laid out by @code{__demo_html__}, producing an
 ## interleaved sequence of prose, input, output, and figure boxes.
 ##
@@ -32,13 +34,13 @@
 ## @seealso{__eval_demo__, __demo_html__, __demo_segments__, __demo_markdown__}
 ## @end deftypefn
 
-function html = __demo_notebook__ (block, imgprefix, imgbase)
+function html = __demo_notebook__ (block, imgprefix, imgbase, figformat)
 
-  if (nargin != 3 || ! ischar (block) || ! ischar (imgprefix))
+  if (nargin != 4 || ! ischar (block) || ! ischar (imgprefix))
     print_usage ();
   endif
 
-  cells = __eval_demo__ (block, imgprefix, imgbase);
+  cells = __eval_demo__ (block, imgprefix, imgbase, figformat);
   html = __demo_html__ (cells);
 
 endfunction

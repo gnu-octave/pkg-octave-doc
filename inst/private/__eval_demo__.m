@@ -16,7 +16,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn  {pkg-octave-doc} {@var{cells} =} __eval_demo__ (@var{block}, @var{imgprefix}, @var{imgbase})
+## @deftypefn  {pkg-octave-doc} {@var{cells} =} __eval_demo__ (@var{block}, @var{imgprefix}, @var{imgbase}, @var{figformat})
 ##
 ## Evaluate a DEMO block cell by cell and capture output and figures.
 ##
@@ -27,6 +27,8 @@
 ##
 ## @var{imgprefix} is the file-name prefix used for figures saved under the
 ## @qcode{assets/} folder and @var{imgbase} is the starting figure number.
+## @var{figformat} is either @qcode{'png'} or @qcode{'svg'} and selects the file
+## format the figures are printed in.
 ##
 ## The returned @var{cells} is the struct array from @code{__demo_segments__}
 ## augmented with two fields: @qcode{output}, the console text captured for a
@@ -39,9 +41,9 @@
 ## @seealso{__demo_segments__, __demo_html__, build_DEMOS}
 ## @end deftypefn
 
-function cells = __eval_demo__ (block, imgprefix, imgbase)
+function cells = __eval_demo__ (block, imgprefix, imgbase, figformat)
 
-  if (nargin != 3 || ! ischar (block) || ! ischar (imgprefix))
+  if (nargin != 4 || ! ischar (block) || ! ischar (imgprefix))
     print_usage ();
   endif
 
@@ -50,6 +52,7 @@ function cells = __eval_demo__ (block, imgprefix, imgbase)
   __cells__ = __demo_segments__ (block);
   __prefix__ = imgprefix;
   __imgn__ = imgbase;
+  __format__ = figformat;
 
   for __i__ = 1:numel (__cells__)
     __cells__(__i__).output = "";
@@ -92,7 +95,7 @@ function cells = __eval_demo__ (block, imgprefix, imgbase)
           && ! any (double (__prevcur__) == __snapped__)
           && ! isempty (get (__prevcur__, "children")))
         __imgn__ += 1;
-        __path__ = __snap_fig__ (__prevcur__, __prefix__, __imgn__);
+        __path__ = __snap_fig__ (__prevcur__, __prefix__, __imgn__, __format__);
         __tgt__ = __prevcode__;
         if (__tgt__ == 0)
           __tgt__ = __i__;
@@ -113,7 +116,7 @@ function cells = __eval_demo__ (block, imgprefix, imgbase)
       if (! any (__fig__ == __snapped__) && ishghandle (__fig__)
           && ! isempty (get (__fig__, "children")))
         __imgn__ += 1;
-        __path__ = __snap_fig__ (__fig__, __prefix__, __imgn__);
+        __path__ = __snap_fig__ (__fig__, __prefix__, __imgn__, __format__);
         if (__prevcode__ > 0)
           __cells__(__prevcode__).images{end+1} = __path__;
         endif
@@ -129,11 +132,17 @@ function cells = __eval_demo__ (block, imgprefix, imgbase)
 
 endfunction
 
-## Save figure FIG as assets/PREFIX_N.png and return the relative path.
-function path = __snap_fig__ (fig, prefix, n)
-  name = sprintf ("%s_%d.svg", prefix, n);
+## Save figure FIG as assets/PREFIX-N.FIGFORMAT and return the relative path.
+function path = __snap_fig__ (fig, prefix, n, figformat)
+  name = sprintf ("%s-%d.%s", prefix, n, figformat);
   path = fullfile ("assets", name);
-  print (fig, path, "-F:14","-S480,360");
+  if (strcmp (figformat, "png"))
+    ## Print at twice the nominal size, font included, so the raster stays sharp
+    ## on a high-density display; the page scales it down with width="70%".
+    print (fig, path, "-F:28", "-S960,720");
+  else
+    print (fig, path, "-F:14", "-S480,360");
+  endif
 endfunction
 
 %!error <Invalid call> __eval_demo__ ()

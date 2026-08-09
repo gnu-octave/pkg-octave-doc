@@ -18,6 +18,7 @@
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {@var{html} =} build_DEMOS (@var{fcnname})
 ## @deftypefnx {pkg-octave-doc} {@var{html} =} build_DEMOS (@var{fcnname}, @var{collapsed})
+## @deftypefnx {pkg-octave-doc} {@var{html} =} build_DEMOS (@dots{}, @var{Name}, @var{Value})
 ##
 ## Build notebook-style HTML for the DEMO blocks of a function or class member.
 ##
@@ -42,6 +43,18 @@
 ## the card renders expanded.  When @var{fcnname} has no demos, @var{html} is
 ## returned empty.
 ##
+## @subsubheading Optional Name/Value pairs
+##
+## @multitable @columnfractions 0.2 0.8
+## @headitem @var{Name} @tab @var{Value}
+##
+## @item @qcode{'figformat'} @tab The file format the demo figures are printed
+## in, either @qcode{'png'} (default) or @qcode{'svg'}.  @qcode{'png'} is
+## printed at twice the nominal size so it stays sharp on a high-density
+## display.  @qcode{'svg'} keeps the figures resolution independent, at the cost
+## of very large files for figures rich in filled areas.
+## @end multitable
+##
 ## @subsubheading Notebook layout
 ##
 ## Each demo is rendered as an interleaved @emph{notebook} instead of a single
@@ -63,9 +76,11 @@
 ## @item @strong{Figures} are saved under the @qcode{assets/} folder of the
 ## working directory, shown right after the code that drew them.  They are named
 ## after their owner as its HTML page is, so the figures of
-## @qcode{prob.NormalDistribution.pdf} are @qcode{prob.NormalDistribution.pdf_N}
-## beside @qcode{prob.NormalDistribution.pdf.html}; @qcode{_} stands only for
-## the file separator of an old-style @qcode{"@@class/method"} name.
+## @qcode{prob.NormalDistribution.pdf} are @qcode{prob.NormalDistribution.pdf-N}
+## beside @qcode{prob.NormalDistribution.pdf.html}.  The figure number is
+## separated with a @qcode{-}, since @qcode{_} already stands for the file
+## separator of an old-style @qcode{"@@class/method"} name and a function name
+## may itself contain one.
 ## @end itemize
 ##
 ## @subsubheading Markdown in comments
@@ -96,9 +111,9 @@
 ## @seealso{find_DEMOS, function_texi2html, classdef_texi2html}
 ## @end deftypefn
 
-function html = build_DEMOS (fcnname, collapsed)
+function html = build_DEMOS (fcnname, varargin)
 
-  if (nargin < 1 || nargin > 2)
+  if (nargin < 1)
     print_usage ();
   endif
 
@@ -106,67 +121,31 @@ function html = build_DEMOS (fcnname, collapsed)
     print_usage ();
   endif
 
-  if (nargin < 2)
-    collapsed = false;
-  elseif (! (islogical (collapsed) && isscalar (collapsed)))
+  ## Parse optional Name/Value paired arguments
+  [opts, args] = parse_pairs ({'figformat'}, {'png'}, varargin);
+  figformat = opts.figformat;
+  if (! (ischar (figformat) && any (strcmpi (figformat, {'png', 'svg'}))))
+    error ("build_DEMOS: FIGFORMAT must be 'png' or 'svg'.");
+  endif
+  figformat = lower (figformat);
+
+  ## Whatever the pairs left behind is the optional COLLAPSED argument
+  if (numel (args) > 1)
     print_usage ();
-  endif
-
-  ## Get available demos from function
-  html = "";
-  demos = find_DEMOS (fcnname);
-
-  if (isempty (demos))
-    return;
-  endif
-
-  ## Figure file names follow the convention of the generated HTML pages: a "."
-  ## is kept, whether it separates a package from a class or a class from a
-  ## member, and "_" stands only for the file separator of an old-style
-  ## "@class/method" name.  A member's figures therefore sit beside its page,
-  ## e.g. prob.NormalDistribution.pdf_101.svg next to
-  ## prob.NormalDistribution.pdf.html.
-  fcnfile = strrep (fcnname, filesep, "_");
-
-  ## The anchor id cannot keep the ".": it breaks Bootstrap's collapse toggle,
-  ## which resolves data-bs-target with querySelector and would read
-  ## "#Class.method-example1" as id "Class" plus class "method-example1".
-  fcnanchor = regexprep (fcnname, "[^A-Za-z0-9]", "_");
-
-  ## Collapse state: a collapsed card starts closed, an expanded one open
-  if (collapsed)
-    show_cls = "";
-    expanded = "false";
+  elseif (numel (args) == 1)
+    collapsed = args{1};
+    if (! (islogical (collapsed) && isscalar (collapsed)))
+      print_usage ();
+    endif
   else
-    show_cls = " show";
-    expanded = "true";
+    collapsed = false;
   endif
 
-  ## Load demos template
-  demos_template = fileread (fullfile ("_layouts", "demos_template.html"));
-
-  ## For each demo, render notebook-style HTML and wrap it in the card template
-  for demo_num = 1:numel (demos)
-    try
-      demo_html = __demo_notebook__ (demos{demo_num}, fcnfile, demo_num * 100);
-      anchor = sprintf ("%s-example%d", fcnanchor, demo_num);
-      full_demo_html = strrep (demos_template, "{{ANCHOR}}", anchor);
-      full_demo_html = strrep (full_demo_html, "{{NUMBER}}", ...
-                               sprintf ("%d", demo_num));
-      full_demo_html = strrep (full_demo_html, "{{SHOW}}", show_cls);
-      full_demo_html = strrep (full_demo_html, "{{EXPANDED}}", expanded);
-      full_demo_html = strrep (full_demo_html, "{{DEMO}}", demo_html);
-      html = [html full_demo_html "\n"];
-    catch
-      printf ("Unable to process demo %d from %s:\n %s\n", ...
-              demo_num, fcnname, lasterr);
-    end_try_catch
-
-    ## Reset classdef dispatch state so a demo cannot poison the ones that
-    ## follow it (all demos of a package build share one Octave process).  See
-    ## https://octave.discourse.group/t/octave-core-classdef-dispatch-bug/7633
-    __reset_classes__ ();
-  endfor
+  ## The work itself is done by __build_demos__, which the other doc-generating
+  ## functions call directly: they have validated FIGFORMAT at their own entry
+  ## point, so nothing is gained by parsing it again for every member of every
+  ## class of a package build.
+  html = __build_demos__ (fcnname, collapsed, figformat);
 
 endfunction
 
@@ -174,3 +153,13 @@ endfunction
 %!error build_DEMOS (1)
 %!error build_DEMOS ("function_texi2html", 1)
 %!error build_DEMOS ("function_texi2html", true, 1)
+%!error <build_DEMOS: FIGFORMAT must be 'png' or 'svg'.>
+%! build_DEMOS ("function_texi2html", 'figformat', 'gif');
+%!error <build_DEMOS: FIGFORMAT must be 'png' or 'svg'.>
+%! build_DEMOS ("function_texi2html", 'figformat', 5);
+%!error <Invalid call> build_DEMOS ("function_texi2html", 'nosuch', 1)
+
+%!test
+%! assert (build_DEMOS ("function_texi2html", 'figformat', 'svg'), "");
+%!test
+%! assert (build_DEMOS ("function_texi2html", true, 'figformat', 'png'), "");

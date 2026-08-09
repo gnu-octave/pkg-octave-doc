@@ -17,6 +17,7 @@
 
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {} function_texi2html (@var{fcnname}, @var{pkgfcns}, @var{info})
+## @deftypefnx {pkg-octave-doc} {} function_texi2html (@dots{}, @var{Name}, @var{Value})
 ##
 ## Generate HTML page for a particular function.
 ##
@@ -59,14 +60,35 @@
 ## The generated HTML code is based on the @qcode{function_template.html}
 ## and @qcode{default.html} layouts.
 ##
+## @subsubheading Optional Name/Value pairs
+##
+## @multitable @columnfractions 0.2 0.8
+## @headitem @var{Name} @tab @var{Value}
+##
+## @item @qcode{'figformat'} @tab The file format the demo figures are printed
+## in, either @qcode{'png'} (default) or @qcode{'svg'}.  It applies to every
+## figure of the function's demos.
+## @end multitable
+##
 ## @seealso{package_texi2html, classdef_texi2html, find_GHurls, build_DEMOS}
 ## @end deftypefn
 
-function function_texi2html (fcnname, pkgfcns, info)
+function function_texi2html (fcnname, pkgfcns, info, varargin)
 
-  if (nargin != 3)
+  if (nargin < 3)
     print_usage ();
   endif
+
+  ## Parse optional Name/Value paired arguments
+  [opts, args] = parse_pairs ({'figformat'}, {'png'}, varargin);
+  if (! isempty (args))
+    print_usage ();
+  endif
+  figformat = opts.figformat;
+  if (! (ischar (figformat) && any (strcmpi (figformat, {'png', 'svg'}))))
+    error ("function_texi2html: FIGFORMAT must be 'png' or 'svg'.");
+  endif
+  figformat = lower (figformat);
 
   if (! ischar (fcnname))
     print_usage ();
@@ -110,7 +132,7 @@ function function_texi2html (fcnname, pkgfcns, info)
     endif
 
     ## Add DEMOS (if applicable)
-    demo_txt = build_DEMOS (fcnname);
+    demo_txt = __build_demos__ (fcnname, false, figformat);
     fcn_text = [fcn_text "\n" demo_txt];
 
     ## Templates for side bar
@@ -202,3 +224,6 @@ endfunction
 %! "PKG_NAME", {""}, "PKG_TITLE", {""}, "OCTAVE_LOGO", {""}))
 %!error function_texi2html ("find_GHurls", cell (2) , struct("field", {""}, ...
 %! "PKG_NAME", {""}, "PKG_TITLE", {""}, "OCTAVE_LOGO", {""}))
+%!error <function_texi2html: FIGFORMAT must be 'png' or 'svg'.>
+%! function_texi2html ("find_GHurls", cell (2), struct (), 'figformat', 'gif');
+%!error <Invalid call> function_texi2html ("find_GHurls", cell (2), struct (), 'nosuch', 1)
