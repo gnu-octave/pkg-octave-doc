@@ -195,10 +195,12 @@ function [varargout] = package_texi2html (pkgname)
   endif
 
   ## Remove any existing html files to avoid left overs from functions that have
-  ## been removed or renamed. Only html files are affected so that other files
-  ## such as the .nojekyll file used for allowing __name__.html files to be
-  ## displayed in GitHub pages.
-  delete ('*.html');
+  ## been removed or renamed.  Only html files are affected, so that other
+  ## files, such as the .nojekyll file used for allowing __name__.html files to
+  ## be displayed in GitHub pages, are preserved.
+  if (! isempty (glob ('*.html')))
+    delete ('*.html');
+  endif
 
   ## Create "assets" folder (if it exists, remove it and create new)
   if (exist (asset) == 7)
