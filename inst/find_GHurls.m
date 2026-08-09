@@ -109,14 +109,35 @@ function pkgfcns = find_GHurls (pkgurl, pkgfcns)
     ## Find each function's index in cell array and retrieve url to source code
     for i = 1:size (pkgfcns, 1)
 
-      ## Check for .m, .cc, or cpp files (m, oct, mex, respectively)
-      if (exist (pkgfcns{i,1}) == 2)
-        fcnname = strsplit (pkgfcns{i,1}, filesep){end};
-        fcnfilename = [fcnname, ".m"];
+      ## Check for .m, .cc, or cpp files (m, oct, mex, respectively).
+      ## exist reports 0 for a name qualified by a package directory, such as
+      ## "prob.NormalDistribution", so resolve those with which, which does
+      ## report their file.  Only an .m hit is taken here; anything else is
+      ## left to the compiled-file branch below.
+      qualfile = "";
+      if (exist (pkgfcns{i,1}) != 2)
+        [~, qname, qext] = fileparts (which (pkgfcns{i,1}));
+        if (strcmp (qext, ".m"))
+          qualfile = [qname, qext];
+        endif
+      endif
+
+      if (exist (pkgfcns{i,1}) == 2 || ! isempty (qualfile))
+        if (isempty (qualfile))
+          fcnname = strsplit (pkgfcns{i,1}, filesep){end};
+          fcnfilename = [fcnname, ".m"];
+        else
+          fcnfilename = qualfile;
+        endif
         fcn_idx = find (strcmp (fcnurls(:,1), fcnfilename));
         if numel (fcn_idx) > 1
-          ## More than one hit, get class
-          classname = strsplit (pkgfcns{i,1}, filesep){end-1};
+          ## More than one hit, get the directory the file resolves into,
+          ## which names the class or the package directory ("+prob").
+          if (isempty (qualfile))
+            classname = strsplit (pkgfcns{i,1}, filesep){end-1};
+          else
+            classname = strsplit (fileparts (which (pkgfcns{i,1})), filesep){end};
+          endif
           for j = 1:numel (fcn_idx)
             lastdir = strsplit (fcnurls{fcn_idx(j),2}, filesep){end};
             if length (classname) == length (lastdir) && classname == lastdir
