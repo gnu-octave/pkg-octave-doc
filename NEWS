@@ -1,23 +1,39 @@
-Summary of important user-visible changes for pkg-octave-doc 0.7.3:
+Summary of important user-visible changes for pkg-octave-doc 0.7.4:
 -------------------------------------------------------------------
 
- ** Demo figures are now saved as SVG instead of PNG and drawn at a reduced
-    size, for sharper and lighter documentation pages.
+ ** Demo figures are saved as PNG again, printed at twice the nominal size so
+    they stay sharp on a high-density display.  SVG, the default since 0.7.3,
+    routes through gl2ps, whose feedback buffer overflows on figures rich in
+    filled areas: building the statistics package produced 60 SVG files above
+    150 KB, the largest 25.3 MB, and one figure consumed 15.5 GB of temporary
+    space before the build wedged.  The same figure is 64 KB as a PNG, and no
+    asset in a 538-page build exceeds 138 KB.
 
- ** Each demo is rendered as a collapsible "Example" card.  On classdef pages
-    the cards start collapsed to keep long pages short, while function pages
-    and grouped-classdef method pages keep them expanded.
+ ** SVG remains available, in full, through the new `figformat` Name/Value
+    pair, accepted by `package_texi2html`, `function_texi2html`,
+    `classdef_texi2html` and `build_DEMOS`:
 
- ** Examples can be cross-referenced from within a docstring: write
-    `@url{#exampleN}` and it links to that demo's card on the same page,
-    automatically expanding and scrolling to it when followed.  The short
-    reference is expanded to a unique per-owner anchor, so references never
-    collide even when several members' demos share one page.
+        package_texi2html ("mypackage", "figformat", "svg");
 
- ** Restored math rendering by loading MathJax from a live CDN; the formerly
-    used `cdn.mathjax.org` was retired in 2017, so `@tex` / `$$` display math
-    had silently stopped rendering on generated pages.
+    Note that for a figure of ordinary complexity SVG is the smaller of the
+    two; PNG is the default because its worst case is bounded.
 
- ** Updated the README documentation guidelines to cover example
-    cross-references and the collapsible demo cards.
+ ** Demo figure files separate their number with a "-", as in
+    `mean-101.png`, since "_" already stands for the file separator of an
+    old-style "@class/method" name and a function name may contain one.
 
+ ** Demo figures are named after their owner exactly as its HTML page is, so
+    the figures of `prob.NormalDistribution.pdf` now sit beside
+    `prob.NormalDistribution.pdf.html` instead of under a flattened name.
+
+ ** Pre-existing HTML files are purged from the documentation's root directory
+    at the start of a package build, so pages of functions that were removed
+    or renamed no longer linger.  Only `.html` files are affected, leaving
+    `.nojekyll` and anything else in place.
+
+ ** Source-code links are resolved for package-qualified names such as
+    `prob.NormalDistribution`.  `exist` reports 0 for those, so every class
+    inside a package directory previously shipped without a source link.
+
+ ** A classdef page no longer emits an empty source-code link when the URL
+    cannot be resolved.
