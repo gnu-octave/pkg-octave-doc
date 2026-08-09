@@ -60,8 +60,12 @@
 ## when it is left unterminated by a semicolon or when it calls @code{disp},
 ## @code{printf}, and the like.
 ##
-## @item @strong{Figures} are saved as PNG images under the @qcode{assets/}
-## folder of the working directory, shown right after the code that drew them.
+## @item @strong{Figures} are saved under the @qcode{assets/} folder of the
+## working directory, shown right after the code that drew them.  They are named
+## after their owner as its HTML page is, so the figures of
+## @qcode{prob.NormalDistribution.pdf} are @qcode{prob.NormalDistribution.pdf_N}
+## beside @qcode{prob.NormalDistribution.pdf.html}; @qcode{_} stands only for
+## the file separator of an old-style @qcode{"@@class/method"} name.
 ## @end itemize
 ##
 ## @subsubheading Markdown in comments
@@ -116,13 +120,18 @@ function html = build_DEMOS (fcnname, collapsed)
     return;
   endif
 
-  ## Sanitise the name into a prefix used both for figure file names and for the
-  ## per-example anchor id.  Every non-alphanumeric character (a file separator,
-  ## and crucially the "." in a "Class.method" member name) becomes "_": a "." in
-  ## an id breaks Bootstrap's collapse toggle, which resolves data-bs-target with
-  ## querySelector and would read "#Class.method-example1" as id "Class" + class
-  ## "method-example1".
-  fcnfile = regexprep (fcnname, "[^A-Za-z0-9]", "_");
+  ## Figure file names follow the convention of the generated HTML pages: a "."
+  ## is kept, whether it separates a package from a class or a class from a
+  ## member, and "_" stands only for the file separator of an old-style
+  ## "@class/method" name.  A member's figures therefore sit beside its page,
+  ## e.g. prob.NormalDistribution.pdf_101.svg next to
+  ## prob.NormalDistribution.pdf.html.
+  fcnfile = strrep (fcnname, filesep, "_");
+
+  ## The anchor id cannot keep the ".": it breaks Bootstrap's collapse toggle,
+  ## which resolves data-bs-target with querySelector and would read
+  ## "#Class.method-example1" as id "Class" plus class "method-example1".
+  fcnanchor = regexprep (fcnname, "[^A-Za-z0-9]", "_");
 
   ## Collapse state: a collapsed card starts closed, an expanded one open
   if (collapsed)
@@ -140,7 +149,7 @@ function html = build_DEMOS (fcnname, collapsed)
   for demo_num = 1:numel (demos)
     try
       demo_html = __demo_notebook__ (demos{demo_num}, fcnfile, demo_num * 100);
-      anchor = sprintf ("%s-example%d", fcnfile, demo_num);
+      anchor = sprintf ("%s-example%d", fcnanchor, demo_num);
       full_demo_html = strrep (demos_template, "{{ANCHOR}}", anchor);
       full_demo_html = strrep (full_demo_html, "{{NUMBER}}", ...
                                sprintf ("%d", demo_num));
