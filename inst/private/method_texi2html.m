@@ -60,8 +60,9 @@ function method_texi2html (clsname, method, groups, pkgfcns, info)
     if (size (pkgfcns, 2) == 3 && ! isempty (cls_idx))
       url = pkgfcns{cls_idx, 3};
       if (! isempty (url))
-        url_text = strcat (["<p><strong>Source Code: </strong>\n"], ...
-                           ["  <a href=""", url, """>", clsname, "</a>\n</div>"]);
+        url_text = strcat ("<p><strong>Source Code: </strong>\n", ...
+                           "  <a href=""", url, """>", clsname, ...
+                           "</a>\n</div>");
         fcn_text = strrep (fcn_text, "</div>", url_text);
       endif
     endif
