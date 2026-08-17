@@ -46,6 +46,18 @@ function demos = find_DEMOS (fcnname)
   demos = {};
   [code, idx] = test (fcnname, "grabdemo");
 
+  ## `test` locates the file with `file_in_loadpath`, which does not resolve a
+  ## namespaced name such as 'geom.offset', so a function inside a +namespace
+  ## directory yields no demos and reports no error.  `which` resolves it, but
+  ## only try it when the name found nothing: for a compiled function `which`
+  ## returns the .oct, bypassing the .cc-tst suffixes `test` searches by name.
+  if (isempty (code))
+    fpath = which (fcnname);
+    if (! isempty (fpath))
+      [code, idx] = test (fpath, "grabdemo");
+    endif
+  endif
+
   if (idx > 0)
     for i = 1:length (idx) - 1
       block = code(idx(i):idx(i+1)-1);
@@ -54,6 +66,46 @@ function demos = find_DEMOS (fcnname)
   endif
 
 endfunction
+
+%!test  # a namespaced function's demos are found
+%! tmpd = tempname ();
+%! mkdir (tmpd);
+%! mkdir (fullfile (tmpd, "+ns"));
+%! fid = fopen (fullfile (tmpd, "+ns", "fcn.m"), "w");
+%! fprintf (fid, "function fcn ()\nendfunction\n");
+%! fprintf (fid, "%%!demo\n%%! disp (1);\n%%!demo\n%%! disp (2);\n");
+%! fclose (fid);
+%! addpath (tmpd);
+%! rehash ();
+%! unwind_protect
+%!   demos = find_DEMOS ("ns.fcn");
+%!   assert (numel (demos), 2);
+%!   assert (! isempty (strfind (demos{1}, "disp (1)")));
+%!   assert (! isempty (strfind (demos{2}, "disp (2)")));
+%! unwind_protect_cleanup
+%!   rmpath (tmpd);
+%!   unlink (fullfile (tmpd, "+ns", "fcn.m"));
+%!   rmdir (fullfile (tmpd, "+ns"));
+%!   rmdir (tmpd);
+%! end_unwind_protect
+
+%!test  # a namespaced function without demos returns an empty cell
+%! tmpd = tempname ();
+%! mkdir (tmpd);
+%! mkdir (fullfile (tmpd, "+ns"));
+%! fid = fopen (fullfile (tmpd, "+ns", "bare.m"), "w");
+%! fprintf (fid, "function bare ()\nendfunction\n");
+%! fclose (fid);
+%! addpath (tmpd);
+%! rehash ();
+%! unwind_protect
+%!   assert (find_DEMOS ("ns.bare"), {});
+%! unwind_protect_cleanup
+%!   rmpath (tmpd);
+%!   unlink (fullfile (tmpd, "+ns", "bare.m"));
+%!   rmdir (fullfile (tmpd, "+ns"));
+%!   rmdir (tmpd);
+%! end_unwind_protect
 
 %!error find_DEMOS ()
 %!error find_DEMOS (1)
