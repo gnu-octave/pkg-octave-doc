@@ -1,39 +1,14 @@
-Summary of important user-visible changes for pkg-octave-doc 0.7.4:
+Summary of important user-visible changes for pkg-octave-doc 0.7.5:
 -------------------------------------------------------------------
 
- ** Demo figures are saved as PNG again, printed at twice the nominal size so
-    they stay sharp on a high-density display.  SVG, the default since 0.7.3,
-    routes through gl2ps, whose feedback buffer overflows on figures rich in
-    filled areas: building the statistics package produced 60 SVG files above
-    150 KB, the largest 25.3 MB, and one figure consumed 15.5 GB of temporary
-    space before the build wedged.  The same figure is 64 KB as a PNG, and no
-    asset in a 538-page build exceeds 138 KB.
+ ** Demos are found for functions inside a `+namespace` directory.  They are
+    retrieved through `test`, which locates a file with `file_in_loadpath`,
+    and that does not resolve a name such as `geom.offset`.  No error was
+    raised, so a namespaced package was documented without any of its demos.
 
- ** SVG remains available, in full, through the new `figformat` Name/Value
-    pair, accepted by `package_texi2html`, `function_texi2html`,
-    `classdef_texi2html` and `build_DEMOS`:
-
-        package_texi2html ("mypackage", "figformat", "svg");
-
-    Note that for a figure of ordinary complexity SVG is the smaller of the
-    two; PNG is the default because its worst case is bounded.
-
- ** Demo figure files separate their number with a "-", as in
-    `mean-101.png`, since "_" already stands for the file separator of an
-    old-style "@class/method" name and a function name may contain one.
-
- ** Demo figures are named after their owner exactly as its HTML page is, so
-    the figures of `prob.NormalDistribution.pdf` now sit beside
-    `prob.NormalDistribution.pdf.html` instead of under a flattened name.
-
- ** Pre-existing HTML files are purged from the documentation's root directory
-    at the start of a package build, so pages of functions that were removed
-    or renamed no longer linger.  Only `.html` files are affected, leaving
-    `.nojekyll` and anything else in place.
-
- ** Source-code links are resolved for package-qualified names such as
-    `prob.NormalDistribution`.  `exist` reports 0 for those, so every class
-    inside a package directory previously shipped without a source link.
-
- ** A classdef page no longer emits an empty source-code link when the URL
-    cannot be resolved.
+ ** Demo figure titles are no longer clipped.  A PNG figure was printed with
+    its font size doubled along with its canvas, but `-F` is relative to the
+    canvas, so the text came out at twice its nominal size and a long title
+    ran past both edges of the frame.  43 of the 83 titled figures in one
+    package build were affected.  Figures are still printed at twice the
+    nominal size, which was the point of the doubling.
