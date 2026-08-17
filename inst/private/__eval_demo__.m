@@ -137,9 +137,13 @@ function path = __snap_fig__ (fig, prefix, n, figformat)
   name = sprintf ("%s-%d.%s", prefix, n, figformat);
   path = fullfile ("assets", name);
   if (strcmp (figformat, "png"))
-    ## Print at twice the nominal size, font included, so the raster stays sharp
-    ## on a high-density display; the page scales it down with width="70%".
-    print (fig, path, "-F:28", "-S960,720");
+    ## Print at twice the nominal pixel size so the raster stays sharp on a
+    ## high-density display; the page scales it down with width="70%".  The
+    ## font size is NOT doubled with it: `-F` is relative to the canvas, not an
+    ## absolute pixel size, so `-S960,720` alone already reproduces the layout
+    ## at twice the resolution.  Doubling both put a long title across the full
+    ## width of the canvas and clipped it at either end.
+    print (fig, path, "-F:14", "-S960,720");
   else
     print (fig, path, "-F:14", "-S480,360");
   endif
