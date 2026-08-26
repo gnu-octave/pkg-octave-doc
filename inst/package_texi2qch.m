@@ -278,7 +278,9 @@ function gen = i_find_generator (given)
     cand = {'qhelpgenerator-qt6', 'qhelpgenerator-qt5', 'qhelpgenerator'};
   endif
   for i = 1:numel (cand)
-    [status, ~] = system (sprintf ("\"%s\" -v", cand{i}));
+    ## 2>&1 keeps the shell's report of a candidate that is not installed out
+    ## of the terminal: system does not capture stderr on its own.
+    [status, ~] = system (sprintf ("\"%s\" -v 2>&1", cand{i}));
     if (status == 0)
       gen = cand{i};
       return;
