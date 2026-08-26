@@ -1,6 +1,6 @@
 name: pkg-octave-doc
-version: 0.7.5
-date: 2026-08-18
+version: 0.7.6
+date: 2026-08-26
 author: Andreas Bertsatos
 maintainer: Andreas Bertsatos <abertsatos@biol.uoa.gr>
 title: Octave Package Documentation
