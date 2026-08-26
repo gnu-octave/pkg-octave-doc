@@ -28,6 +28,11 @@ are ignored).
 the functions' generated pages also include a URL to their respective repository locations.  This
 feature is only available for packages hosted at GitHub.
 
+* The `package_texi2qch` function requires the `qhelpgenerator` program of the Qt toolkit, which is
+looked up on $PATH.  On a system carrying more than one Qt version, name the program explicitly with
+the `'Generator'` option, since a file built by one Qt major version may not register with a GUI
+linked against another.
+
 
 ## Installation
 
@@ -60,6 +65,31 @@ If you wish to host the generated documentation on GitHub Pages, you need to cre
 <b>Branch</b>  ->  `main` `/docs` and click `Save`.
 
 You only need to do this once, and the package's website will be automatically updated every time you push a new commit into the package's `/docs` folder.
+
+Generate the Qt compressed help file, which Octave's GUI reads to populate its Documentation tab.
+`pkg load` registers `doc/<pkgname>.qch` from a package's installation directory and `pkg unload`
+unregisters it, so generate it there:
+
+```
+cd <package installation directory>/doc
+package_texi2qch ("statistics")
+```
+
+Then reload the package for the GUI to pick it up:
+
+```
+pkg unload statistics
+pkg load statistics
+```
+
+The same file must also be placed in the `doc/` folder of the package's repository, so that it
+travels in the release tarball and every user gets it on `pkg install`.  Demos are not included in
+the Qt help file, neither their code nor their figures.  On a system carrying more than one Qt
+version, name the generator explicitly:
+
+```
+package_texi2qch ("statistics", 'Generator', '/usr/lib/qt6/libexec/qhelpgenerator')
+```
 
 ## Guidelines for texinfo docstrings
 
