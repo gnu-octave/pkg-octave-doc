@@ -34,8 +34,9 @@
 ## rendered to HTML, one page per INDEX category, and each function is
 ## registered as a keyword pointing at its own anchor within that page.
 ##
-## A classdef is not put on a category page.  It is given a page tree of its
-## own, whatever its size:
+## A classdef is not rendered onto its category page.  It keeps the category
+## its INDEX entry puts it in, and is given a page tree of its own beneath it,
+## whatever its size:
 ##
 ## @itemize
 ## @item
@@ -52,9 +53,11 @@
 ## group's methods, in the order the class declares them.
 ## @end itemize
 ##
-## The contents tree of the documentation browser therefore enters a class
-## rather than scrolling past it among its neighbours, which is what a
-## category holding a few dozen classdefs would otherwise ask of a reader.
+## The contents tree of the documentation browser therefore nests a class
+## under its own category, and is entered rather than scrolled past among its
+## neighbours, which is what a category holding a few dozen classdefs would
+## otherwise ask of a reader.  A category page carries its plain functions and
+## a list of links to the classes it owns.
 ##
 ## Functions are grouped by category rather than given a page each because
 ## every file inside a @qcode{.qch} is compressed on its own, so fragmenting
@@ -147,16 +150,20 @@ function package_texi2qch (pkgname, varargin)
   ## grouped classdef is a category in its own right, so it is lifted out of
   ## the INDEX category it was listed under and collected separately.
   pkg_cat = desc{1}.provides;
-  cat = struct ("name", {}, "page", {}, "fcns", {});
+  cat = struct ("name", {}, "page", {}, "fcns", {}, "clsidx", {});
   cls = struct ("name", {}, "page", {}, "props", {}, "proppage", {}, ...
                 "subs", {});
   for i = 1:numel (pkg_cat)
-    keep = {};
+    ci = numel (cat) + 1;
+    cat(ci).name = pkg_cat{i}.category;
+    cat(ci).page = [i_sanitize(pkg_cat{i}.category), ".html"];
+    cat(ci).fcns = {};
+    cat(ci).clsidx = [];
     for j = 1:numel (pkg_cat{i}.functions)
       fcn = pkg_cat{i}.functions{j};
       [MTHDS, PROPS, GROUPS, ISCLS] = i_class_members (fcn);
       if (! ISCLS)
-        keep{end+1} = fcn;
+        cat(ci).fcns{end+1} = fcn;
         continue;
       endif
       k = numel (cls) + 1;
@@ -182,13 +189,8 @@ function package_texi2qch (pkgname, varargin)
         subs(1).methods = MTHDS;
       endif
       cls(k).subs = subs;
+      cat(ci).clsidx(end+1) = k;
     endfor
-    if (! isempty (keep))
-      k = numel (cat) + 1;
-      cat(k).name = pkg_cat{i}.category;
-      cat(k).page = [i_sanitize(cat(k).name), ".html"];
-      cat(k).fcns = keep;
-    endif
   endfor
 
   ## First pass: enumerate every documented name against the page and the
@@ -225,6 +227,14 @@ function package_texi2qch (pkgname, varargin)
     for j = 1:numel (cat(i).fcns)
       txt = [txt, i_render(cat(i).fcns{j}, "h2", pkgfcns, qchmap)];
     endfor
+    if (! isempty (cat(i).clsidx))
+      txt = [txt, "<h2>Classes</h2>\n<ul>\n"];
+      for c = cat(i).clsidx
+        txt = [txt, "<li><a href=\"", cls(c).page, "\">", cls(c).name, ...
+               "</a></li>\n"];
+      endfor
+      txt = [txt, "</ul>\n"];
+    endif
     tmpfiles{end+1} = i_finish (cat(i).page, txt);
   endfor
 
@@ -372,20 +382,23 @@ endfunction
 
 ## Render one documented name into a titled, anchored HTML block.
 function html = i_render (name, tag, pkgfcns, qchmap)
-  html = "";
-  [text, format] = get_help_text (name);
-  if (! strcmp (format, "texinfo"))
-    return;
-  endif
-  try
-    frag = __texi2html__ (text, name, pkgfcns);
-  catch
-    return;                 ## a help text that will not render is skipped
-  end_try_catch
-  frag = qch_postprocess (frag, name, qchmap);
+  ## The anchor and the heading are emitted whatever the help text turns out
+  ## to be: the keyword was registered before rendering, so a name that is
+  ## skipped here would leave the documentation browser with nowhere to land.
   idx = find (strcmp (qchmap(:,1), name), 1);
   html = ["<a name=\"", qchmap{idx,3}, "\"></a>\n<", tag, ">", name, ...
-          "</", tag, ">\n", frag, "\n"];
+          "</", tag, ">\n"];
+  [text, format] = get_help_text (name);
+  if (strcmp (format, "texinfo"))
+    try
+      frag = __texi2html__ (text, name, pkgfcns);
+      html = [html, qch_postprocess(frag, name, qchmap), "\n"];
+      return;
+    catch
+      ## fall through and show the help text as it stands
+    end_try_catch
+  endif
+  html = [html, "<pre>", i_xml(strtrim (text)), "</pre>\n"];
 endfunction
 
 ## The opening of a category page.  It carries no navigation and no assets:
@@ -439,21 +452,27 @@ function i_write_qhp (fname, pkgname, cat, cls, qchmap)
   endif
   fprintf (fid, "      <section title=\"%s\" ref=\"%s\">\n", pkgname, root);
   for i = 1:numel (cat)
-    fprintf (fid, "        <section title=\"%s\" ref=\"%s\"/>\n", ...
-             i_xml (cat(i).name), cat(i).page);
-  endfor
-  ## A classdef sits beside the categories, its properties and its methods
-  ## nested under it, so the contents tree is entered rather than scrolled.
-  for k = 1:numel (cls)
-    fprintf (fid, "        <section title=\"%s\" ref=\"%s\">\n", ...
-             i_xml (cls(k).name), cls(k).page);
-    if (! isempty (cls(k).proppage))
-      fprintf (fid, ["          <section title=\"Properties\"", ...
-                     " ref=\"%s\"/>\n"], cls(k).proppage);
+    if (isempty (cat(i).clsidx))
+      fprintf (fid, "        <section title=\"%s\" ref=\"%s\"/>\n", ...
+               i_xml (cat(i).name), cat(i).page);
+      continue;
     endif
-    for t = 1:numel (cls(k).subs)
-      fprintf (fid, "          <section title=\"%s\" ref=\"%s\"/>\n", ...
-               i_xml (cls(k).subs(t).title), cls(k).subs(t).page);
+    ## A classdef nests inside the category its INDEX entry puts it in, its
+    ## properties and its methods nested under it in turn.
+    fprintf (fid, "        <section title=\"%s\" ref=\"%s\">\n", ...
+             i_xml (cat(i).name), cat(i).page);
+    for c = cat(i).clsidx
+      fprintf (fid, "          <section title=\"%s\" ref=\"%s\">\n", ...
+               i_xml (cls(c).name), cls(c).page);
+      if (! isempty (cls(c).proppage))
+        fprintf (fid, ["            <section title=\"Properties\"", ...
+                       " ref=\"%s\"/>\n"], cls(c).proppage);
+      endif
+      for t = 1:numel (cls(c).subs)
+        fprintf (fid, "            <section title=\"%s\" ref=\"%s\"/>\n", ...
+                 i_xml (cls(c).subs(t).title), cls(c).subs(t).page);
+      endfor
+      fputs (fid, "          </section>\n");
     endfor
     fputs (fid, "        </section>\n");
   endfor
