@@ -1,14 +1,23 @@
-Summary of important user-visible changes for pkg-octave-doc 0.7.5:
+Summary of important user-visible changes for pkg-octave-doc 0.7.6:
 -------------------------------------------------------------------
 
- ** Demos are found for functions inside a `+namespace` directory.  They are
-    retrieved through `test`, which locates a file with `file_in_loadpath`,
-    and that does not resolve a name such as `geom.offset`.  No error was
-    raised, so a namespaced package was documented without any of its demos.
+ ** New function `package_texi2qch` builds a package's Qt compressed help
+    file, which Octave's GUI reads to populate its documentation tab.  `pkg
+    load` registers `doc/<pkgname>.qch` from the package's installation
+    directory and `pkg unload` unregisters it, so the generated file has to
+    be placed there before the release tarball is built.
 
- ** Demo figure titles are no longer clipped.  A PNG figure was printed with
-    its font size doubled along with its canvas, but `-F` is relative to the
-    canvas, so the text came out at twice its nominal size and a long title
-    ran past both edges of the frame.  43 of the 83 titled figures in one
-    package build were affected.  Figures are still printed at twice the
-    nominal size, which was the point of the doubling.
+ ** The help text of every function listed in a package's INDEX file is
+    rendered to one page per category, and that of every classdef method and
+    property to a page tree belonging to the class: the class help text, its
+    properties, and its methods, the last split into one page per group for a
+    classdef that sorts its methods under `** Group Name **` banners.  A class
+    nests under the category its INDEX entry puts it in.
+
+ ** Demos are not included, neither their code nor their figures.  The
+    resulting file is 1.05 MB for `statistics` and 0.29 MB for `datatypes`.
+
+ ** `package_texi2qch` requires the `qhelpgenerator` program of the Qt
+    toolkit.  It is looked up before any page is rendered, and an error is
+    raised if it cannot be found.  Name it with the `'Generator'` option on a
+    system carrying more than one Qt version.
