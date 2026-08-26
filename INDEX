@@ -7,3 +7,4 @@ Documentation
  function_texi2html
  list_packages
  package_texi2html
+ package_texi2qch
