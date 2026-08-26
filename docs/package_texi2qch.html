@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Octave Package Documentation: package_texi2html</title>
+    <title>Octave Package Documentation: package_texi2qch</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -152,8 +152,8 @@
 					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace"><small>find_GHurls</small></a></li>
 					<li><a href="function_texi2html.html" class="text-decoration-none font-monospace"><small>function_texi2html</small></a></li>
 					<li><a href="list_packages.html" class="text-decoration-none font-monospace"><small>list_packages</small></a></li>
-					<li><a href="package_texi2html.html" class="text-decoration-none font-monospace fw-bolder"><small>package_texi2html</small></a></li>
-					<li><a href="package_texi2qch.html" class="text-decoration-none font-monospace"><small>package_texi2qch</small></a></li>
+					<li><a href="package_texi2html.html" class="text-decoration-none font-monospace"><small>package_texi2html</small></a></li>
+					<li><a href="package_texi2qch.html" class="text-decoration-none font-monospace fw-bolder"><small>package_texi2qch</small></a></li>
 				</ul>
 				</div>
 			</div>
@@ -164,108 +164,108 @@
             <div class="card-header card-header-mod">
               <div class="row d-flex flex-wrap align-items-center">
                 <h3 class="d-inline-block mr-2">
-                Function&nbsp;Reference: <b><code>package_texi2html</code></b>
+                Function&nbsp;Reference: <b><code>package_texi2qch</code></b>
                 </h3>
               </div>
             </div>
             <div class="card-body">
 <dl>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2html</b> (<var>pkgname</var>)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2html</b> (<var>pkgname</var>, <var>Name</var>, <var>Value</var>)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: [<var>pkgfcns</var>, <var>info</var>] = <b>package_texi2html</b> (<var>pkgname</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2qch</b> (<var>pkgname</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2qch</b> (<var>pkgname</var>, <var>Name</var>, <var>Value</var>)</code></h5></dt>
 </dl>
-<p> Generate HTML pages for an entire package.
+<p> Generate a Qt compressed help file for an entire package.
 </p>
 <div class="ms-5">
-<p> <code>package_texi2html</code> takes a single input argument, <var>pkgname</var>, which
- is a char string with the package&rsquo;s name whose HTML documentation need to be
- generated.  The function considers the current working path as the root
- directory of the built pages.  It creates an <code>index.html</code> page with the
- available functions (and their subdivision into separate categories) of the
- package according to its INDEX file.  Although the INDEX file (if absent) is
- automatically generated during the package&rsquo;s installation, it is best
- practice to include one in the package&rsquo;s source so there is full comtrol of
- the categorization among the functions.  Individual functions HTML pages area
- generated with <code>function_texi2html</code>.  Note that every existing HTML file
- matching an <code>'.html'</code> extension as well as an <code>/assets</code> named
- folder inside the current working path are purged.
+<p> <code>package_texi2qch</code> takes a single input argument, <var>pkgname</var>, which
+ is a char string with the package&rsquo;s name whose Qt help file needs to be
+ generated, and writes <code><var>pkgname</var>.qch</code> into the current working
+ directory.  Octave&rsquo;s GUI reads such a file to populate its documentation
+ tab: <code>pkg load</code> registers <code>doc/<var>pkgname</var>.qch</code> from the
+ package&rsquo;s installation directory and <code>pkg unload</code> unregisters it, so
+ the generated file must be placed in the package&rsquo;s <code>doc/</code> directory
+ before the release tarball is built for it to have any effect.
 </p>
-<p> The generated pages follow the template of the Octave Packages GitHub Pages
- based on bootstrap 5 and the generated HTML code is based on the
- <code>index_template.html</code> and <code>default.html</code> layouts.
+<p> The help text of every function listed in the package&rsquo;s INDEX file is
+ rendered to HTML, one page per INDEX category, and each function is
+ registered as a keyword pointing at its own anchor within that page.
 </p>
-<p> For packages whose repository is available at GitHub, individual URLs to each
- function&rsquo;s location within the reposity are retrieved and used to add a link
- to source code in each function&rsquo;s page.  This requires an internet connection
- and <code>git</code> installed and available to the system&rsquo;s <code>$PATH</code>.  If not
- available, the source code link is omitted and the functions&rsquo; HTML pages are
- generated without it.
-</p>
-<p> Optionally, <code>package_texi2html</code> can return two output arguments, namely
- <var>pkgfcns</var> and <var>info</var>, which are necessary for the <code>find_GHurls</code>
- and <code>function_texi2html</code> functions.  In such case, the HTML pages
- generation is skipped.  This is useful for building individual function pages
- without the need to regenerate the package&rsquo;s entire documentation.
-</p>
-<p> Examples:
-</p>
-<table><tr><td>&nbsp;</td><td><pre class="example"> [pkgfcns, info] = package_texi2html (&quot;pkg-octave-doc&quot;);
- pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
- function_texi2html (&quot;find_GHurls&quot;, pkgfcns, info);
-</pre></td></tr></table>
-
-<p> Returning arguments:
+<p> A classdef is not rendered onto its category page.  It keeps the category
+ its INDEX entry puts it in, and is given a page tree of its own beneath it,
+ whatever its size:
 </p>
 <ul>
 <li>
- <var>pkgfcns</var> is a Nx2 cell array containing the package&rsquo;s available
- functions (1st column) and their respective category (2nd column).
+ <code>&lt;Class&gt;.html</code> carries the class help text and a list of links to the
+ pages below it.
 </li><li>
- <var>info</var> is a structure with the following fields:
-<div class="table-responsive">
-<table class="table table-striped table-bordered table-sm">
-<thead class="table-primary"><tr><th width="20%">Field Name</th><th width="80%">Description</th></tr></thead>
-<tr><td width="20%"><code>PKG_URL</code></td><td width="80%">The URL to the package&rsquo;s repository at GitHub.</td></tr>
-<tr><td width="20%"><code>PKG_ICON</code></td><td width="80%">The relative reference to the package&rsquo;s logo
- image which must be either in .svg or .png format and it is located in the
- newly created <code>assets/</code> folder inside the working directory.</td></tr>
-<tr><td width="20%"><code>PKG_NAME</code></td><td width="80%">The package&rsquo;s name (e.g. &quot;pkg-octave-doc&quot;)</td></tr>
-<tr><td width="20%"><code>PKG_TITLE</code></td><td width="80%">The package&rsquo;s title (e.g. &quot;Octave Package
- Documentation&quot;)</td></tr>
-<tr><td width="20%"><code>OCTAVE_LOGO</code></td><td width="80%">The relative reference to Octave&rsquo;s logo, also
- located inside the <code>assets/</code> folder.</td></tr>
-</table>
-<p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/package_texi2html.m">package_texi2html</a>
-</div>
-
-
+ <code>&lt;Class&gt;_properties.html</code> carries one section per property, and is
+ absent from a class that declares none.
+</li><li>
+ <code>&lt;Class&gt;_methods.html</code> carries one section per method.  A
+ <em>grouped</em> classdef, one that sorts its methods under
+ <code>** Group Name **</code> banner blocks as <code>classdef_texi2html</code> reads
+ them, takes one page per group instead, named after it and carrying that
+ group&rsquo;s methods, in the order the class declares them.
 </li></ul>
+
+<p> The contents tree of the documentation browser therefore nests a class
+ under its own category, and is entered rather than scrolled past among its
+ neighbours, which is what a category holding a few dozen classdefs would
+ otherwise ask of a reader.  A category page carries its plain functions and
+ a list of links to the classes it owns.
+</p>
+<p> Functions are grouped by category rather than given a page each because
+ every file inside a <code>.qch</code> is compressed on its own, so fragmenting
+ what the pages share inflates the archive: for the <code>statistics</code>
+ package the same documentation measures 0.57 MB at one page per category
+ against 1.89 MB at one page per function.  The page tree a classdef is
+ given costs a part of that difference and buys the navigation back.
+</p>
+<p> <strong>Demos are not included</strong>, neither their code nor their figures.  A
+ <code>.qch</code> is an offline reference to be shipped inside the package, where
+ the rendered figures of a package the size of <code>statistics</code> would cost
+ more than the rest of the documentation put together.  Demos remain
+ available through <code>demo</code> and through the online pages that
+ <code>package_texi2html</code> builds.
+</p>
+<p> <code>package_texi2qch</code> requires the <code>qhelpgenerator</code> program of the Qt
+ toolkit, which is located on the system&rsquo;s <code>$PATH</code> unless the
+ <code>'generator'</code> option names it explicitly.  The program is looked up
+ before any page is rendered and, if it cannot be found, an error is raised
+ and nothing is written, rather than spending the build on documentation that
+ cannot be packaged.
+</p>
+<p> Example:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example"> package_texi2qch (&quot;statistics&quot;);
+</pre></td></tr></table>
 
 <p>  Optional Name/Value pairs
 </p>
 <div class="table-responsive">
 <table class="table table-striped table-bordered table-sm">
 <thead class="table-primary"><tr><th width="20%"><var>Name</var></th><th width="80%"><var>Value</var></th></tr></thead>
-<tr><td width="20%"><code>'figformat'</code></td><td width="80%">The file format the demo figures are printed
- in, either <code>'png'</code> (default) or <code>'svg'</code>.  It is passed on to
- every page the build generates.  <code>'png'</code> is printed at twice the
- nominal size, so it stays sharp on a high-density display, and keeps the
- documentation small.  <code>'svg'</code> keeps the figures resolution independent,
- but a figure rich in filled areas can cost tens of MB and, on a large
- package, exhaust the memory of the graphics back end.</td></tr>
+<tr><td width="20%"><code>'Generator'</code></td><td width="80%">The <code>qhelpgenerator</code> executable, given
+ as a char string.  By default the program is looked up on the system&rsquo;s
+ <code>$PATH</code>.  Name it explicitly on a system carrying more than one Qt
+ version, since a file built by one Qt major version may not register with a
+ GUI linked against another.</td></tr>
+<tr><td width="20%"><code>'KeepHTML'</code></td><td width="80%">A logical scalar specifying whether the
+ intermediate HTML pages and the Qt help project file are kept beside the
+ generated <code>.qch</code>, which is <code>false</code> by default.  They are useful
+ for inspecting what was rendered before shipping it.</td></tr>
 </table>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/package_texi2html.m">package_texi2html</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/package_texi2qch.m">package_texi2qch</a>
 </div>
 
 <p> <strong>See also: </strong>
+  <a href="package_texi2html.html">package_texi2html</a>, 
   <a href="function_texi2html.html">function_texi2html</a>, 
-  <a href="find_GHurls.html">find_GHurls</a>, 
-  <a href="build_DEMOS.html">build_DEMOS</a>
+  <a href="classdef_texi2html.html">classdef_texi2html</a>
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/package_texi2html.m">package_texi2html</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/package_texi2qch.m">package_texi2qch</a>
 </div>
 
             </div>
