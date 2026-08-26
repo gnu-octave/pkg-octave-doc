@@ -32,26 +32,36 @@
 ##
 ## The help text of every function listed in the package's INDEX file is
 ## rendered to HTML, one page per INDEX category, and each function is
-## registered as a keyword pointing at its own anchor within that page.  The
-## help text of every classdef method and property is rendered and registered
-## alongside the classdef itself.
+## registered as a keyword pointing at its own anchor within that page.
 ##
-## A @emph{grouped} classdef, one that sorts its methods under
-## @qcode{** Group Name **} banner blocks and which
-## @code{classdef_texi2html} renders as a set of pages rather than one,
-## becomes a category of its own.  It is lifted out of the INDEX category it
-## was listed under and given a page carrying its own help text, its
-## properties, and its methods under a section per banner group, in the order
-## the class declares them.  The contents tree of the documentation browser
-## therefore shows such a class beside the categories rather than buried in
-## one.  A flat classdef is left where its INDEX entry puts it.
+## A classdef is not put on a category page.  It is given a page tree of its
+## own, whatever its size:
 ##
-## Grouping the pages by category rather than by function is deliberate.  Each
-## file inside a @qcode{.qch} is compressed on its own, so a page per function
-## discards what the pages share and inflates the result: for the
-## @qcode{statistics} package the same documentation measures 0.57 MB at one
-## page per category against 1.89 MB at one page per function, while no single
-## page grows beyond a few hundred KB.
+## @itemize
+## @item
+## @file{<Class>.html} carries the class help text and a list of links to the
+## pages below it.
+## @item
+## @file{<Class>_properties.html} carries one section per property, and is
+## absent from a class that declares none.
+## @item
+## @file{<Class>_methods.html} carries one section per method.  A
+## @emph{grouped} classdef, one that sorts its methods under
+## @qcode{** Group Name **} banner blocks as @code{classdef_texi2html} reads
+## them, takes one page per group instead, named after it and carrying that
+## group's methods, in the order the class declares them.
+## @end itemize
+##
+## The contents tree of the documentation browser therefore enters a class
+## rather than scrolling past it among its neighbours, which is what a
+## category holding a few dozen classdefs would otherwise ask of a reader.
+##
+## Functions are grouped by category rather than given a page each because
+## every file inside a @qcode{.qch} is compressed on its own, so fragmenting
+## what the pages share inflates the archive: for the @qcode{statistics}
+## package the same documentation measures 0.57 MB at one page per category
+## against 1.89 MB at one page per function.  The page tree a classdef is
+## given costs a part of that difference and buys the navigation back.
 ##
 ## @strong{Demos are not included}, neither their code nor their figures.  A
 ## @qcode{.qch} is an offline reference to be shipped inside the package, where
@@ -138,21 +148,40 @@ function package_texi2qch (pkgname, varargin)
   ## the INDEX category it was listed under and collected separately.
   pkg_cat = desc{1}.provides;
   cat = struct ("name", {}, "page", {}, "fcns", {});
-  cls = struct ("name", {}, "page", {}, "groups", {}, "props", {});
+  cls = struct ("name", {}, "page", {}, "props", {}, "proppage", {}, ...
+                "subs", {});
   for i = 1:numel (pkg_cat)
     keep = {};
     for j = 1:numel (pkg_cat{i}.functions)
       fcn = pkg_cat{i}.functions{j};
-      [MTHDS, PROPS, GROUPS] = i_class_members (fcn);
-      if (! isempty (GROUPS))
-        k = numel (cls) + 1;
-        cls(k).name = fcn;
-        cls(k).page = [i_sanitize(fcn), ".html"];
-        cls(k).groups = GROUPS;
-        cls(k).props = PROPS;
-      else
+      [MTHDS, PROPS, GROUPS, ISCLS] = i_class_members (fcn);
+      if (! ISCLS)
         keep{end+1} = fcn;
+        continue;
       endif
+      k = numel (cls) + 1;
+      base = i_sanitize (fcn);
+      cls(k).name = fcn;
+      cls(k).page = [base, ".html"];
+      cls(k).props = PROPS;
+      if (isempty (PROPS))
+        cls(k).proppage = "";
+      else
+        cls(k).proppage = [base, "_properties.html"];
+      endif
+      subs = struct ("title", {}, "page", {}, "methods", {});
+      if (! isempty (GROUPS))
+        for g = 1:numel (GROUPS)
+          subs(g).title = GROUPS(g).name;
+          subs(g).page = [base, "_", i_sanitize(GROUPS(g).name), ".html"];
+          subs(g).methods = GROUPS(g).methods;
+        endfor
+      elseif (! isempty (MTHDS))
+        subs(1).title = "Methods";
+        subs(1).page = [base, "_methods.html"];
+        subs(1).methods = MTHDS;
+      endif
+      cls(k).subs = subs;
     endfor
     if (! isempty (keep))
       k = numel (cat) + 1;
@@ -170,27 +199,18 @@ function package_texi2qch (pkgname, varargin)
     for j = 1:numel (cat(i).fcns)
       fcn = cat(i).fcns{j};
       qchmap(end+1,:) = {fcn, cat(i).page, i_sanitize(fcn)};
-      [MTHDS, PROPS] = i_class_members (fcn);
-      for k = 1:numel (PROPS)
-        nm = [fcn, ".", PROPS{k}];
-        qchmap(end+1,:) = {nm, cat(i).page, i_sanitize(nm)};
-      endfor
-      for k = 1:numel (MTHDS)
-        nm = [fcn, ".", MTHDS{k}];
-        qchmap(end+1,:) = {nm, cat(i).page, i_sanitize(nm)};
-      endfor
     endfor
   endfor
   for k = 1:numel (cls)
     qchmap(end+1,:) = {cls(k).name, cls(k).page, i_sanitize(cls(k).name)};
     for p = 1:numel (cls(k).props)
       nm = [cls(k).name, ".", cls(k).props{p}];
-      qchmap(end+1,:) = {nm, cls(k).page, i_sanitize(nm)};
+      qchmap(end+1,:) = {nm, cls(k).proppage, i_sanitize(nm)};
     endfor
-    for g = 1:numel (cls(k).groups)
-      for m = 1:numel (cls(k).groups(g).methods)
-        nm = [cls(k).name, ".", cls(k).groups(g).methods{m}];
-        qchmap(end+1,:) = {nm, cls(k).page, i_sanitize(nm)};
+    for t = 1:numel (cls(k).subs)
+      for m = 1:numel (cls(k).subs(t).methods)
+        nm = [cls(k).name, ".", cls(k).subs(t).methods{m}];
+        qchmap(end+1,:) = {nm, cls(k).subs(t).page, i_sanitize(nm)};
       endfor
     endfor
   endfor
@@ -198,49 +218,54 @@ function package_texi2qch (pkgname, varargin)
   ## __texi2html__ links a name only when it appears in the first column
   pkgfcns = qchmap(:,1:2);
 
-  ## Second pass: render one page per category
+  ## Second pass: render one page per category, functions only
   tmpfiles = {};
   for i = 1:numel (cat)
     txt = i_page_head (cat(i).name, pkgname);
     for j = 1:numel (cat(i).fcns)
-      fcn = cat(i).fcns{j};
-      txt = [txt, i_render(fcn, "h2", pkgfcns, qchmap)];
-      [MTHDS, PROPS] = i_class_members (fcn);
-      for k = 1:numel (PROPS)
-        txt = [txt, i_render([fcn, ".", PROPS{k}], "h3", pkgfcns, qchmap)];
-      endfor
-      for k = 1:numel (MTHDS)
-        txt = [txt, i_render([fcn, ".", MTHDS{k}], "h3", pkgfcns, qchmap)];
-      endfor
+      txt = [txt, i_render(cat(i).fcns{j}, "h2", pkgfcns, qchmap)];
     endfor
-    txt = [txt, "</body>\n</html>\n"];
-    fname = fullfile (pwd, cat(i).page);
-    i_write (fname, txt);
-    tmpfiles{end+1} = fname;
+    tmpfiles{end+1} = i_finish (cat(i).page, txt);
   endfor
 
-  ## One page per grouped classdef, its methods under a section per banner
+  ## A classdef owns a page of its own carrying its class help text and a
+  ## link to each of its subpages, so that a class is entered rather than
+  ## scrolled past among its neighbours.
   for k = 1:numel (cls)
     txt = i_page_head (cls(k).name, pkgname);
     txt = [txt, i_render(cls(k).name, "h2", pkgfcns, qchmap)];
-    if (! isempty (cls(k).props))
-      txt = [txt, "<h2>Properties</h2>\n"];
+    txt = [txt, "<h2>Contents</h2>\n<ul>\n"];
+    if (! isempty (cls(k).proppage))
+      txt = [txt, "<li><a href=\"", cls(k).proppage, "\">Properties</a>", ...
+             "</li>\n"];
+    endif
+    for t = 1:numel (cls(k).subs)
+      txt = [txt, "<li><a href=\"", cls(k).subs(t).page, "\">", ...
+             cls(k).subs(t).title, "</a></li>\n"];
+    endfor
+    txt = [txt, "</ul>\n"];
+    tmpfiles{end+1} = i_finish (cls(k).page, txt);
+
+    ## The properties of the class, one subpage
+    if (! isempty (cls(k).proppage))
+      txt = i_page_head ([cls(k).name, " properties"], pkgname);
       for p = 1:numel (cls(k).props)
         nm = [cls(k).name, ".", cls(k).props{p}];
-        txt = [txt, i_render(nm, "h3", pkgfcns, qchmap)];
+        txt = [txt, i_render(nm, "h2", pkgfcns, qchmap)];
       endfor
-      for g = 1:numel (cls(k).groups)
-        txt = [txt, "<h2>", cls(k).groups(g).name, "</h2>\n"];
-        for m = 1:numel (cls(k).groups(g).methods)
-          nm = [cls(k).name, ".", cls(k).groups(g).methods{m}];
-          txt = [txt, i_render(nm, "h3", pkgfcns, qchmap)];
-        endfor
-      endfor
+      tmpfiles{end+1} = i_finish (cls(k).proppage, txt);
     endif
-    txt = [txt, "</body>\n</html>\n"];
-    fname = fullfile (pwd, cls(k).page);
-    i_write (fname, txt);
-    tmpfiles{end+1} = fname;
+
+    ## Its methods, one subpage for a flat classdef and one per banner group
+    ## for a grouped one
+    for t = 1:numel (cls(k).subs)
+      txt = i_page_head ([cls(k).name, " ", cls(k).subs(t).title], pkgname);
+      for m = 1:numel (cls(k).subs(t).methods)
+        nm = [cls(k).name, ".", cls(k).subs(t).methods{m}];
+        txt = [txt, i_render(nm, "h2", pkgfcns, qchmap)];
+      endfor
+      tmpfiles{end+1} = i_finish (cls(k).subs(t).page, txt);
+    endfor
   endfor
 
   ## Write the Qt help project naming every page and every keyword
@@ -303,10 +328,11 @@ endfunction
 ## Return the methods and the properties of a classdef, or empty for anything
 ## else.  The classdef keyword is looked for in the file itself, since methods
 ## and properties answer for names that are not classes at all.
-function [MTHDS, PROPS, GROUPS] = i_class_members (name)
+function [MTHDS, PROPS, GROUPS, ISCLS] = i_class_members (name)
   MTHDS = {};
   PROPS = {};
   GROUPS = [];
+  ISCLS = false;
   fname = which (name);
   ## Only a classdef source can carry methods; anything else, a compiled
   ## function above all, is not worth reading and would not parse as text.
@@ -324,6 +350,7 @@ function [MTHDS, PROPS, GROUPS] = i_class_members (name)
   if (isempty (regexp (txt, '^\s*classdef\s', "once", "lineanchors")))
     return;
   endif
+  ISCLS = true;
   try
     MTHDS = get_methods_ordered (name, methods (name));
   catch
@@ -369,6 +396,21 @@ function txt = i_page_head (catname, pkgname)
          "</head>\n<body>\n<h1>", pkgname, ": ", catname, "</h1>\n"];
 endfunction
 
+## Close a page, write it to the working directory, and name the file.
+function fname = i_finish (page, txt)
+  fname = fullfile (pwd, page);
+  i_write (fname, [txt, "</body>\n</html>\n"]);
+endfunction
+
+## Escape what an XML attribute may not carry verbatim.  A banner group title
+## is free text and reaches the Qt help project as an attribute value.
+function s = i_xml (s)
+  s = strrep (s, "&", "&amp;");
+  s = strrep (s, "<", "&lt;");
+  s = strrep (s, ">", "&gt;");
+  s = strrep (s, "\"", "&quot;");
+endfunction
+
 ## Write a character vector to a file, or say which file could not be written.
 function i_write (fname, txt)
   fid = fopen (fname, "wt");
@@ -398,23 +440,27 @@ function i_write_qhp (fname, pkgname, cat, cls, qchmap)
   fprintf (fid, "      <section title=\"%s\" ref=\"%s\">\n", pkgname, root);
   for i = 1:numel (cat)
     fprintf (fid, "        <section title=\"%s\" ref=\"%s\"/>\n", ...
-             cat(i).name, cat(i).page);
+             i_xml (cat(i).name), cat(i).page);
   endfor
-  ## A grouped classdef sits beside the categories, its banner groups nested
-  ## under it, so the contents tree mirrors the class rather than hiding it.
+  ## A classdef sits beside the categories, its properties and its methods
+  ## nested under it, so the contents tree is entered rather than scrolled.
   for k = 1:numel (cls)
     fprintf (fid, "        <section title=\"%s\" ref=\"%s\">\n", ...
-             cls(k).name, cls(k).page);
-    for g = 1:numel (cls(k).groups)
+             i_xml (cls(k).name), cls(k).page);
+    if (! isempty (cls(k).proppage))
+      fprintf (fid, ["          <section title=\"Properties\"", ...
+                     " ref=\"%s\"/>\n"], cls(k).proppage);
+    endif
+    for t = 1:numel (cls(k).subs)
       fprintf (fid, "          <section title=\"%s\" ref=\"%s\"/>\n", ...
-               cls(k).groups(g).name, cls(k).page);
+               i_xml (cls(k).subs(t).title), cls(k).subs(t).page);
     endfor
     fputs (fid, "        </section>\n");
   endfor
   fputs (fid, "      </section>\n    </toc>\n    <keywords>\n");
   for i = 1:rows (qchmap)
     fprintf (fid, "      <keyword name=\"%s\" ref=\"%s#%s\"/>\n", ...
-             qchmap{i,1}, qchmap{i,2}, qchmap{i,3});
+             i_xml (qchmap{i,1}), qchmap{i,2}, qchmap{i,3});
   endfor
   fputs (fid, "    </keywords>\n    <files>\n");
   for i = 1:numel (cat)
@@ -422,6 +468,12 @@ function i_write_qhp (fname, pkgname, cat, cls, qchmap)
   endfor
   for k = 1:numel (cls)
     fprintf (fid, "      <file>%s</file>\n", cls(k).page);
+    if (! isempty (cls(k).proppage))
+      fprintf (fid, "      <file>%s</file>\n", cls(k).proppage);
+    endif
+    for t = 1:numel (cls(k).subs)
+      fprintf (fid, "      <file>%s</file>\n", cls(k).subs(t).page);
+    endfor
   endfor
   fputs (fid, "    </files>\n  </filterSection>\n</QtHelpProject>\n");
   fclose (fid);
