@@ -228,6 +228,13 @@
  available through <code>demo</code> and through the online pages that
  <code>package_texi2html</code> builds.
 </p>
+<p> <strong>A <code>@tex</code> formula is rendered as its <code>@ifnottex</code>
+ alternative, and dropped when it has none.</strong>  The documentation browser of
+ the GUI runs no JavaScript, so the MathJax that typesets a formula in the
+ online pages is not available to it, and the TeX would reach the reader as
+ source.  This is what <code>makeinfo</code> does for every output that is not
+ TeX, and what <code>help</code> prints in the terminal for the same docstring.
+</p>
 <p> <code>package_texi2qch</code> requires the <code>qhelpgenerator</code> program of the Qt
  toolkit, which is located on the system&rsquo;s <code>$PATH</code> unless the
  <code>'generator'</code> option names it explicitly.  The program is looked up
