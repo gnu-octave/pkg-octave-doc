@@ -73,6 +73,15 @@
 ## available through @code{demo} and through the online pages that
 ## @code{package_texi2html} builds.
 ##
+## @strong{A @code{@@tex} formula is rendered as its @code{@@ifnottex}
+## alternative.}  The documentation browser of the GUI runs no JavaScript, so
+## the MathJax that typesets a formula in the online pages is not available to
+## it, and the TeX would reach the reader as source.  Dropping it in favour of
+## the alternative is what @code{makeinfo} does for every output that is not
+## TeX, and the alternative is what its author wrote it for.  A docstring that
+## carries a formula and no alternative keeps its TeX, and its name is reported
+## so that it can be given one.
+##
 ## @code{package_texi2qch} requires the @code{qhelpgenerator} program of the Qt
 ## toolkit, which is located on the system's @code{$PATH} unless the
 ## @qcode{'generator'} option names it explicitly.  The program is looked up
@@ -391,7 +400,7 @@ function html = i_render (name, tag, pkgfcns, qchmap)
   [text, format] = get_help_text (name);
   if (strcmp (format, "texinfo"))
     try
-      frag = __texi2html__ (text, name, pkgfcns);
+      frag = __texi2html__ (i_untex (text, name), name, pkgfcns);
       html = [html, qch_postprocess(frag, name, qchmap), "\n"];
       return;
     catch
@@ -399,6 +408,45 @@ function html = i_render (name, tag, pkgfcns, qchmap)
     end_try_catch
   endif
   html = [html, "<pre>", i_xml(strtrim (text)), "</pre>\n"];
+endfunction
+
+## Resolve a @tex block for a target that cannot typeset it.  The documentation
+## browser of the GUI is a QTextBrowser, which runs no JavaScript, so the
+## MathJax that renders the TeX literal of __texi2html__ in the online pages is
+## not there and the reader is shown the formula as source.  Dropping the block
+## leaves __texi2html__ to keep the @ifnottex alternative instead, which is what
+## makeinfo does for every non-TeX output and what the author wrote it for.  A
+## docstring carrying no alternative keeps its TeX, source being more than
+## nothing, and is named so that it can be given one.
+function text = i_untex (text, name)
+  if (isempty (strfind (text, "@tex")))
+    return;
+  endif
+  if (isempty (strfind (text, "@ifnottex")))
+    warning ("package_texi2qch: no @ifnottex alternative in %s.", name);
+    warning ("TeX formula will appear as source in the documentation tab.");
+    return;
+  endif
+  do
+    b = strfind (text, "@tex");
+    e = strfind (text, "@end tex");
+    if (isempty (b))
+      break;
+    endif
+    b = b(1);
+    ## Only a terminator that follows the opening closes it: a docstring that
+    ## carries them the other way round would otherwise never be consumed.
+    e = e(e > b);
+    if (isempty (e))
+      break;
+    endif
+    e = e(1) + 7;                     # end of "@end tex"
+    tail = text(e+1:end);
+    if (! isempty (tail) && tail(1) == "\n")
+      tail = tail(2:end);
+    endif
+    text = [text(1:b-1), tail];
+  until (false)
 endfunction
 
 ## The opening of a category page.  It carries no navigation and no assets:
