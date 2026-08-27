@@ -229,12 +229,17 @@ function package_texi2qch (pkgname, varargin)
   ## __texi2html__ links a name only when it appears in the first column
   pkgfcns = qchmap(:,1:2);
 
-  ## Second pass: render one page per category, functions only
+  ## Second pass: render one page per category, functions only.  The first
+  ## sentence of every top-level name is kept as it is rendered, since the
+  ## landing page lists them and nothing else reads a help text twice.
   tmpfiles = {};
+  firsts = cell (0, 2);
   for i = 1:numel (cat)
     txt = i_page_head (cat(i).name, pkgname);
     for j = 1:numel (cat(i).fcns)
-      txt = [txt, i_render(cat(i).fcns{j}, "h2", pkgfcns, qchmap)];
+      [frag, first] = i_render (cat(i).fcns{j}, "h2", pkgfcns, qchmap);
+      txt = [txt, frag];
+      firsts(end+1,:) = {cat(i).fcns{j}, first};
     endfor
     if (! isempty (cat(i).clsidx))
       txt = [txt, "<h2>Classes</h2>\n<ul>\n"];
@@ -252,7 +257,9 @@ function package_texi2qch (pkgname, varargin)
   ## scrolled past among its neighbours.
   for k = 1:numel (cls)
     txt = i_page_head (cls(k).name, pkgname);
-    txt = [txt, i_render(cls(k).name, "h2", pkgfcns, qchmap)];
+    [frag, first] = i_render (cls(k).name, "h2", pkgfcns, qchmap);
+    txt = [txt, frag];
+    firsts(end+1,:) = {cls(k).name, first};
     txt = [txt, "<h2>Contents</h2>\n<ul>\n"];
     if (! isempty (cls(k).proppage))
       txt = [txt, "<li><a href=\"", cls(k).proppage, "\">Properties</a>", ...
@@ -287,9 +294,15 @@ function package_texi2qch (pkgname, varargin)
     endfor
   endfor
 
+  ## The landing page.  The root of the contents tree points here, so that
+  ## double-clicking the package enters it at an overview rather than at
+  ## whichever category happened to be listed first.
+  indexpage = i_index_page (pkgname, desc{1}, cat, cls, qchmap, firsts);
+  tmpfiles{end+1} = fullfile (pwd, indexpage);
+
   ## Write the Qt help project naming every page and every keyword
   qhpfile = fullfile (pwd, [pkgname, ".qhp"]);
-  i_write_qhp (qhpfile, pkgname, cat, cls, qchmap);
+  i_write_qhp (qhpfile, pkgname, cat, cls, qchmap, indexpage);
   tmpfiles{end+1} = qhpfile;
 
   ## Compress the pages into the Qt help file
@@ -389,8 +402,10 @@ function [MTHDS, PROPS, GROUPS, ISCLS] = i_class_members (name)
   end_try_catch
 endfunction
 
-## Render one documented name into a titled, anchored HTML block.
-function html = i_render (name, tag, pkgfcns, qchmap)
+## Render one documented name into a titled, anchored HTML block, and report
+## the first sentence of its help text for the landing page to list it by.
+function [html, first] = i_render (name, tag, pkgfcns, qchmap)
+  first = "";
   ## The anchor and the heading are emitted whatever the help text turns out
   ## to be: the keyword was registered before rendering, so a name that is
   ## skipped here would leave the documentation browser with nowhere to land.
@@ -401,7 +416,9 @@ function html = i_render (name, tag, pkgfcns, qchmap)
   if (strcmp (format, "texinfo"))
     try
       frag = __texi2html__ (i_untex (text, name), name, pkgfcns);
-      html = [html, qch_postprocess(frag, name, qchmap), "\n"];
+      body = qch_postprocess (frag, name, qchmap);
+      first = get_text_first_sentence (body);
+      html = [html, body, "\n"];
       return;
     catch
       ## fall through and show the help text as it stands
@@ -449,6 +466,57 @@ function text = i_untex (text, name)
   until (false)
 endfunction
 
+## The landing page of the package: what the online index page carries, minus
+## the assets and the category selector, which needs a script to do anything.
+## The name, version and description come from the package's own metadata, and
+## every documented top-level name is listed under its category against the
+## first sentence of its help text.
+function page = i_index_page (pkgname, desc, cat, cls, qchmap, firsts)
+  page = "index.html";
+  txt = ["<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\"/>\n", ...
+         "<title>", pkgname, "</title>\n</head>\n<body>\n", ...
+         "<h1>", pkgname, " ", desc.version, "</h1>\n"];
+  if (! isempty (desc.date))
+    txt = [txt, "<p>", i_xml(desc.date), "</p>\n"];
+  endif
+  if (! isempty (desc.description))
+    txt = [txt, "<p>", i_xml(desc.description), "</p>\n"];
+  endif
+  txt = [txt, "<h2>Contents</h2>\n<ul>\n"];
+  for i = 1:numel (cat)
+    txt = [txt, "<li><a href=\"#", i_sanitize(cat(i).name), "\">", ...
+           i_xml(cat(i).name), "</a></li>\n"];
+  endfor
+  txt = [txt, "</ul>\n"];
+  for i = 1:numel (cat)
+    txt = [txt, "<h2><a name=\"", i_sanitize(cat(i).name), "\"></a>", ...
+           i_xml(cat(i).name), "</h2>\n<table>\n"];
+    for j = 1:numel (cat(i).fcns)
+      txt = [txt, i_index_row(cat(i).fcns{j}, qchmap, firsts)];
+    endfor
+    for c = cat(i).clsidx
+      txt = [txt, i_index_row(cls(c).name, qchmap, firsts)];
+    endfor
+    txt = [txt, "</table>\n"];
+  endfor
+  i_write (fullfile (pwd, page), [txt, "</body>\n</html>\n"]);
+endfunction
+
+## One row of the landing page: a name against the first sentence of its help
+## text, linking to the anchor that name owns.
+function row = i_index_row (name, qchmap, firsts)
+  idx = find (strcmp (qchmap(:,1), name), 1);
+  href = [qchmap{idx,2}, "#", qchmap{idx,3}];
+  fidx = find (strcmp (firsts(:,1), name), 1);
+  if (isempty (fidx))
+    first = "";
+  else
+    first = firsts{fidx,2};
+  endif
+  row = ["<tr><td><code><a href=\"", href, "\">", i_xml(name), ...
+         "</a></code></td><td>", first, "</td></tr>\n"];
+endfunction
+
 ## The opening of a category page.  It carries no navigation and no assets:
 ## the Qt browser supplies its own, and every byte here is shipped.
 function txt = i_page_head (catname, pkgname)
@@ -483,7 +551,7 @@ function i_write (fname, txt)
 endfunction
 
 ## Write the Qt help project file listing the pages and the keywords.
-function i_write_qhp (fname, pkgname, cat, cls, qchmap)
+function i_write_qhp (fname, pkgname, cat, cls, qchmap, indexpage)
   fid = fopen (fname, "wt");
   if (fid < 0)
     error ("package_texi2qch: cannot write '%s'.", fname);
@@ -493,12 +561,8 @@ function i_write_qhp (fname, pkgname, cat, cls, qchmap)
   fprintf (fid, "  <namespace>octave.community.%s</namespace>\n", pkgname);
   fputs (fid, "  <virtualFolder>doc</virtualFolder>\n");
   fputs (fid, "  <filterSection>\n    <toc>\n");
-  if (! isempty (cat))
-    root = cat(1).page;
-  else
-    root = cls(1).page;
-  endif
-  fprintf (fid, "      <section title=\"%s\" ref=\"%s\">\n", pkgname, root);
+  fprintf (fid, "      <section title=\"%s\" ref=\"%s\">\n", pkgname, ...
+           indexpage);
   for i = 1:numel (cat)
     if (isempty (cat(i).clsidx))
       fprintf (fid, "        <section title=\"%s\" ref=\"%s\"/>\n", ...
@@ -530,6 +594,7 @@ function i_write_qhp (fname, pkgname, cat, cls, qchmap)
              i_xml (qchmap{i,1}), qchmap{i,2}, qchmap{i,3});
   endfor
   fputs (fid, "    </keywords>\n    <files>\n");
+  fprintf (fid, "      <file>%s</file>\n", indexpage);
   for i = 1:numel (cat)
     fprintf (fid, "      <file>%s</file>\n", cat(i).page);
   endfor
