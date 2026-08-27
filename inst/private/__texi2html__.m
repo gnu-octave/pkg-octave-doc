@@ -869,9 +869,13 @@ function out = i_render (cmd, content, pkgfcns)
       ## rendered as the times sign; the letter "x" is left untouched so it can
       ## be used as a variable name (e.g. @math{exp (-2 * x)}).  Authors must use
       ## "*" for multiplication -- a bare "x" is NOT treated as a times sign.
+      ## The element is the one makeinfo emits.  A bare <math> is the MathML
+      ## root element: an HTML5 parser reads what follows as foreign content,
+      ## so an inline tag inside it, as @math{100 * (1 - @var{alpha})%} emits,
+      ## closes the formula early and the remainder of it continues outside.
       inner = i_inline (content, pkgfcns, true);
       inner = strrep (inner, "*", "&times;");
-      out = ["<math>", inner, "</math>"];
+      out = ["<em class=\"math\">", inner, "</em>"];
     case "strong"
       out = ["<strong>", i_inline(content,pkgfcns), "</strong>"];
     case "emph"

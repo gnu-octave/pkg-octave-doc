@@ -14,6 +14,12 @@ Summary of important user-visible changes for pkg-octave-doc 0.7.7:
     pages is not available to it and the TeX reached the reader as source.
     This is what `help` prints in the terminal for the same docstring.
 
+ ** `@math{...}` is rendered as `<em class="math">`, the element `makeinfo`
+    emits, instead of a bare `<math>`.  `<math>` is the MathML root element,
+    so an HTML5 parser read everything after it as foreign content: an inline
+    tag inside a formula, as `@math{100 * (1 - @var{alpha})%}` produces,
+    closed the formula early and left the remainder of it outside.
+
  ** `classdef_texi2html` no longer loses the page of a class whose method is
     documented outside texinfo.  Such a method left the renderer without a
     first sentence or a body, raising `'mtds_fs' undefined` for the first one
