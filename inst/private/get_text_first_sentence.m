@@ -25,14 +25,16 @@
 
 function text = get_text_first_sentence (text);
 
-  ## Get indices to first paragraph
+  ## Get indices to first paragraph.  What sits between the tags is taken
+  ## whole and trimmed, rather than counted past: __texi2html__ opens a
+  ## paragraph as "<p> " for a docstring whose text is indented and as "<p>"
+  ## for one whose text is not, and a fixed offset eats the first character
+  ## of the latter.
   fs_beg = strfind (text, "<p>");
   fs_end = strfind (text, "</p>");
 
   if (! isempty (fs_beg) && ! isempty (fs_end))
-    fs_beg = fs_beg(1) + 4;
-    fs_end = fs_end(1) - 2;
-    text = text(fs_beg:fs_end);
+    text = strtrim (text(fs_beg(1)+3:fs_end(1)-1));
   else
     text = "";
   endif
