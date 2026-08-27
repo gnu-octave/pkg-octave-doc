@@ -1,23 +1,26 @@
-Summary of important user-visible changes for pkg-octave-doc 0.7.6:
+Summary of important user-visible changes for pkg-octave-doc 0.7.7:
 -------------------------------------------------------------------
 
- ** New function `package_texi2qch` builds a package's Qt compressed help
-    file, which Octave's GUI reads to populate its documentation tab.  `pkg
-    load` registers `doc/<pkgname>.qch` from the package's installation
-    directory and `pkg unload` unregisters it, so the generated file has to
-    be placed there before the release tarball is built.
+ ** `package_texi2qch` generates a landing page for the package and points the
+    root of the contents tree at it.  Double-clicking the package in the
+    Documentation tab opened whichever category was listed first; it now opens
+    an overview carrying the package name, version and description, and every
+    documented name under its category against the first sentence of its help
+    text.
 
- ** The help text of every function listed in a package's INDEX file is
-    rendered to one page per category, and that of every classdef method and
-    property to a page tree belonging to the class: the class help text, its
-    properties, and its methods, the last split into one page per group for a
-    classdef that sorts its methods under `** Group Name **` banners.  A class
-    nests under the category its INDEX entry puts it in.
+ ** A `@tex` formula is rendered as its `@ifnottex` alternative in a `.qch`,
+    and dropped when the docstring carries none.  The Qt documentation browser
+    runs no JavaScript, so the MathJax that typesets a formula in the online
+    pages is not available to it and the TeX reached the reader as source.
+    This is what `help` prints in the terminal for the same docstring.
 
- ** Demos are not included, neither their code nor their figures.  The
-    resulting file is 1.05 MB for `statistics` and 0.29 MB for `datatypes`.
+ ** `classdef_texi2html` no longer loses the page of a class whose method is
+    documented outside texinfo.  Such a method left the renderer without a
+    first sentence or a body, raising `'mtds_fs' undefined` for the first one
+    in a class and repeating the previous method's documentation for any later
+    one.  It now renders as not documented, as the grouped layout already did.
 
- ** `package_texi2qch` requires the `qhelpgenerator` program of the Qt
-    toolkit.  It is looked up before any page is rendered, and an error is
-    raised if it cannot be found.  Name it with the `'Generator'` option on a
-    system carrying more than one Qt version.
+ ** The first sentence of a help text no longer loses its first character when
+    the docstring body starts at column 0, as an oct-file's does.  It was read
+    by counting a fixed offset past the paragraph tag, which is correct only
+    for an indented body.
