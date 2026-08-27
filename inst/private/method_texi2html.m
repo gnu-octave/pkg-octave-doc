@@ -128,6 +128,6 @@ function method_texi2html (clsname, method, groups, pkgfcns, info, figformat)
 
 endfunction
 
-%!error <Invalid call> method_texi2html (1)
-%!error <Invalid call> method_texi2html ("table", "head")
-%!error <Invalid call> method_texi2html ("table", "head", struct(), cell (2))
+## The behaviour of this function is tested through classdef_texi2html, the
+## public entry point that reaches it: a test block is evaluated in the scope
+## of test.m, so it cannot name a private function.

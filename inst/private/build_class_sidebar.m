@@ -90,37 +90,6 @@ function sidebar = build_class_sidebar (clsname, groups, active)
 
 endfunction
 
-%!shared g
-%! g = struct ("name", {"Group One", "Group Two"}, ...
-%!             "methods", {{"m1", "m2"}, {"m3"}});
-
-%!test
-%! s = build_class_sidebar ("Foo", g, "m2");
-%! ## Overview link back to the class page
-%! assert (! isempty (strfind (s, "Foo.html")));
-%! ## Method links use Class.method.html naming
-%! assert (! isempty (strfind (s, "Foo.m1.html")));
-%! assert (! isempty (strfind (s, "Foo.m3.html")));
-
-%!test
-%! ## The active method is rendered bold (fw-bolder); the group holding it is
-%! ## expanded (checked)
-%! s = build_class_sidebar ("Foo", g, "m2");
-%! i_active = strfind (s, "Foo.m2.html");
-%! i_bold = strfind (s, "fw-bolder");
-%! assert (! isempty (i_bold));
-%! ## Group One (index 1) is the active group -> its checkbox is checked
-%! assert (! isempty (strfind (s, "id=\"togList1\" type=\"checkbox\" checked")));
-%! ## Group Two is not
-%! assert (! isempty (strfind (s, "id=\"togList2\" type=\"checkbox\">")));
-
-%!test
-%! ## With no active match nothing is bold and no group is expanded
-%! s = build_class_sidebar ("Foo", g, "");
-%! assert (isempty (strfind (s, "fw-bolder")));
-%! assert (isempty (strfind (s, "checkbox\" checked")));
-
-%!error <Invalid call> build_class_sidebar ()
-%!error <Invalid call> build_class_sidebar ("Foo", g)
-%!error <Invalid call> build_class_sidebar (1, g, "m1")
-%!error <Invalid call> build_class_sidebar ("Foo", "notstruct", "m1")
+## The behaviour of this function is tested through classdef_texi2html, the
+## public entry point that reaches it: a test block is evaluated in the scope
+## of test.m, so it cannot name a private function.

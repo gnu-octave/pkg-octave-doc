@@ -45,6 +45,6 @@ function html = __demo_notebook__ (block, imgprefix, imgbase, figformat)
 
 endfunction
 
-%!error <Invalid call> __demo_notebook__ ()
-%!error <Invalid call> __demo_notebook__ ("x = 1")
-%!error <Invalid call> __demo_notebook__ (1, "p", 100)
+## The behaviour of this function is tested through build_DEMOS, the public
+## entry point that reaches it: a test block is evaluated in the scope of
+## test.m, so it cannot name a private function.

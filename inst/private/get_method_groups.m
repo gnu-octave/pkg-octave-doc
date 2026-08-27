@@ -42,7 +42,6 @@ function groups = get_method_groups (clsname, MTHDS)
 
 endfunction
 
-%!error <Invalid call> get_method_groups ()
-%!error <Invalid call> get_method_groups ("table")
-%!error <Invalid call> get_method_groups (1, {"m"})
-%!error <Invalid call> get_method_groups ("table", "notcell")
+## The behaviour of this function is tested through classdef_texi2html, the
+## public entry point that reaches it: a test block is evaluated in the scope
+## of test.m, so it cannot name a private function.
