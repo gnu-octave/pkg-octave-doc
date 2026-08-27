@@ -74,13 +74,11 @@
 ## @code{package_texi2html} builds.
 ##
 ## @strong{A @code{@@tex} formula is rendered as its @code{@@ifnottex}
-## alternative.}  The documentation browser of the GUI runs no JavaScript, so
-## the MathJax that typesets a formula in the online pages is not available to
-## it, and the TeX would reach the reader as source.  Dropping it in favour of
-## the alternative is what @code{makeinfo} does for every output that is not
-## TeX, and the alternative is what its author wrote it for.  A docstring that
-## carries a formula and no alternative keeps its TeX, and its name is reported
-## so that it can be given one.
+## alternative, and dropped when it has none.}  The documentation browser of
+## the GUI runs no JavaScript, so the MathJax that typesets a formula in the
+## online pages is not available to it, and the TeX would reach the reader as
+## source.  This is what @code{makeinfo} does for every output that is not
+## TeX, and what @code{help} prints in the terminal for the same docstring.
 ##
 ## @code{package_texi2qch} requires the @code{qhelpgenerator} program of the Qt
 ## toolkit, which is located on the system's @code{$PATH} unless the
@@ -415,7 +413,7 @@ function [html, first] = i_render (name, tag, pkgfcns, qchmap)
   [text, format] = get_help_text (name);
   if (strcmp (format, "texinfo"))
     try
-      frag = __texi2html__ (i_untex (text, name), name, pkgfcns);
+      frag = __texi2html__ (i_untex (text), name, pkgfcns);
       body = qch_postprocess (frag, name, qchmap);
       first = get_text_first_sentence (body);
       html = [html, body, "\n"];
@@ -427,23 +425,18 @@ function [html, first] = i_render (name, tag, pkgfcns, qchmap)
   html = [html, "<pre>", i_xml(strtrim (text)), "</pre>\n"];
 endfunction
 
-## Resolve a @tex block for a target that cannot typeset it.  The documentation
+## Drop a @tex block, which this target cannot typeset.  The documentation
 ## browser of the GUI is a QTextBrowser, which runs no JavaScript, so the
 ## MathJax that renders the TeX literal of __texi2html__ in the online pages is
-## not there and the reader is shown the formula as source.  Dropping the block
-## leaves __texi2html__ to keep the @ifnottex alternative instead, which is what
-## makeinfo does for every non-TeX output and what the author wrote it for.  A
-## docstring carrying no alternative keeps its TeX, source being more than
-## nothing, and is named so that it can be given one.
-function text = i_untex (text, name)
-  if (isempty (strfind (text, "@tex")))
-    return;
-  endif
-  if (isempty (strfind (text, "@ifnottex")))
-    warning ("package_texi2qch: no @ifnottex alternative in %s.", name);
-    warning ("TeX formula will appear as source in the documentation tab.");
-    return;
-  endif
+## not there.  Dropping the block leaves __texi2html__ to keep the @ifnottex
+## alternative instead, which is what makeinfo does for every non-TeX output
+## and what the author wrote it for.  A docstring carrying no alternative
+## renders without the formula, exactly as `help' prints it in the terminal:
+## the literal reaching the page as source is worse than its absence, all the
+## more since a browser reads the '<' of a relation as the opening of a tag and
+## swallows the rest, and since a formula whose author wrote no plain-text form
+## for it is usually one that has none worth reading.
+function text = i_untex (text)
   do
     b = strfind (text, "@tex");
     e = strfind (text, "@end tex");
