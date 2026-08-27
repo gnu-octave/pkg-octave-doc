@@ -34,7 +34,10 @@
 ## @end example
 ##
 ## placed before each @code{methods} block, matching the convention used in the
-## datatypes package.  @code{parse_method_groups} walks the source and assigns
+## datatypes package.  Nothing here requires that placement, but the class
+## does: a comment run reaching down to a method is that method's help text, so
+## a banner directly above one documents it.  @code{parse_method_groups} walks
+## the source and assigns
 ## each public method to the most recent banner above its @code{function}
 ## declaration.
 ##

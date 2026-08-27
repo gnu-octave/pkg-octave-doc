@@ -91,7 +91,9 @@
 ## @end example
 ##
 ## placed before a @code{methods} block, matching the convention used by the
-## datatypes package.  Each public method is assigned to the most recent banner
+## datatypes package, and never directly above a method: a comment run
+## reaching down to one is that method's help text, so the banner would be
+## documenting it.  Each public method is assigned to the most recent banner
 ## above its definition; groups whose methods are all non-public (@code{Hidden}
 ## or private) are omitted, and any public method before the first banner is
 ## collected under an @qcode{"Other"} group.
