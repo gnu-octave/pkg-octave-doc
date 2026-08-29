@@ -19,7 +19,9 @@
 ## @deftypefn  {pkg-octave-doc} {@var{PROPS} =} get_properties_ordered (@var{class}, @var{PROPS})
 ##
 ## Private function to order properties according to their order of appearance
-## in the classdef file.
+## in the classdef file.  Properties inherited from a superclass are not
+## declared in the file, so they are appended in the order @code{properties}
+## reported them.
 ##
 ## @end deftypefn
 
@@ -105,7 +107,12 @@ function PROPS = get_properties_ordered (class, PROPS);
     endif
   endfor
 
-  ## Reorder methods in MTDS cell array
-  PROPS = PROPS(index);
+  ## Reorder properties according to their appearance in the classdef file.
+  ## Properties inherited from a superclass are not declared in this file, so
+  ## keep them, in the order 'properties' reported them, after those that are.
+  ## Scanning only this file would otherwise drop them without warning.
+  rest = 1:numel (PROPS);
+  rest(index) = [];
+  PROPS = PROPS([index, rest]);
 
 endfunction
