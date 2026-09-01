@@ -21,8 +21,8 @@
 ## Split a DEMO code block into an ordered sequence of comment and code cells.
 ##
 ## @var{code} is a char string holding the source of a single DEMO block, as
-## returned by @code{find_DEMOS}.  @__demo_segments__ returns @var{seg}, a struct
-## array with two fields:
+## returned by @code{find_DEMOS}.  @code{__demo_segments__} returns @var{seg},
+## a struct array with two fields:
 ##
 ## @itemize
 ## @item @qcode{type} is either @qcode{"comment"} for a run of consecutive

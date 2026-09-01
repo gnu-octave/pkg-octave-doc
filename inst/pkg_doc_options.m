@@ -413,6 +413,13 @@ classdef pkg_doc_options
                 'INDEX rules', {'IndexMissingEntry', 'IndexOrphanEntry', ...
                                 'IndexNotFound'}};
       changed = fieldnames (differences (this));
+
+      ## A severity fits the value column and a path does not, so a value too
+      ## wide for it takes a line of its own underneath rather than pushing
+      ## every other row across or being cut short
+      width = 13;
+      fmt = sprintf ('    %%s %%-18s %%-%ds %%s\n', width);
+
       fprintf ('\n  pkg_doc_options\n');
       for ii = 1:rows (groups)
         fprintf ('\n    %s\n', groups{ii, 1});
@@ -423,8 +430,13 @@ classdef pkg_doc_options
           else
             mark = ' ';
           endif
-          fprintf ('    %s %-18s %s\n', mark, names{jj}, ...
-                   valueString (this.(names{jj})));
+          val = valueString (this.(names{jj}));
+          if (numel (val) > width)
+            fprintf (fmt, mark, names{jj}, '', summaryOf (names{jj}));
+            fprintf ('    %s %-18s %s\n', ' ', '', val);
+          else
+            fprintf (fmt, mark, names{jj}, val, summaryOf (names{jj}));
+          endif
         endfor
       endfor
       if (isempty (changed))
@@ -526,6 +538,44 @@ function val = checkSeverity (val, name)
     error (strcat ("pkg_doc_options: %s must be 'error', 'warning',", ...
                    " or 'off'."), name);
   endif
+endfunction
+
+## What a property controls, in the width a column allows.  The help text of
+## each property says the same thing at length, and is where a reader is sent
+## for the detail this cannot carry.
+function str = summaryOf (name)
+  switch (name)
+    case 'Index'
+      str = "path to the package's INDEX";
+    case 'Verbosity'
+      str = 'how much a run prints';
+    case 'WrappedHeader'
+      str = 'a header broken across lines';
+    case 'EndTrailingText'
+      str = 'text after @end on its line';
+    case 'BareAt'
+      str = 'an @ that is not a command';
+    case 'UnbalancedBrace'
+      str = 'a brace that never closes';
+    case 'UnclosedBlock'
+      str = 'a block with no @end';
+    case 'CategoryLabel'
+      str = 'a label naming no class or package';
+    case 'MissingDocstring'
+      str = 'a public member with no help';
+    case 'BodyColumns'
+      str = 'width limit of a body line';
+    case 'SeealsoInMember'
+      str = '@seealso on a class member';
+    case 'IndexMissingEntry'
+      str = 'a name absent from INDEX';
+    case 'IndexOrphanEntry'
+      str = 'an INDEX entry with no file';
+    case 'IndexNotFound'
+      str = 'no INDEX where one was expected';
+    otherwise
+      str = '';
+  endswitch
 endfunction
 
 ## Render a property value for display
