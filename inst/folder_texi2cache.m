@@ -40,7 +40,10 @@
 ## @qcode{'-auto'} narrows the work to what @code{git} reports as changed
 ## within this directory, and is the form to reach for while working in one: a
 ## directory holding many classes takes minutes to rebuild whole and seconds to
-## refresh for the two files just edited.  A file that moved between
+## refresh for the two files just edited.  Where there is no @code{git} to ask,
+## or the tree is not a repository, it is ignored with a warning and the whole
+## directory is rebuilt, which is what would have been asked for had the
+## question been answerable.  A file that moved between
 ## directories is only half of its own rename here, the departure seen in the
 ## directory it left and the arrival in the one it joined, so run it in both or
 ## reach for @code{package_texi2cache} instead.
@@ -105,7 +108,14 @@ function report = folder_texi2cache (varargin)
   ## them without appearing here at all, which is how its entries are dropped.
   touched = {};
   if (auto)
-    changed = __git_changed__ ('folder_texi2cache', here);
+    [changed, why] = __git_changed__ (here);
+    if (! isempty (why))
+      warning (strcat ("folder_texi2cache: %s, so '-auto' is ignored", ...
+                       " and the whole directory is rebuilt."), why);
+      auto = false;
+    endif
+  endif
+  if (auto)
     keep = false (1, numel (items));
     for ii = 1:numel (items)
       keep(ii) = any (strcmp (changed, fullfile (here, items(ii).file)));
@@ -365,9 +375,10 @@ endfunction
 %!   before = fileread ('doc-cache');
 %!   fid = fopen (fullfile (d, 'bistextra.m'), 'w');
 %!   fprintf (fid, '## -*- texinfo -*-\n## @deftypefn {bistpkg} {} bistextra ()\n');
-%!   fprintf (fid, '##\n## A function added after the cache was written.\n##\n');
+%!   fprintf (fid, '##\n## A function added after the cache.\n##\n');
 %!   fprintf (fid, '## A body line that is distinctive enough to look for.\n');
-%!   fprintf (fid, '##\n## @end deftypefn\nfunction bistextra ()\nendfunction\n');
+%!   fprintf (fid, '##\n## @end deftypefn\n');
+%!   fprintf (fid, 'function bistextra ()\nendfunction\n');
 %!   fclose (fid);
 %!   r = folder_texi2cache ('-check');
 %!   assert (r.changed, true);
@@ -395,6 +406,27 @@ endfunction
 %!   assert (any (strcmp (cached, 'bistplain')));
 %!   assert (! any (strcmp (cached, 'ns.bistns')));
 %!   assert (any (strcmp ({r.findings.rule}, 'IndexMissingEntry')));
+%! unwind_protect_cleanup
+%!   cd (old);
+%!   rmpath (d);
+%! end_unwind_protect
+
+%!test  # '-auto' outside a repository rebuilds everything instead of failing
+%! d = fullfile (tempdir (), 'pkg_octave_doc_fd_bist');
+%! old = pwd ();
+%! addpath (d);
+%! unwind_protect
+%!   cd (d);
+%!   delete ('doc-cache');
+%!   warning ('off', 'all');
+%!   unwind_protect
+%!     r = folder_texi2cache ('-auto');
+%!   unwind_protect_cleanup
+%!     warning ('on', 'all');
+%!   end_unwind_protect
+%!   s = load ('doc-cache');
+%!   assert (any (strcmp (s.cache(1,:), 'bistplain')));
+%!   assert (any (strcmp (s.cache(1,:), 'ns.bistns')));
 %! unwind_protect_cleanup
 %!   cd (old);
 %!   rmpath (d);

@@ -16,7 +16,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn {pkg-octave-doc} {@var{files} =} __git_changed__ (@var{caller}, @var{dirpath})
+## @deftypefn {pkg-octave-doc} {[@var{files}, @var{why}] =} __git_changed__ (@var{dirpath})
 ##
 ## Private function listing the files @code{git} reports as changed.
 ##
@@ -26,32 +26,45 @@
 ## would otherwise be missing from its first commit.  A file that was deleted
 ## is listed too, its entries being what has to go.
 ##
-## A directory that is not inside a repository stops the run rather than
-## quietly rebuilding everything, since a caller asking for the changed files
-## alone would otherwise be answered with silence.
+## @var{why} says why the question could not be answered, and is empty when it
+## was.  Neither @code{git} being absent nor the tree not being a repository
+## is an error: a caller asking for the changed files alone is told that it
+## cannot have them, and rebuilds everything instead, which is right rather
+## than merely lenient, since the alternative is refusing to do work that is
+## perfectly possible.
 ##
 ## @end deftypefn
 
-function files = __git_changed__ (caller, dirpath)
+function [files, why] = __git_changed__ (dirpath)
 
   ## Input validation
-  if (nargin != 2)
+  if (nargin != 1)
     error ("__git_changed__: invalid number of input arguments.");
   endif
 
   files = {};
+  why = '';
+
+  ## Is there a git to ask at all
+  [status, ~] = system ('git --version');
+  if (status != 0)
+    why = 'git is not installed';
+    return;
+  endif
+
   [status, out] = system (sprintf ('git -C "%s" rev-parse --show-toplevel', ...
                                    dirpath));
   if (status != 0)
-    error (strcat ("%s: '%s' is not inside a git repository, so the", ...
-                   " changed files cannot be found."), caller, dirpath);
+    why = 'this tree is not a git repository';
+    return;
   endif
   root = strtrim (out);
 
   [status, out] = system (sprintf ('git -C "%s" status --porcelain -uall', ...
                                    root));
   if (status != 0)
-    error ("%s: git could not report what changed in '%s'.", caller, root);
+    why = 'git could not report what changed';
+    return;
   endif
 
   lines = strsplit (strrep (out, "\r\n", "\n"), "\n", ...
