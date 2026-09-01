@@ -36,9 +36,8 @@ function MTHDS = get_methods_ordered (class, MTHDS);
   ## Find lines with function declarations
   fcn_beg = strfind (txt, " function ");
   endline = strfind (txt, "\n");
-  fcn_beg = [fcn_beg, fcn_beg(end)];
   index = [];
-  for i = 1:numel (fcn_beg) - 1
+  for i = 1:numel (fcn_beg)
     ## Get text line for each occurence of "function"
     fcn_idx = fcn_beg(i);
     fcn_line_beg = endline(find (endline < fcn_beg(i), 1, "last")) + 1;

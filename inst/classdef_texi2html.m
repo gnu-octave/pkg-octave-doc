@@ -627,7 +627,7 @@ endfunction
 ## a comment run reaching down to a method becomes that method's help text, so
 ## a banner written directly above one would be read as its documentation.
 
-%!shared grouped, mthd, flat, hashed, plain, derived, files
+%!shared grouped, mthd, flat, hashed, plain, derived, base, files
 %! d = fullfile (tempdir (), "pkg_octave_doc_cls_bist");
 %! if (! isfolder (d))
 %!   mkdir (d);
@@ -838,6 +838,7 @@ endfunction
 %!   classdef_texi2html ("BistFlat", {"BistFlat", "Cat"}, info);
 %!   classdef_texi2html ("BistHash", {"BistHash", "Cat"}, info);
 %!   classdef_texi2html ("BistDerived", {"BistDerived", "Cat"}, info);
+%!   classdef_texi2html ("BistBase", {"BistBase", "Cat"}, info);
 %!   ## A class documenting its methods outside texinfo used to raise rather
 %!   ## than render, so its failure is kept to the two tests that own it.
 %!   try
@@ -852,9 +853,15 @@ endfunction
 %!   flat = fileread ("BistFlat.html");
 %!   hashed = fileread ("BistHash.html");
 %!   derived = fileread ("BistDerived.html");
+%!   base = fileread ("BistBase.html");
 %! unwind_protect_cleanup
 %!   cd (oldpwd);
 %! end_unwind_protect
+
+%!test  # a class declaring no method at all is documented rather than raising
+%! assert (any (strcmp (files, "BistBase.html")));
+%! assert (! isempty (strfind (base, "InheritedProp")));
+%! assert (! isempty (strfind (base, "Documented on the abstract base")));
 
 %!test  # a class declaring no banner keeps the single-page layout
 %! assert (any (strcmp (files, "BistFlat.html")));
