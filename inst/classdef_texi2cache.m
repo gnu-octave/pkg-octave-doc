@@ -45,8 +45,9 @@
 ## it is skipped.
 ##
 ## @var{options} is a @code{pkg_doc_options} object.  Its
-## @code{IndexLocation} property never decides what is written here: the class named is always cached, and an
-## @file{INDEX} given only adds a warning when the class is not listed in it.
+## @code{IndexLocation} property never decides what is written here: the class
+## named is always cached, and an @file{INDEX} given only adds a warning when
+## the class is not listed in it.
 ##
 ## An inherited property is cached, its help text belonging to the superclass
 ## that declares it, but only the rules a renderer can apply are run on it: the
@@ -164,35 +165,38 @@ endfunction
 %! for ii = 1:numel (stale)
 %!   delete (fullfile (d, stale(ii).name));
 %! endfor
-%! fid = fopen (fullfile (d, 'BistBase.m'), 'w');
-%! fprintf (fid, 'classdef BistBase\n');
-%! fprintf (fid, '  ## -*- texinfo -*-\n  ## @deftp {bistpkg} BistBase\n  ##\n');
+%! fid = fopen (fullfile (d, 'BistCacheBase.m'), 'w');
+%! fprintf (fid, 'classdef BistCacheBase\n');
+%! fprintf (fid, '  ## -*- texinfo -*-\n');
+%! fprintf (fid, '  ## @deftp {bistpkg} BistCacheBase\n  ##\n');
 %! fprintf (fid, '  ## A base class written for the tests here.\n  ##\n');
 %! fprintf (fid, '  ## @end deftp\n  properties\n');
 %! fprintf (fid, '    ## -*- texinfo -*-\n');
-%! fprintf (fid, '    ## @deftp {BistBase} {property} Inherited\n    ##\n');
+%! fprintf (fid, '    ## @deftp {BistCacheBase} {property} Inherited\n');
+%! fprintf (fid, '    ##\n');
 %! fprintf (fid, '    ## A property the derived class inherits from here.\n');
 %! fprintf (fid, '    ##\n    ## @end deftp\n    Inherited = 1\n');
 %! fprintf (fid, '  endproperties\n  methods (Access = public)\n');
 %! fprintf (fid, '    ## -*- texinfo -*-\n');
-%! fprintf (fid, '    ## @deftypefn {BistBase} {} inheritedMethod (@var{obj})\n    ##\n');
+%! fprintf (fid, '    ## @deftypefn {BistCacheBase} {} inheritedMethod (@var{obj})\n    ##\n');
 %! fprintf (fid, '    ## A method the derived class inherits from here.\n');
 %! fprintf (fid, '    ##\n    ## @end deftypefn\n');
 %! fprintf (fid, '    function inheritedMethod (this)\n    endfunction\n');
 %! fprintf (fid, '  endmethods\nendclassdef\n');
 %! fclose (fid);
-%! fid = fopen (fullfile (d, 'BistDerived.m'), 'w');
-%! fprintf (fid, 'classdef BistDerived < BistBase\n');
-%! fprintf (fid, '  ## -*- texinfo -*-\n  ## @deftp {bistpkg} BistDerived\n  ##\n');
+%! fid = fopen (fullfile (d, 'BistCacheSub.m'), 'w');
+%! fprintf (fid, 'classdef BistCacheSub < BistCacheBase\n');
+%! fprintf (fid, '  ## -*- texinfo -*-\n');
+%! fprintf (fid, '  ## @deftp {bistpkg} BistCacheSub\n  ##\n');
 %! fprintf (fid, '  ## A class deriving from the base class here.\n  ##\n');
 %! fprintf (fid, '  ## @end deftp\n  properties\n');
 %! fprintf (fid, '    ## -*- texinfo -*-\n');
-%! fprintf (fid, '    ## @deftp {BistDerived} {property} Own\n    ##\n');
+%! fprintf (fid, '    ## @deftp {BistCacheSub} {property} Own\n    ##\n');
 %! fprintf (fid, '    ## A property this class declares for itself.\n');
 %! fprintf (fid, '    ##\n    ## @end deftp\n    Own = 2\n');
 %! fprintf (fid, '  endproperties\n  methods (Access = public)\n');
 %! fprintf (fid, '    ## -*- texinfo -*-\n');
-%! fprintf (fid, '    ## @deftypefn {BistDerived} {} ownMethod (@var{obj})\n    ##\n');
+%! fprintf (fid, '    ## @deftypefn {BistCacheSub} {} ownMethod (@var{obj})\n    ##\n');
 %! fprintf (fid, '    ## A method this class declares for itself.\n');
 %! fprintf (fid, '    ##\n    ## @end deftypefn\n');
 %! fprintf (fid, '    function ownMethod (this)\n    endfunction\n');
@@ -202,12 +206,12 @@ endfunction
 %! addpath (d);
 %! unwind_protect
 %!   cd (d);
-%!   r = classdef_texi2cache ('BistDerived');
+%!   r = classdef_texi2cache ('BistCacheSub');
 %!   s = load ('doc-cache');
 %!   names = s.cache(1,:);
-%!   assert (any (strcmp (names, 'BistDerived')));
-%!   assert (any (strcmp (names, 'BistDerived.Own')));
-%!   assert (any (strcmp (names, 'BistDerived.ownMethod')));
+%!   assert (any (strcmp (names, 'BistCacheSub')));
+%!   assert (any (strcmp (names, 'BistCacheSub.Own')));
+%!   assert (any (strcmp (names, 'BistCacheSub.ownMethod')));
 %!   assert (r.changed, true);
 %! unwind_protect_cleanup
 %!   cd (old);
@@ -222,8 +226,8 @@ endfunction
 %!   cd (d);
 %!   s = load ('doc-cache');
 %!   names = s.cache(1,:);
-%!   assert (any (strcmp (names, 'BistDerived.Inherited')));
-%!   assert (! any (strcmp (names, 'BistDerived.inheritedMethod')));
+%!   assert (any (strcmp (names, 'BistCacheSub.Inherited')));
+%!   assert (! any (strcmp (names, 'BistCacheSub.inheritedMethod')));
 %! unwind_protect_cleanup
 %!   cd (old);
 %!   rmpath (d);
@@ -235,7 +239,7 @@ endfunction
 %! addpath (d);
 %! unwind_protect
 %!   cd (d);
-%!   r = classdef_texi2cache ('BistDerived');
+%!   r = classdef_texi2cache ('BistCacheSub');
 %!   assert (r.changed, false);
 %!   assert (isempty (r.added));
 %!   assert (isempty (r.removed));
@@ -247,7 +251,7 @@ endfunction
 %!test  # INDEX never gates the class named, it only reports
 %! d = fullfile (tempdir (), 'pkg_octave_doc_cc_bist');
 %! fid = fopen (fullfile (d, 'INDEX'), 'w');
-%! fputs (fid, "bistpkg >> Bist Package\nDocumentation\n BistBase\n");
+%! fputs (fid, "bistpkg >> Bist Package\nDocumentation\n BistCacheBase\n");
 %! fclose (fid);
 %! old = pwd ();
 %! addpath (d);
@@ -255,10 +259,10 @@ endfunction
 %!   cd (d);
 %!   o = pkg_doc_options ();
 %!   o.IndexLocation = fullfile (d, 'INDEX');
-%!   r = classdef_texi2cache ('BistDerived', o);
+%!   r = classdef_texi2cache ('BistCacheSub', o);
 %!   assert (any (strcmp ({r.findings.rule}, 'IndexMissingEntry')));
 %!   s = load ('doc-cache');
-%!   assert (any (strcmp (s.cache(1,:), 'BistDerived')));
+%!   assert (any (strcmp (s.cache(1,:), 'BistCacheSub')));
 %! unwind_protect_cleanup
 %!   cd (old);
 %!   rmpath (d);

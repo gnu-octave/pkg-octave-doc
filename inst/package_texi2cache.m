@@ -256,7 +256,7 @@ endfunction
 %! fclose (fid);
 %! spec = {fullfile(d, 'inst', 'bisttop.m'), 'bisttop'; ...
 %!         fullfile(d, 'inst', 'Sub', 'bistsub.m'), 'bistsub'; ...
-%!         fullfile(d, 'inst', '+ns', 'bistns.m'), 'bistns'};
+%!         fullfile(d, 'inst', '+ns', 'bistpkgns.m'), 'bistpkgns'};
 %! for ii = 1:rows (spec)
 %!   fid = fopen (spec{ii,1}, 'w');
 %!   fprintf (fid, '## -*- texinfo -*-\n');
@@ -269,7 +269,7 @@ endfunction
 %! endfor
 %! fid = fopen (fullfile (d, 'INDEX'), 'w');
 %! fputs (fid, "bistpkg >> Bist Package\nDocumentation\n bisttop\n bistsub\n");
-%! fputs (fid, " ns.bistns\n bistghost\n");
+%! fputs (fid, " ns.bistpkgns\n bistghost\n");
 %! fclose (fid);
 %! old = pwd ();
 %! unwind_protect
@@ -279,7 +279,7 @@ endfunction
 %!   assert (numel (rep), 2);
 %!   s = load (fullfile (d, 'inst', 'doc-cache'));
 %!   assert (any (strcmp (s.cache(1,:), 'bisttop')));
-%!   assert (any (strcmp (s.cache(1,:), 'ns.bistns')));
+%!   assert (any (strcmp (s.cache(1,:), 'ns.bistpkgns')));
 %!   s = load (fullfile (d, 'inst', 'Sub', 'doc-cache'));
 %!   assert (s.cache{1,1}, 'bistsub');
 %! unwind_protect_cleanup

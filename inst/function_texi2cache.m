@@ -42,9 +42,9 @@
 ## of its members together.
 ##
 ## @var{options} is a @code{pkg_doc_options} object.  Its
-## @code{IndexLocation} property never decides what is written here: the function named is always cached, and
-## an @file{INDEX} given only adds a warning when the function is not listed in
-## it.
+## @code{IndexLocation} property never decides what is written here: the
+## function named is always cached, and an @file{INDEX} given only adds a
+## warning when the function is not listed in it.
 ##
 ## The help text is read from the file rather than from the session:
 ## @code{clear functions} is issued first, and what the interpreter then
