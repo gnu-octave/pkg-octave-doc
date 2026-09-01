@@ -195,7 +195,11 @@ function [status, report] = package_texi2cache (varargin)
     for ii = 1:numel (report)
       __show_report__ (report(ii), options);
     endfor
-    printf ('%d cache files changed.\n', status);
+    if (status == 1)
+      printf ('1 cache file changed.\n');
+    else
+      printf ('%d cache files changed.\n', status);
+    endif
     clear status;
   endif
 
