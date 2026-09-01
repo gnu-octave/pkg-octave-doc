@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Octave Package Documentation: find_GHurls</title>
+    <title>Octave Package Documentation: classdef_texi2cache</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -148,10 +148,10 @@
 				<ul style="list-style-type: none; padding-left: 20px;">
 					<li><a href="build_DEMOS.html" class="text-decoration-none font-monospace"><small>build_DEMOS</small></a></li>
 					<li><a href="check_texi_docs.html" class="text-decoration-none font-monospace"><small>check_texi_docs</small></a></li>
-					<li><a href="classdef_texi2cache.html" class="text-decoration-none font-monospace"><small>classdef_texi2cache</small></a></li>
+					<li><a href="classdef_texi2cache.html" class="text-decoration-none font-monospace fw-bolder"><small>classdef_texi2cache</small></a></li>
 					<li><a href="classdef_texi2html.html" class="text-decoration-none font-monospace"><small>classdef_texi2html</small></a></li>
 					<li><a href="find_DEMOS.html" class="text-decoration-none font-monospace"><small>find_DEMOS</small></a></li>
-					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace fw-bolder"><small>find_GHurls</small></a></li>
+					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace"><small>find_GHurls</small></a></li>
 					<li><a href="folder_texi2cache.html" class="text-decoration-none font-monospace"><small>folder_texi2cache</small></a></li>
 					<li><a href="function_texi2cache.html" class="text-decoration-none font-monospace"><small>function_texi2cache</small></a></li>
 					<li><a href="function_texi2html.html" class="text-decoration-none font-monospace"><small>function_texi2html</small></a></li>
@@ -170,48 +170,65 @@
             <div class="card-header card-header-mod">
               <div class="row d-flex flex-wrap align-items-center">
                 <h3 class="d-inline-block mr-2">
-                Function&nbsp;Reference: <b><code>find_GHurls</code></b>
+                Function&nbsp;Reference: <b><code>classdef_texi2cache</code></b>
                 </h3>
               </div>
             </div>
             <div class="card-body">
 <dl>
-<dt><code><h5 class="fs">pkg-octave-doc: <var>pkgfcns</var> = <b>find_GHurls</b> (<var>pkgurl</var>, <var>pkgfcns</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>classdef_texi2cache</b> (<var>clsname</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>classdef_texi2cache</b> (<var>clsname</var>, <var>options</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <var>report</var> = <b>classdef_texi2cache</b> (&hellip;)</code></h5></dt>
 </dl>
-<p> Retrieve unique URLs to every function&rsquo;s location within the package&rsquo;s GitHub
- repository.
+<p> Write a class and its documented members into this directory&rsquo;s doc-cache.
 </p>
 <div class="ms-5">
-<p> <code>find_GHurls</code> requires two input arguments, <var>pkgurl</var>, a char string
- with the URL to the root directory to the package&rsquo;s GitHub repository and
- <var>pkgfcns</var>, a Nx2 cell array containing the package&rsquo;s available functions
- (1st column) and their respective category (2nd column).
+<p> <var>clsname</var> is a class, qualified by its package when it lives in one, as
+ in <code>'prob.NormalDistribution'</code>.  Its own entry and one per member are
+ written into the <code>doc-cache</code> of the <strong>current directory</strong>, and the
+ entries the class no longer has are dropped, so a method renamed inside a
+ class needs only the class named once.
 </p>
-<p> Note: <code>find_GHurls</code> explicitly works with repositories hosted on GitHub!
- <var>pkgurl</var> can be easily retrieved from the <code>PKG_URL</code> field of the
- <var>info</var> structure returned from <code>package_texi2html</code>.
+<p> The class file must live in the current directory, or in a <code>+pkg</code>
+ directory below it.  A <code>+pkg</code> directory is never itself the place to
+ stand: a cache inside one can be read by nothing, so a namespaced class is
+ written from the directory holding the <code>+pkg</code>.
 </p>
-<p> <code>find_GHurls</code> returns a cell array, <var>pkgfcns</var>, by appending a third
- column to the input <var>pkgfcns</var> with the URLs to the source code location
- of each individual function listed in the 1st column of <var>pkgfcns</var>.
- <code>find_GHurls</code> relies on <code>curl</code> and <code>tar</code>, which must be
- installed and available to the system&rsquo;s <code>$PATH</code>, and an active internet
- connection to download and extract the targeted repository to a temporary
- directory.  If either <code>curl</code> or <code>tar</code> fail for any reason,
- <code>find_GHurls</code> returns a verbatim copy of the input <var>pkgfcns</var>.
+<p> The members are the ones the class documents: its public constructor, the
+ methods declared in the class&rsquo;s own file, and the properties reported by
+ <code>properties</code>, inherited ones included.  This is what
+ <code>classdef_texi2html</code> publishes, so a class reads the same way online
+ and in <code>lookfor</code>, and it is not an arbitrary choice: <code>help</code>
+ resolves an inherited property on a subclass but not an inherited method, so
+ these are exactly the members a cache entry can be built for.  Members of a
+ <code>Hidden</code> or private block are left out, as are those carrying no
+ texinfo help, each of the latter reported under <code>MissingDocstring</code> as
+ it is skipped.
 </p>
-<p> Use the following example to obtain a cell array with each function&rsquo;s URL to
- its source code location at GitHub:
+<p> <var>options</var> is a <code>pkg_doc_options</code> object.  Its
+ <code>IndexLocation</code> property never decides what is written here: the class
+ named is always cached, and an <code>INDEX</code> given only adds a warning when
+ the class is not listed in it.
 </p>
-<table><tr><td>&nbsp;</td><td><pre class="example"> [pkgfcns, info] = package_texi2html (&quot;pkg-octave-doc&quot;);
- pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
-</pre></td></tr></table>
-
+<p> An inherited property is cached, its help text belonging to the superclass
+ that declares it, but only the rules a renderer can apply are run on it: the
+ rules that measure a file are left to the run that covers the file it is
+ written in.
+</p>
+<p> <var>report</var> is a struct with the fields <code>'cache'</code>, <code>'added'</code>,
+ <code>'updated'</code>, <code>'removed'</code>, <code>'changed'</code> and
+ <code>'findings'</code>.  With no output requested the same information is
+ printed.
+</p>
 <p> <strong>See also: </strong>
-  <a href="function_texi2html.html">function_texi2html</a>
+  <a href="package_texi2cache.html">package_texi2cache</a>, 
+  <a href="folder_texi2cache.html">folder_texi2cache</a>, 
+  <a href="function_texi2cache.html">function_texi2cache</a>, 
+  <a href="classdef_texi2html.html">classdef_texi2html</a>, 
+  <a href="pkg_doc_options.html">pkg_doc_options</a>
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/find_GHurls.m">find_GHurls</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/classdef_texi2cache.m">classdef_texi2cache</a>
 </div>
 
             </div>

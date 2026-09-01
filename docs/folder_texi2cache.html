@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Octave Package Documentation: find_GHurls</title>
+    <title>Octave Package Documentation: folder_texi2cache</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -151,8 +151,8 @@
 					<li><a href="classdef_texi2cache.html" class="text-decoration-none font-monospace"><small>classdef_texi2cache</small></a></li>
 					<li><a href="classdef_texi2html.html" class="text-decoration-none font-monospace"><small>classdef_texi2html</small></a></li>
 					<li><a href="find_DEMOS.html" class="text-decoration-none font-monospace"><small>find_DEMOS</small></a></li>
-					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace fw-bolder"><small>find_GHurls</small></a></li>
-					<li><a href="folder_texi2cache.html" class="text-decoration-none font-monospace"><small>folder_texi2cache</small></a></li>
+					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace"><small>find_GHurls</small></a></li>
+					<li><a href="folder_texi2cache.html" class="text-decoration-none font-monospace fw-bolder"><small>folder_texi2cache</small></a></li>
 					<li><a href="function_texi2cache.html" class="text-decoration-none font-monospace"><small>function_texi2cache</small></a></li>
 					<li><a href="function_texi2html.html" class="text-decoration-none font-monospace"><small>function_texi2html</small></a></li>
 					<li><a href="list_packages.html" class="text-decoration-none font-monospace"><small>list_packages</small></a></li>
@@ -170,48 +170,70 @@
             <div class="card-header card-header-mod">
               <div class="row d-flex flex-wrap align-items-center">
                 <h3 class="d-inline-block mr-2">
-                Function&nbsp;Reference: <b><code>find_GHurls</code></b>
+                Function&nbsp;Reference: <b><code>folder_texi2cache</code></b>
                 </h3>
               </div>
             </div>
             <div class="card-body">
 <dl>
-<dt><code><h5 class="fs">pkg-octave-doc: <var>pkgfcns</var> = <b>find_GHurls</b> (<var>pkgurl</var>, <var>pkgfcns</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>folder_texi2cache</b> ()</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>folder_texi2cache</b> (<code>'-auto'</code>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>folder_texi2cache</b> (<code>'-check'</code>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>folder_texi2cache</b> (&hellip;, <var>options</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <var>report</var> = <b>folder_texi2cache</b> (&hellip;)</code></h5></dt>
 </dl>
-<p> Retrieve unique URLs to every function&rsquo;s location within the package&rsquo;s GitHub
- repository.
+<p> Rebuild the doc-cache of the current directory.
 </p>
 <div class="ms-5">
-<p> <code>find_GHurls</code> requires two input arguments, <var>pkgurl</var>, a char string
- with the URL to the root directory to the package&rsquo;s GitHub repository and
- <var>pkgfcns</var>, a Nx2 cell array containing the package&rsquo;s available functions
- (1st column) and their respective category (2nd column).
+<p> Every function and class in the current directory is written afresh, along
+ with the members of each class and the contents of any <code>+pkg</code> or
+ <code>@class</code> directory below it, and any entry that no longer corresponds
+ to a file is dropped.  A <code>doc-cache</code> is a per-directory file, so this
+ is the whole of one, which is what makes it the unit worth having: a
+ directory rebuilt this way is in the state a full package rebuild would
+ leave it in.
 </p>
-<p> Note: <code>find_GHurls</code> explicitly works with repositories hosted on GitHub!
- <var>pkgurl</var> can be easily retrieved from the <code>PKG_URL</code> field of the
- <var>info</var> structure returned from <code>package_texi2html</code>.
+<p> The current directory must be a function directory of a package, so a
+ package root, a <code>+pkg</code> or <code>@class</code> directory, and <code>private</code>,
+ <code>tests</code>, <code>demos</code> or <code>datasets</code> are all refused, the middle
+ two because their cache could be read by nothing.
 </p>
-<p> <code>find_GHurls</code> returns a cell array, <var>pkgfcns</var>, by appending a third
- column to the input <var>pkgfcns</var> with the URLs to the source code location
- of each individual function listed in the 1st column of <var>pkgfcns</var>.
- <code>find_GHurls</code> relies on <code>curl</code> and <code>tar</code>, which must be
- installed and available to the system&rsquo;s <code>$PATH</code>, and an active internet
- connection to download and extract the targeted repository to a temporary
- directory.  If either <code>curl</code> or <code>tar</code> fail for any reason,
- <code>find_GHurls</code> returns a verbatim copy of the input <var>pkgfcns</var>.
+<p> <code>'-auto'</code> narrows the work to what <code>git</code> reports as changed
+ within this directory, and is the form to reach for while working in one: a
+ directory holding many classes takes minutes to rebuild whole and seconds to
+ refresh for the two files just edited.  Where there is no <code>git</code> to ask,
+ or the tree is not a repository, it is ignored with a warning and the whole
+ directory is rebuilt, which is what would have been asked for had the
+ question been answerable.  A file that moved between
+ directories is only half of its own rename here, the departure seen in the
+ directory it left and the arrival in the one it joined, so run it in both or
+ reach for <code>package_texi2cache</code> instead.
 </p>
-<p> Use the following example to obtain a cell array with each function&rsquo;s URL to
- its source code location at GitHub:
+<p> <code>'-check'</code> writes nothing and reports what would change, and may be
+ given together with <code>'-auto'</code> to ask whether the files just edited are
+ already accounted for.
 </p>
-<table><tr><td>&nbsp;</td><td><pre class="example"> [pkgfcns, info] = package_texi2html (&quot;pkg-octave-doc&quot;);
- pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
-</pre></td></tr></table>
-
+<p> <var>options</var> is a <code>pkg_doc_options</code> object.  Unlike the per-item
+ functions, an <code>INDEX</code> given through it <strong>decides what is cached</strong>:
+ only the names it lists are written, so the cache holds the package&rsquo;s public
+ surface rather than whatever the directory happens to carry.  A name found
+ here but absent from <code>INDEX</code> is skipped and reported.  An <code>INDEX</code>
+ entry answering to no file is not reported at this scope, since a directory
+ cannot tell one naming a file elsewhere from one naming nothing at all.
+</p>
+<p> <var>report</var> is a struct with the fields <code>'cache'</code>, <code>'added'</code>,
+ <code>'updated'</code>, <code>'removed'</code>, <code>'changed'</code> and
+ <code>'findings'</code>.  With no output requested the same information is
+ printed.
+</p>
 <p> <strong>See also: </strong>
-  <a href="function_texi2html.html">function_texi2html</a>
+  <a href="package_texi2cache.html">package_texi2cache</a>, 
+  <a href="classdef_texi2cache.html">classdef_texi2cache</a>, 
+  <a href="function_texi2cache.html">function_texi2cache</a>, 
+  <a href="pkg_doc_options.html">pkg_doc_options</a>
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/find_GHurls.m">find_GHurls</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/folder_texi2cache.m">folder_texi2cache</a>
 </div>
 
             </div>

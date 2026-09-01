@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Octave Package Documentation: find_GHurls</title>
+    <title>Octave Package Documentation: function_texi2cache</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -151,9 +151,9 @@
 					<li><a href="classdef_texi2cache.html" class="text-decoration-none font-monospace"><small>classdef_texi2cache</small></a></li>
 					<li><a href="classdef_texi2html.html" class="text-decoration-none font-monospace"><small>classdef_texi2html</small></a></li>
 					<li><a href="find_DEMOS.html" class="text-decoration-none font-monospace"><small>find_DEMOS</small></a></li>
-					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace fw-bolder"><small>find_GHurls</small></a></li>
+					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace"><small>find_GHurls</small></a></li>
 					<li><a href="folder_texi2cache.html" class="text-decoration-none font-monospace"><small>folder_texi2cache</small></a></li>
-					<li><a href="function_texi2cache.html" class="text-decoration-none font-monospace"><small>function_texi2cache</small></a></li>
+					<li><a href="function_texi2cache.html" class="text-decoration-none font-monospace fw-bolder"><small>function_texi2cache</small></a></li>
 					<li><a href="function_texi2html.html" class="text-decoration-none font-monospace"><small>function_texi2html</small></a></li>
 					<li><a href="list_packages.html" class="text-decoration-none font-monospace"><small>list_packages</small></a></li>
 					<li><a href="package_texi2cache.html" class="text-decoration-none font-monospace"><small>package_texi2cache</small></a></li>
@@ -170,48 +170,63 @@
             <div class="card-header card-header-mod">
               <div class="row d-flex flex-wrap align-items-center">
                 <h3 class="d-inline-block mr-2">
-                Function&nbsp;Reference: <b><code>find_GHurls</code></b>
+                Function&nbsp;Reference: <b><code>function_texi2cache</code></b>
                 </h3>
               </div>
             </div>
             <div class="card-body">
 <dl>
-<dt><code><h5 class="fs">pkg-octave-doc: <var>pkgfcns</var> = <b>find_GHurls</b> (<var>pkgurl</var>, <var>pkgfcns</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>function_texi2cache</b> (<var>fcnname</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>function_texi2cache</b> (<var>fcnname</var>, <var>options</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <var>report</var> = <b>function_texi2cache</b> (&hellip;)</code></h5></dt>
 </dl>
-<p> Retrieve unique URLs to every function&rsquo;s location within the package&rsquo;s GitHub
- repository.
+<p> Write one function&rsquo;s entry into this directory&rsquo;s doc-cache.
 </p>
 <div class="ms-5">
-<p> <code>find_GHurls</code> requires two input arguments, <var>pkgurl</var>, a char string
- with the URL to the root directory to the package&rsquo;s GitHub repository and
- <var>pkgfcns</var>, a Nx2 cell array containing the package&rsquo;s available functions
- (1st column) and their respective category (2nd column).
+<p> <var>fcnname</var> is a function, whether an m-file or a compiled one, a function
+ inside a package as <code>'pkg.fcnname'</code>, or a method of an old-style class
+ as <code>'@cls/method'</code>, each spelled the way <code>help</code> takes it.  Its
+ entry is written into the <code>doc-cache</code> of the <strong>current
+ directory</strong>, leaving every other entry in that file alone.  The file must
+ live here, or in a <code>+pkg</code> or <code>@class</code> directory below, neither of
+ which can hold a cache of its own.
 </p>
-<p> Note: <code>find_GHurls</code> explicitly works with repositories hosted on GitHub!
- <var>pkgurl</var> can be easily retrieved from the <code>PKG_URL</code> field of the
- <var>info</var> structure returned from <code>package_texi2html</code>.
+<p> A name that no longer resolves is treated as removed and its entry dropped,
+ which is how a deleted or renamed function is cleared out of the cache it
+ still sits in.
 </p>
-<p> <code>find_GHurls</code> returns a cell array, <var>pkgfcns</var>, by appending a third
- column to the input <var>pkgfcns</var> with the URLs to the source code location
- of each individual function listed in the 1st column of <var>pkgfcns</var>.
- <code>find_GHurls</code> relies on <code>curl</code> and <code>tar</code>, which must be
- installed and available to the system&rsquo;s <code>$PATH</code>, and an active internet
- connection to download and extract the targeted repository to a temporary
- directory.  If either <code>curl</code> or <code>tar</code> fail for any reason,
- <code>find_GHurls</code> returns a verbatim copy of the input <var>pkgfcns</var>.
+<p> A compiled function is read from its <code>.oct</code>, which must exist and be
+ newer than its <code>.cc</code>, since that is the only place a <code>DEFUN_DLD</code>
+ docstring lives.
 </p>
-<p> Use the following example to obtain a cell array with each function&rsquo;s URL to
- its source code location at GitHub:
+<p> For a class, use <code>classdef_texi2cache</code>, which writes the class and all
+ of its members together.
 </p>
-<table><tr><td>&nbsp;</td><td><pre class="example"> [pkgfcns, info] = package_texi2html (&quot;pkg-octave-doc&quot;);
- pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
-</pre></td></tr></table>
-
+<p> <var>options</var> is a <code>pkg_doc_options</code> object.  Its
+ <code>IndexLocation</code> property never decides what is written here: the
+ function named is always cached, and an <code>INDEX</code> given only adds a
+ warning when the function is not listed in it.
+</p>
+<p> The help text is read from the file rather than from the session:
+ <code>clear functions</code> is issued first, and what the interpreter then
+ answers must carry a distinctive run of the docstring in the file, so that
+ neither a definition held from earlier nor a copy installed elsewhere can be
+ cached unnoticed.
+</p>
+<p> <var>report</var> is a struct with the fields <code>'cache'</code>, <code>'added'</code>,
+ <code>'updated'</code>, <code>'removed'</code>, <code>'changed'</code> and
+ <code>'findings'</code>.  With no output requested the same information is
+ printed.
+</p>
 <p> <strong>See also: </strong>
-  <a href="function_texi2html.html">function_texi2html</a>
+  <a href="package_texi2cache.html">package_texi2cache</a>, 
+  <a href="folder_texi2cache.html">folder_texi2cache</a>, 
+  <a href="classdef_texi2cache.html">classdef_texi2cache</a>, 
+  <a href="function_texi2html.html">function_texi2html</a>, 
+  <a href="pkg_doc_options.html">pkg_doc_options</a>
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/find_GHurls.m">find_GHurls</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/function_texi2cache.m">function_texi2cache</a>
 </div>
 
             </div>

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Octave Package Documentation: pkg_doc_options</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    <script type="text/javascript" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML">
+    </script>
+    <script type="text/javascript">
+      window.addEventListener("load", () => {
+        for (let i of document.querySelectorAll(".collapse ul")) {
+          let tog = document.createElement("div");
+          tog.innerHTML = i.previousSibling.textContent;
+          tog.className = "toggle";
+          tog.onclick = () => tog.classList.toggle("show");
+          i.parentElement.removeChild(i.previousSibling);
+          i.parentElement.insertBefore(tog, i);
+        }
+      });
+      // Open the collapsible demo an "#example" link points to, then scroll to
+      // it.  getElementById (not querySelector) matches ids that contain a dot,
+      // e.g. "Class.method-example1".
+      function openHashTarget () {
+        if (! window.location.hash) { return; }
+        let el = document.getElementById (
+          decodeURIComponent (window.location.hash.slice (1)));
+        if (! el) { return; }
+        if (el.classList.contains ("collapse") &&
+            ! el.classList.contains ("show")) {
+          bootstrap.Collapse.getOrCreateInstance (el).show ();
+        }
+        el.scrollIntoView ();
+      }
+      window.addEventListener ("DOMContentLoaded", openHashTarget);
+      window.addEventListener ("hashchange", openHashTarget);
+      // When the collapsible named by the current URL fragment is collapsed,
+      // drop the fragment (replaceState: no scroll, no history entry).  Otherwise
+      // the fragment would still equal this id, so clicking the same #example
+      // link again fires no "hashchange" and the example would not re-expand.
+      document.addEventListener ("hide.bs.collapse", (e) => {
+        if (e.target.id && window.location.hash === "#" + e.target.id) {
+          history.replaceState (null, "",
+            window.location.pathname + window.location.search);
+        }
+      });
+    </script>
+    <style>
+    h5.fs {
+    margin-top: -0.15em;
+    margin-bottom: -0.15em;
+    }
+    h6:hover {
+      color: gray;
+    }
+    code {
+    font-family: Consolas, "Courier New", monospace;
+    border-radius: 0.3em;
+    white-space: nowrap;
+    color: gray;
+    }
+    code.description {
+    font-family: Consolas, "Courier New", monospace;
+    border-radius: 0.3em;
+    white-space: normal;
+    font-size:1.2em;
+    color: gray;
+    }
+    var {
+    font-family: Consolas, "Courier New", monospace;
+    border-radius: 0.3em;
+    font-style: normal;
+    font-weight: bold;
+    color: gray;
+    }
+    td {
+      vertical-align: top;
+    }
+    [id^="togList"],                        /* HIDE CHECKBOX */
+    [id^="togList"] ~ .list,                /* HIDE LIST */
+    [id^="togList"] + label  span + span,   /* HIDE "Collapse" */
+    [id^="togList"]:checked + label span{   /* HIDE "Expand" (IF CHECKED) */
+      display:none;
+    }
+    [id^="togList"]:checked + label span + span{
+      display:inline-block;                 /* SHOW "Collapse" (IF CHECKED) */
+    }
+    [id^="togList"]:checked ~ .list{
+      display:block;                        /* SHOW LIST (IF CHECKED) */
+    }
+    </style>
+  </head>
+  <body>
+    <div class="bg-dark">
+      <div class="container-xl">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+          <div class="container-fluid">
+            <a class="navbar-brand" href=index.html>
+              <img src="assets/pkg-octave-doc.png" alt="pkg-octave-doc" class="d-inline-block align-top" width="25" height="25">
+              Octave Package Documentation
+            </a>
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="index.html#Documentation">
+                    <i class="fas fa-list-alt"></i>
+                    Documentation
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://gnu-octave.github.io/packages/">
+                  <img src="assets/octave-logo.svg" alt="GNU Octave logo" class="d-inline-block align-top" width="25" height="25">
+                    Octave Packages
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://www.octave.org">
+                    <i class="fas fa-home"></i>
+                    GNU Octave website
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+    <div class="container-xl my-4">
+      <div class="row flex-nowrap" style="min-height:0">
+        <div class="col-md-2 bg-light" style="overflow-y: scroll; width: 250px;">
+          <div class="p-2" style="text-align: center;">
+            <h3>Categories &</h3>
+            <h4 style="color: blue">Functions List</h4>
+          </div>
+			<div class="row">
+				<input id="togList1" type="checkbox" checked>
+				<label for="togList1">
+					<span><h6>Documentation</h6></span>
+					<span><h6>Documentation</h6></span>
+				</label>
+				<div class="list">
+				<ul style="list-style-type: none; padding-left: 20px;">
+					<li><a href="build_DEMOS.html" class="text-decoration-none font-monospace"><small>build_DEMOS</small></a></li>
+					<li><a href="check_texi_docs.html" class="text-decoration-none font-monospace"><small>check_texi_docs</small></a></li>
+					<li><a href="classdef_texi2cache.html" class="text-decoration-none font-monospace"><small>classdef_texi2cache</small></a></li>
+					<li><a href="classdef_texi2html.html" class="text-decoration-none font-monospace"><small>classdef_texi2html</small></a></li>
+					<li><a href="find_DEMOS.html" class="text-decoration-none font-monospace"><small>find_DEMOS</small></a></li>
+					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace"><small>find_GHurls</small></a></li>
+					<li><a href="folder_texi2cache.html" class="text-decoration-none font-monospace"><small>folder_texi2cache</small></a></li>
+					<li><a href="function_texi2cache.html" class="text-decoration-none font-monospace"><small>function_texi2cache</small></a></li>
+					<li><a href="function_texi2html.html" class="text-decoration-none font-monospace"><small>function_texi2html</small></a></li>
+					<li><a href="list_packages.html" class="text-decoration-none font-monospace"><small>list_packages</small></a></li>
+					<li><a href="package_texi2cache.html" class="text-decoration-none font-monospace"><small>package_texi2cache</small></a></li>
+					<li><a href="package_texi2html.html" class="text-decoration-none font-monospace"><small>package_texi2html</small></a></li>
+					<li><a href="package_texi2qch.html" class="text-decoration-none font-monospace"><small>package_texi2qch</small></a></li>
+					<li><a href="pkg_doc_options.html" class="text-decoration-none font-monospace fw-bolder"><small>pkg_doc_options</small></a></li>
+				</ul>
+				</div>
+			</div>
+
+			  </div>
+			  <div class="col-md-10">
+          <div class="card rounded">
+            <div class="card-header card-header-mod">
+              <div class="row d-flex flex-wrap align-items-center">
+                <h3 class="d-inline-block mr-2">
+                Class&nbsp;Definition: <b><code>pkg_doc_options</code></b>
+                </h3>
+              </div>
+            </div>
+            <div class="card-body">
+<dl><code><h5 class="description">pkg-octave-doc: pkg_doc_options</h5></code></dl>
+<p> Settings for the documentation builders of a package.
+</p>
+<div class="ms-5">
+<p> A <code>pkg_doc_options</code> object carries the location of a package&rsquo;s
+ <code>INDEX</code> file, how much a run prints, and the severity of each rule the
+ documentation builders check a docstring against.  Every property is
+ public, so the object is itself the list of what a maintainer may
+ configure, and each carries its own help text describing what it controls.
+</p>
+<p> <code><var>opts</var> = pkg_doc_options ()</code> returns an object holding the
+ default settings.  <code><var>opts</var> = pkg_doc_options (<var>filename</var>)</code>
+ reads a JSON file over those defaults, taking a bare name in the current
+ directory or an absolute path anywhere.  Anything in it this release
+ cannot use, whether a key that is not a property or a value a property
+ will not take, is reported and passed over, and the rest of the file is
+ read: a settings file outlives the release that wrote it, and one written
+ for a later release must not stop a documentation build under an earlier
+ one.
+</p>
+<p> It is a value class, so an assignment returns a modified copy:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="example"> opts = pkg_doc_options ();
+ opts.BodyColumns = 80;
+ opts.SeealsoInMember = 'error';
+</pre></td></tr></table>
+
+<p> <code>save_to_json</code> writes the settings back, storing only the properties
+ that differ from the defaults, so a rule added in a later release cannot be
+ pinned to an old value by a file already written.
+</p>
+<p> A severity is <code>'error'</code>, <code>'warning'</code> or <code>'off'</code>.  It says
+ how a finding is reported and never whether a run continues: a docstring
+ defect is reported, counted and returned, and the run goes on.
+</p>
+<p> <strong>See also: </strong>
+  <a href="package_texi2cache.html">package_texi2cache</a>, 
+  <a href="folder_texi2cache.html">folder_texi2cache</a>, 
+  <a href="classdef_texi2cache.html">classdef_texi2cache</a>, 
+  <a href="function_texi2cache.html">function_texi2cache</a>
+</p>
+<p><strong>Source Code: </strong>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/pkg_doc_options.m">pkg_doc_options</a>
+</p>
+</div>
+        <p class="lead my-3">The <code>pkg_doc_options</code> class contains the following properties:</p>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty1"
+              aria-expanded="false" aria-controls="collapseProperty1">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>WrappedHeader</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+A <code>@deftypefn</code> header wrapped across lines
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty1">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Severity of a <code>@deftypefn</code> or <code>@deftypefnx</code> header broken
+ across two or more lines, which <code>makeinfo</code> does not accept and which
+ therefore breaks <code>help</code> for the whole docstring.  Defaults to
+ <code>'error'</code>.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty2"
+              aria-expanded="false" aria-controls="collapseProperty2">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>EndTrailingText</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+Body text on an <code>@end</code> line
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty2">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Severity of an <code>@end</code> command carrying body text on the same line,
+ as in <code>@end itemize and more text</code>, which is not a valid closing
+ command.  Defaults to <code>'error'</code>.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty3"
+              aria-expanded="false" aria-controls="collapseProperty3">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>BareAt</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+A literal <code>@</code> that is neither doubled nor a command
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty3">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Severity of a literal <code>@</code> that is neither doubled nor the start of
+ a known texinfo command, as an anonymous function written inside
+ <code>@code</code> without doubling it.  Defaults to <code>'error'</code>.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty4"
+              aria-expanded="false" aria-controls="collapseProperty4">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>UnbalancedBrace</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+A brace that never closes, or closes too often
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty4">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Severity of an unbalanced brace in a docstring, which swallows the text
+ following it or ends a command early.  Defaults to <code>'error'</code>.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty5"
+              aria-expanded="false" aria-controls="collapseProperty5">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>UnclosedBlock</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+A block opened and never ended
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty5">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Severity of a block command, such as <code>@itemize</code> or
+ <code>@example</code>, opened and never closed by a matching <code>@end</code>.
+ Defaults to <code>'error'</code>.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty6"
+              aria-expanded="false" aria-controls="collapseProperty6">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>CategoryLabel</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+A category label naming no class in the package
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty6">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Severity of a category label that names no class in the package, or that
+ is not an identifier at all, as a literal format specifier left in the
+ text.  Defaults to <code>'warning'</code>.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty7"
+              aria-expanded="false" aria-controls="collapseProperty7">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>MissingDocstring</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+A public member carrying no docstring
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty7">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Severity of a public function or class member with no help text, for
+ which <code>help</code> answers that it is undocumented and which no cache
+ entry can be built for.  Defaults to <code>'warning'</code>.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty8"
+              aria-expanded="false" aria-controls="collapseProperty8">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>BodyColumns</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+Width limit of a docstring body line
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty8">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Width limit of a docstring body line, specified as a positive integer
+ giving the column past which a line is reported, or as <code>'off'</code>, the
+ default, which does not check the width at all.  A <code>@deftypefn</code> or
+ <code>@deftypefnx</code> header is never measured, being allowed to run over.
+</p>
+<p> This is a house rule of the packages maintained alongside this one rather
+ than a defect, which is why it is off unless a package asks for it.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty9"
+              aria-expanded="false" aria-controls="collapseProperty9">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>SeealsoInMember</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+<code>@seealso</code> in the help of a class member
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty9">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Severity of a <code>@seealso</code> command in the help text of a class
+ member.  Defaults to <code>'off'</code>, this being a house rule of the
+ packages maintained alongside this one rather than a defect.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty10"
+              aria-expanded="false" aria-controls="collapseProperty10">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>IndexLocation</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+Location of the package&rsquo;s <code>INDEX</code> file
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty10">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Location of the package&rsquo;s <code>INDEX</code> file, specified as a character
+ vector holding an absolute path, as <code>''</code> to use no <code>INDEX</code>
+ even where one exists, or as <code>[]</code>, the default, to leave it
+ unspecified.
+</p>
+<p> The three states are distinct because <code>INDEX</code> decides what a whole
+ scope caches: left unspecified, <code>package_texi2cache</code> reads the
+ <code>INDEX</code> of the package root it is standing in, whereas <code>''</code>
+ switches that off and caches whatever the tree holds.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty11"
+              aria-expanded="false" aria-controls="collapseProperty11">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>IndexMissingEntry</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+A name in the tree absent from <code>INDEX</code>
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty11">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Severity of a documented name found in the tree but absent from the
+ package&rsquo;s <code>INDEX</code>, which leaves it out of the published
+ documentation and, where <code>INDEX</code> decides what is cached, out of the
+ doc-cache as well.  Defaults to <code>'warning'</code>.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty12"
+              aria-expanded="false" aria-controls="collapseProperty12">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>IndexOrphanEntry</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+An <code>INDEX</code> entry answering to no file
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty12">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Severity of an <code>INDEX</code> entry that answers to no file in the package,
+ which is reported only by a run covering the whole package, a single
+ directory being unable to tell such an entry from one naming a file
+ elsewhere.  Defaults to <code>'warning'</code>.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty13"
+              aria-expanded="false" aria-controls="collapseProperty13">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>IndexNotFound</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+No <code>INDEX</code> where one was expected
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty13">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> Severity of a run that reads <code>INDEX</code> finding none to read.
+ Defaults to <code>'warning'</code>, and is the rule to switch off for a
+ package that deliberately ships without an <code>INDEX</code>.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseProperty14"
+              aria-expanded="false" aria-controls="collapseProperty14">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>Verbosity</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+How much a run prints
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseProperty14">
+            <div class="border-bottom py-2">
+
+<p> </p>
+<p> How much a run prints, specified as <code>'all'</code>, the default, which
+ prints every finding and then the summary; <code>'summary'</code>, which
+ prints the summary alone; or <code>'none'</code>, which prints nothing.
+</p>
+<p> Findings are returned in the report at every setting, so <code>'none'</code>
+ is for a programmatic caller rather than a way of hiding them.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <p class="lead my-3">The <code>pkg_doc_options</code> class offers the following public methods:</p>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#colapsibleConstructor"
+              aria-expanded="false" aria-controls="colapsibleConstructor">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>pkg_doc_options</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+Create a settings object for the documentation builders.
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="colapsibleConstructor">
+            <div class="border-bottom py-2">
+<dl>
+<dt><code><h5 class="fs">pkg_doc_options: <var>obj</var> = <b>pkg_doc_options</b> ()</code></h5></dt>
+<dt><code><h5 class="fs">pkg_doc_options: <var>obj</var> = <b>pkg_doc_options</b> (<var>filename</var>)</code></h5></dt>
+</dl>
+<p> </p>
+<p> <code><var>obj</var> = pkg_doc_options ()</code> returns an object holding the
+ default settings.
+</p>
+<p> <code><var>obj</var> = pkg_doc_options (<var>filename</var>)</code> reads a JSON file
+ over those defaults, taking a bare name in the current directory or an
+ absolute path anywhere.  The file holds only the settings a package
+ differs from the defaults in, which is what <code>save_to_json</code> writes.
+ Anything the running release cannot use, a key that is not a property
+ or a value a property will not take, is reported and passed over while
+ the rest of the file is read.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="container-xl my-1">
+          <div class="row">
+            <button class="btn btn-light btn-sm w-100 text-start" type="button"
+              data-bs-toggle="collapse" data-bs-target="#collapseMethod1"
+              aria-expanded="false" aria-controls="collapseMethod1">
+              <div class="row align-items-center">
+                <div class="col-4">
+                  <h4 class="d-inline-block mr-4">
+                    <b><code>save_to_json</code></b>
+                  </h4>
+                </div>
+                <div class="col-8">
+Save the settings that differ from the defaults to a JSON file.
+                </div>
+              </div>
+          </div>
+          <div class="collapse multi-collapse" id="collapseMethod1">
+            <div class="border-bottom py-2">
+<dl>
+<dt><code><h5 class="fs">pkg_doc_options: <b>save_to_json</b> (<var>obj</var>, <var>filename</var>)</code></h5></dt>
+</dl>
+<p> </p>
+<p> <code>save_to_json (<var>obj</var>, <var>filename</var>)</code> writes the properties of
+ <var>obj</var> that differ from the default settings to <var>filename</var>, taking
+ a bare name in the current directory or an absolute path anywhere.  An
+ object holding nothing but defaults writes an empty JSON object.
+</p>
+<p> Only the differences are stored, so a property added in a later release
+ is not pinned to an old value by a file already written, and the file
+ stays readable as a statement of what a package asks for.
+</p>
+
+
+            </div>
+          </div>
+        </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>

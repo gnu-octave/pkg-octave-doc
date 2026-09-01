@@ -147,13 +147,19 @@
 				<div class="list">
 				<ul style="list-style-type: none; padding-left: 20px;">
 					<li><a href="build_DEMOS.html" class="text-decoration-none font-monospace"><small>build_DEMOS</small></a></li>
+					<li><a href="check_texi_docs.html" class="text-decoration-none font-monospace"><small>check_texi_docs</small></a></li>
+					<li><a href="classdef_texi2cache.html" class="text-decoration-none font-monospace"><small>classdef_texi2cache</small></a></li>
 					<li><a href="classdef_texi2html.html" class="text-decoration-none font-monospace"><small>classdef_texi2html</small></a></li>
 					<li><a href="find_DEMOS.html" class="text-decoration-none font-monospace"><small>find_DEMOS</small></a></li>
 					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace"><small>find_GHurls</small></a></li>
+					<li><a href="folder_texi2cache.html" class="text-decoration-none font-monospace"><small>folder_texi2cache</small></a></li>
+					<li><a href="function_texi2cache.html" class="text-decoration-none font-monospace"><small>function_texi2cache</small></a></li>
 					<li><a href="function_texi2html.html" class="text-decoration-none font-monospace"><small>function_texi2html</small></a></li>
 					<li><a href="list_packages.html" class="text-decoration-none font-monospace fw-bolder"><small>list_packages</small></a></li>
+					<li><a href="package_texi2cache.html" class="text-decoration-none font-monospace"><small>package_texi2cache</small></a></li>
 					<li><a href="package_texi2html.html" class="text-decoration-none font-monospace"><small>package_texi2html</small></a></li>
 					<li><a href="package_texi2qch.html" class="text-decoration-none font-monospace"><small>package_texi2qch</small></a></li>
+					<li><a href="pkg_doc_options.html" class="text-decoration-none font-monospace"><small>pkg_doc_options</small></a></li>
 				</ul>
 				</div>
 			</div>
@@ -171,13 +177,26 @@
             <div class="card-body">
 <dl>
 <dt><code><h5 class="fs">pkg-octave-doc: <var>valid_packages</var> = <b>list_packages</b> ()</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <var>valid_packages</var> = <b>list_packages</b> (<var>index</var>)</code></h5></dt>
 </dl>
 <p> List <code>pkg</code>-installable packages from Octave Packages.
 </p>
 <div class="ms-5">
-<p> <code><var>valid_packages</var> = list_packages ()</code> returns a cell array of
- strings with the available names at Octave Package, which are installable
- with the <code>pkg</code> command, along with the URL to their latest release.
+<p> <code><var>valid_packages</var> = list_packages ()</code> returns an <em class="math">Nx2</em> cell
+ array naming every package at Octave Packages that is installable with the
+ <code>pkg</code> command, against the URL of its latest release.  A package
+ qualifies by declaring <code>pkg</code> among the dependencies of that release.
+ The index is fetched from Octave Packages, and a fetch that does not
+ succeed is an error saying so.
+</p>
+<p> <code><var>valid_packages</var> = list_packages (<var>index</var>)</code> reads the index
+ from <var>index</var> instead of fetching it, given either as the JSON text or
+ as the structure <code>jsondecode</code> returns for it.  This is what makes the
+ selection testable without reaching the network, and it is useful against a
+ copy of the index taken earlier.
+</p>
+<p> An index in which nothing qualifies returns an empty cell array rather than
+ nothing at all.
 </p>
 <p><strong>Source Code: </strong>
   <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/list_packages.m">list_packages</a>

@@ -147,13 +147,19 @@
 				<div class="list">
 				<ul style="list-style-type: none; padding-left: 20px;">
 					<li><a href="build_DEMOS.html" class="text-decoration-none font-monospace"><small>build_DEMOS</small></a></li>
+					<li><a href="check_texi_docs.html" class="text-decoration-none font-monospace"><small>check_texi_docs</small></a></li>
+					<li><a href="classdef_texi2cache.html" class="text-decoration-none font-monospace"><small>classdef_texi2cache</small></a></li>
 					<li><a href="classdef_texi2html.html" class="text-decoration-none font-monospace"><small>classdef_texi2html</small></a></li>
 					<li><a href="find_DEMOS.html" class="text-decoration-none font-monospace"><small>find_DEMOS</small></a></li>
 					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace"><small>find_GHurls</small></a></li>
+					<li><a href="folder_texi2cache.html" class="text-decoration-none font-monospace"><small>folder_texi2cache</small></a></li>
+					<li><a href="function_texi2cache.html" class="text-decoration-none font-monospace"><small>function_texi2cache</small></a></li>
 					<li><a href="function_texi2html.html" class="text-decoration-none font-monospace"><small>function_texi2html</small></a></li>
 					<li><a href="list_packages.html" class="text-decoration-none font-monospace"><small>list_packages</small></a></li>
+					<li><a href="package_texi2cache.html" class="text-decoration-none font-monospace"><small>package_texi2cache</small></a></li>
 					<li><a href="package_texi2html.html" class="text-decoration-none font-monospace"><small>package_texi2html</small></a></li>
 					<li><a href="package_texi2qch.html" class="text-decoration-none font-monospace fw-bolder"><small>package_texi2qch</small></a></li>
+					<li><a href="pkg_doc_options.html" class="text-decoration-none font-monospace"><small>pkg_doc_options</small></a></li>
 				</ul>
 				</div>
 			</div>
@@ -261,15 +267,38 @@
  intermediate HTML pages and the Qt help project file are kept beside the
  generated <code>.qch</code>, which is <code>false</code> by default.  They are useful
  for inspecting what was rendered before shipping it.</td></tr>
+<tr><td width="20%"><code>'Options'</code></td><td width="80%">A <code>pkg_doc_options</code> object giving each
+ rule the severity the package asks for, the defaults being used when none
+ is given.  Unlike <code>package_texi2cache</code> and <code>check_texi_docs</code>,
+ which read <code>doc-options.json</code> from the package root they are run in,
+ this reads no settings file: it works from the <strong>installed</strong> package,
+ and a file at a source root is not installed, only the contents of
+ <code>inst</code> together with <code>doc</code> and <code>packinfo</code> being carried
+ there.  So a package&rsquo;s own conventions reach this route by being handed to
+ it, and the rules that are on by default, which are the ones wrong in any
+ package, apply either way.</td></tr>
 </table>
 <p><strong>Source Code: </strong>
   <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/package_texi2qch.m">package_texi2qch</a>
 </div>
 
+<p> Every help text is checked as it is read, and what is found is reported
+ with the name it belongs to and a line counted from the first line of that
+ help text.  A finding never stops the build: a page is written from a help
+ text whatever it says, since refusing would leave the package with no
+ documentation over a defect the reader would have met anyway.
+</p>
+<p> Only the rules a help text can be judged by on its own are applied here.
+ The rest measure the file a help text was written in, which this route
+ never opens, working as it does from the installed package; <code>help</code> is
+ its source and <code>check_texi_docs</code> is where those rules live.
+</p>
 <p> <strong>See also: </strong>
   <a href="package_texi2html.html">package_texi2html</a>, 
   <a href="function_texi2html.html">function_texi2html</a>, 
-  <a href="classdef_texi2html.html">classdef_texi2html</a>
+  <a href="classdef_texi2html.html">classdef_texi2html</a>, 
+  <a href="check_texi_docs.html">check_texi_docs</a>, 
+  <a href="pkg_doc_options.html">pkg_doc_options</a>
 </p>
 <p><strong>Source Code: </strong>
   <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/package_texi2qch.m">package_texi2qch</a>

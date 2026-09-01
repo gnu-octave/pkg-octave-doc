@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Octave Package Documentation: find_GHurls</title>
+    <title>Octave Package Documentation: check_texi_docs</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -147,11 +147,11 @@
 				<div class="list">
 				<ul style="list-style-type: none; padding-left: 20px;">
 					<li><a href="build_DEMOS.html" class="text-decoration-none font-monospace"><small>build_DEMOS</small></a></li>
-					<li><a href="check_texi_docs.html" class="text-decoration-none font-monospace"><small>check_texi_docs</small></a></li>
+					<li><a href="check_texi_docs.html" class="text-decoration-none font-monospace fw-bolder"><small>check_texi_docs</small></a></li>
 					<li><a href="classdef_texi2cache.html" class="text-decoration-none font-monospace"><small>classdef_texi2cache</small></a></li>
 					<li><a href="classdef_texi2html.html" class="text-decoration-none font-monospace"><small>classdef_texi2html</small></a></li>
 					<li><a href="find_DEMOS.html" class="text-decoration-none font-monospace"><small>find_DEMOS</small></a></li>
-					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace fw-bolder"><small>find_GHurls</small></a></li>
+					<li><a href="find_GHurls.html" class="text-decoration-none font-monospace"><small>find_GHurls</small></a></li>
 					<li><a href="folder_texi2cache.html" class="text-decoration-none font-monospace"><small>folder_texi2cache</small></a></li>
 					<li><a href="function_texi2cache.html" class="text-decoration-none font-monospace"><small>function_texi2cache</small></a></li>
 					<li><a href="function_texi2html.html" class="text-decoration-none font-monospace"><small>function_texi2html</small></a></li>
@@ -170,48 +170,58 @@
             <div class="card-header card-header-mod">
               <div class="row d-flex flex-wrap align-items-center">
                 <h3 class="d-inline-block mr-2">
-                Function&nbsp;Reference: <b><code>find_GHurls</code></b>
+                Function&nbsp;Reference: <b><code>check_texi_docs</code></b>
                 </h3>
               </div>
             </div>
             <div class="card-body">
 <dl>
-<dt><code><h5 class="fs">pkg-octave-doc: <var>pkgfcns</var> = <b>find_GHurls</b> (<var>pkgurl</var>, <var>pkgfcns</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>check_texi_docs</b> ()</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <b>check_texi_docs</b> (<var>options</var>)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: <var>status</var> = <b>check_texi_docs</b> (&hellip;)</code></h5></dt>
+<dt><code><h5 class="fs">pkg-octave-doc: [<var>status</var>, <var>report</var>] = <b>check_texi_docs</b> (&hellip;)</code></h5></dt>
 </dl>
-<p> Retrieve unique URLs to every function&rsquo;s location within the package&rsquo;s GitHub
- repository.
+<p> Check the texinfo help texts of a tree, writing nothing.
 </p>
 <div class="ms-5">
-<p> <code>find_GHurls</code> requires two input arguments, <var>pkgurl</var>, a char string
- with the URL to the root directory to the package&rsquo;s GitHub repository and
- <var>pkgfcns</var>, a Nx2 cell array containing the package&rsquo;s available functions
- (1st column) and their respective category (2nd column).
+<p> Every help text below the current directory is parsed and reported on, and
+ no file of any kind is produced.  It is the way to examine a package whose
+ documentation is built as HTML, that route writing pages rather than
+ reporting on what it rendered, and it is the fastest of the three: nothing
+ is rendered and no definition is loaded, so a tree is read straight from
+ disk.
 </p>
-<p> Note: <code>find_GHurls</code> explicitly works with repositories hosted on GitHub!
- <var>pkgurl</var> can be easily retrieved from the <code>PKG_URL</code> field of the
- <var>info</var> structure returned from <code>package_texi2html</code>.
+<p> It runs from wherever it is called and works downwards, so a package root
+ covers the whole package and <code>inst</code> covers only what is below it.  A
+ <code>src</code> directory is passed over, a <code>DEFUN_DLD</code> help text living
+ inside the compiled file rather than the source, as are <code>tests</code>,
+ <code>demos</code> and <code>datasets</code>, which carry none.
 </p>
-<p> <code>find_GHurls</code> returns a cell array, <var>pkgfcns</var>, by appending a third
- column to the input <var>pkgfcns</var> with the URLs to the source code location
- of each individual function listed in the 1st column of <var>pkgfcns</var>.
- <code>find_GHurls</code> relies on <code>curl</code> and <code>tar</code>, which must be
- installed and available to the system&rsquo;s <code>$PATH</code>, and an active internet
- connection to download and extract the targeted repository to a temporary
- directory.  If either <code>curl</code> or <code>tar</code> fail for any reason,
- <code>find_GHurls</code> returns a verbatim copy of the input <var>pkgfcns</var>.
+<p> Unlike the documentation builders, it checks <strong>everything it finds</strong>,
+ a <code>Hidden</code> member and a private helper included.  Those are the help
+ texts no reader ever meets and nothing else looks at, so they are the ones
+ that rot unnoticed.
 </p>
-<p> Use the following example to obtain a cell array with each function&rsquo;s URL to
- its source code location at GitHub:
+<p> <var>options</var> is a <code>pkg_doc_options</code> object, and without one the
+ settings are read from <code>doc-options.json</code> in the current directory if
+ there is one.  The <code>INDEX</code> of the current directory is read unless the
+ object names another, which is what the category label rule is checked
+ against; where no <code>INDEX</code> can be found that rule stands down rather
+ than guess.
 </p>
-<table><tr><td>&nbsp;</td><td><pre class="example"> [pkgfcns, info] = package_texi2html (&quot;pkg-octave-doc&quot;);
- pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
-</pre></td></tr></table>
-
+<p> <var>status</var> is the number of findings and is zero when nothing was found.
+ <var>report</var> is a struct array of them, carrying <code>'rule'</code>,
+ <code>'severity'</code>, <code>'file'</code>, <code>'line'</code> and <code>'message'</code>.
+ With no output requested they are printed.
+</p>
 <p> <strong>See also: </strong>
-  <a href="function_texi2html.html">function_texi2html</a>
+  <a href="package_texi2cache.html">package_texi2cache</a>, 
+  <a href="package_texi2html.html">package_texi2html</a>, 
+  <a href="package_texi2qch.html">package_texi2qch</a>, 
+  <a href="pkg_doc_options.html">pkg_doc_options</a>
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/find_GHurls.m">find_GHurls</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/tree/main/inst/check_texi_docs.m">check_texi_docs</a>
 </div>
 
             </div>
