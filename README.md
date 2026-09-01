@@ -91,6 +91,65 @@ version, name the generator explicitly:
 package_texi2qch ("statistics", 'Generator', '/usr/lib/qt6/libexec/qhelpgenerator')
 ```
 
+Every help text is checked as it is read, and anything wrong with it is reported against the name
+it belongs to.  A finding never stops the build.
+
+Generate the `doc-cache` files, which are what `lookfor` searches.  Octave builds one per directory
+when a package is installed, resolving each file by its bare name, so a classdef contributes a
+single entry and its methods and properties contribute none: they cannot be found by `lookfor` or
+by anything built on it.  Run this at the root of the package's repository, where its `INDEX` is:
+
+```
+cd <package repository root>
+package_texi2cache ()
+```
+
+One cache is written per directory below `inst`, and one in `src` for the compiled functions, whose
+help text lives inside the built file.  Commit them: they travel in the release tarball and every
+user gets them on `pkg install`.
+
+The package's `INDEX` decides what is cached, so the cache holds the package's public surface and a
+name absent from `INDEX` is reported rather than written.  Ask what a run would change without
+writing anything, which is how a tree is tested for a stale cache before a commit:
+
+```
+package_texi2cache ("-check")
+```
+
+`"-auto"` limits the work to the files `git` reports as changed, which is the form to use while
+working.  `folder_texi2cache`, `classdef_texi2cache` and `function_texi2cache` do the same for a
+single directory, class or function, each working on the current directory.
+
+Check the help texts of a package without building anything at all:
+
+```
+cd <package repository root>
+check_texi_docs ()
+```
+
+It runs from wherever it is called and works downwards, so a package root covers the package and
+`inst` covers only what is below it.  Nothing is rendered and no definition is loaded, so it is
+fast, and unlike the documentation builders it checks everything it finds, a `Hidden` member and a
+private helper included.  It returns the number of findings, so it is what to reach for if a
+package's documentation is published as HTML and nothing else.
+
+Twelve rules are checked, covering a `@deftypefn` header broken across lines, body text left on an
+`@end` line, a literal `@` that is neither doubled nor a command, an unbalanced brace, an unclosed
+block, a category label naming neither the class nor the package, a public member with no help
+text, an over-wide source line, `@seealso` in the help of a class member, and three about `INDEX`.
+Their severities are carried by a `pkg_doc_options` object:
+
+```
+opts = pkg_doc_options ();
+opts.BodyColumns = 80;
+opts.SeealsoInMember = "warning";
+save_to_json (opts, "doc-options.json")
+```
+
+`package_texi2cache` and `check_texi_docs` read `doc-options.json` from a package root when one is
+there, so a package's own conventions are applied by anyone who runs them; `package_texi2qch` takes
+the object through its `'Options'` pair.
+
 ## Guidelines for texinfo docstrings
 
 
