@@ -1,32 +1,57 @@
-Summary of important user-visible changes for pkg-octave-doc 0.7.7:
+Summary of important user-visible changes for pkg-octave-doc 0.8.0:
 -------------------------------------------------------------------
 
- ** `package_texi2qch` generates a landing page for the package and points the
-    root of the contents tree at it.  Double-clicking the package in the
-    Documentation tab opened whichever category was listed first; it now opens
-    an overview carrying the package name, version and description, and every
-    documented name under its category against the first sentence of its help
-    text.
+ ** New: `package_texi2cache`, `folder_texi2cache`, `classdef_texi2cache` and
+    `function_texi2cache` regenerate a package's `doc-cache` files from its
+    source tree, carrying class members.  Octave's own `doc_cache_create`
+    resolves each file by its bare name, so a class contributes one entry and
+    its methods and properties contribute none: they are invisible to
+    `lookfor` and to anything built on it.  The members cached are the ones
+    `classdef_texi2html` publishes, so a class reads the same way online and
+    in a search.  Run `package_texi2cache` at the package root; `-auto` limits
+    the work to what `git` reports as changed and `-check` reports what would
+    change without writing.  A package's `INDEX` decides what is cached, and a
+    name it does not list is skipped and reported.
 
- ** A `@tex` formula is rendered as its `@ifnottex` alternative in a `.qch`,
-    and dropped when the docstring carries none.  The Qt documentation browser
-    runs no JavaScript, so the MathJax that typesets a formula in the online
-    pages is not available to it and the TeX reached the reader as source.
-    This is what `help` prints in the terminal for the same docstring.
+ ** New: `check_texi_docs` checks the texinfo help texts of a tree and writes
+    nothing.  It runs from wherever it is called and works downwards, so a
+    package root covers a package and `inst` covers what is below it, and it
+    is the way to examine a package whose documentation is built as HTML.
+    Nothing is rendered and no definition is loaded.  Unlike the documentation
+    builders it checks everything it finds, a `Hidden` member and a private
+    helper included.
 
- ** `@math{...}` is rendered as `<em class="math">`, the element `makeinfo`
-    emits, instead of a bare `<math>`.  `<math>` is the MathML root element,
-    so an HTML5 parser read everything after it as foreign content: an inline
-    tag inside a formula, as `@math{100 * (1 - @var{alpha})%}` produces,
-    closed the formula early and left the remainder of it outside.
+ ** New: the `pkg_doc_options` class carries the settings the builders use,
+    the location of a package's `INDEX`, how much a run prints, and the
+    severity of each of twelve rules a help text is checked against.  Every
+    property is public and documented.  `save_to_json` writes back only the
+    settings that differ from the defaults, and a file is read for whatever
+    the running release understands, so one written for a later release is
+    read in part rather than refused.  `package_texi2cache` and
+    `check_texi_docs` read `doc-options.json` from a package root when one is
+    there, so a package's own conventions are applied without being asked
+    for; `package_texi2qch` takes the object through its `'Options'` pair.
 
- ** `classdef_texi2html` no longer loses the page of a class whose method is
-    documented outside texinfo.  Such a method left the renderer without a
-    first sentence or a body, raising `'mtds_fs' undefined` for the first one
-    in a class and repeating the previous method's documentation for any later
-    one.  It now renders as not documented, as the grouped layout already did.
+ ** `package_texi2qch` reports what the help texts say while it builds, naming
+    the member and the line for each finding, and takes a `pkg_doc_options`
+    object through a new `'Options'` pair.  A finding never stops a build.
 
- ** The first sentence of a help text no longer loses its first character when
-    the docstring body starts at column 0, as an oct-file's does.  It was read
-    by counting a fixed offset past the paragraph tag, which is correct only
-    for an indented body.
+ ** `list_packages` returned nothing usable from Octave Packages.  A
+    dependency is named there by a string carrying the package and any version
+    it asks for, as in `octave (>= 9.1.0)`, where the function read an object
+    with a `name` field, and a release list decodes to a cell array whenever
+    its entries carry different fields, where the function assumed a struct
+    array.  It now reads both forms and returns 139 of the 141 packages
+    listed.  It also takes the index as an argument, so a selection can be
+    made from a copy taken earlier.
+
+ ** A class declaring no methods at all can now be documented.
+    `classdef_texi2html` raised `fcn_beg(0): subscripts must be either
+    integers` on such a class rather than rendering it, so a class carrying
+    only properties has never had a page.
+
+ ** A property inherited from a superclass is documented on the subclass page.
+    Anything inherited was dropped without a warning, so a subclass adding no
+    properties of its own published no properties block at all, and one adding
+    some published only those.  In the `statistics` package this affected four
+    pages.  Rebuilding a package's documentation picks the properties up.
