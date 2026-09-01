@@ -45,23 +45,25 @@ function [files, why] = __git_changed__ (dirpath)
   files = {};
   why = '';
 
-  ## Is there a git to ask at all
-  [status, ~] = system ('git --version');
+  ## Is there a git to ask at all.  Every call folds stderr into its output,
+  ## so that a tree which is not a repository is answered by this function
+  ## rather than by git writing to the terminal behind it.
+  [status, ~] = system ('git --version 2>&1');
   if (status != 0)
     why = 'git is not installed';
     return;
   endif
 
-  [status, out] = system (sprintf ('git -C "%s" rev-parse --show-toplevel', ...
-                                   dirpath));
+  cmd = sprintf ('git -C "%s" rev-parse --show-toplevel 2>&1', dirpath);
+  [status, out] = system (cmd);
   if (status != 0)
     why = 'this tree is not a git repository';
     return;
   endif
   root = strtrim (out);
 
-  [status, out] = system (sprintf ('git -C "%s" status --porcelain -uall', ...
-                                   root));
+  cmd = sprintf ('git -C "%s" status --porcelain -uall 2>&1', root);
+  [status, out] = system (cmd);
   if (status != 0)
     why = 'git could not report what changed';
     return;
