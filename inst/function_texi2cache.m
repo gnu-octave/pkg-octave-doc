@@ -112,19 +112,18 @@ function report = function_texi2cache (fcnname, options)
   clear functions;
   text = get_help_text (fcnname);
   srclines = __help_block__ (srcfile);
-  __verify_help__ (fcnname, srcfile, text, srclines);
+  __verify_help__ ('function_texi2cache', fcnname, srcfile, text, srclines);
 
   ## Build the entry, collecting what the renderer finds while it converts
   [rows, findings] = __cache_rows__ (fcnname, text, options);
-  ctx = struct ('package', __package_name__ (options), 'class', '', ...
-                'member', '');
+  [listed, pkgname] = __index_info__ (options);
+  ctx = struct ('package', pkgname, 'class', '', 'member', '');
   findings = [findings, __source_lint__(srclines, options, ctx)];
   for ii = 1:numel (findings)
     findings(ii).file = srcfile;
   endfor
 
   ## An INDEX given never gates what is written here, it only reports
-  listed = __index_names__ (options);
   if (! isempty (listed) && ! any (strcmp (fcnname, listed)) ...
       && ! strcmp (options.IndexMissingEntry, 'off'))
     f = struct ('rule', 'IndexMissingEntry', ...
@@ -217,89 +216,9 @@ function srclines = __help_block__ (srcfile)
   endfor
 endfunction
 
-## Prove that the help text answered for came from the file on disk
-function __verify_help__ (name, srcfile, text, srclines)
-  if (isempty (text))
-    return;                              # an undocumented item is reported
-  endif
-  if (isempty (srclines))
-    return;                              # nothing to compare a compiled one to
-  endif
-  best = '';
-  for ii = 1:numel (srclines)
-    ln = strtrim (regexprep (srclines{ii}, '^\s*##\s?', ''));
-    if (numel (ln) > numel (best) && isempty (strfind (ln, '@')))
-      best = ln;
-    endif
-  endfor
-  if (numel (best) < 12)
-    return;                              # nothing distinctive enough to use
-  endif
-  if (isempty (strfind (text, best)))
-    error (strcat ("function_texi2cache: the help text of '%s' is not the", ...
-                   " one in '%s'; the definition did not reload."), ...
-           name, srcfile);
-  endif
-endfunction
 
-## The package's name, which INDEX carries on its first line
-function name = __package_name__ (options)
-  name = '';
-  if (isempty (options.Index) || ! ischar (options.Index))
-    return;
-  endif
-  if (! exist (options.Index, 'file'))
-    return;
-  endif
-  fid = fopen (options.Index, 'r');
-  if (fid < 0)
-    return;
-  endif
-  first = fgetl (fid);
-  fclose (fid);
-  if (ischar (first))
-    tok = regexp (first, '^\s*(\S+)\s*>>', 'tokens', 'once');
-    if (! isempty (tok))
-      name = tok{1};
-    endif
-  endif
-endfunction
 
-## Every name INDEX lists
-function names = __index_names__ (options)
-  names = {};
-  if (isempty (options.Index) || ! ischar (options.Index) ...
-      || ! exist (options.Index, 'file'))
-    return;
-  endif
-  lines = strsplit (strrep (fileread (options.Index), "\r\n", "\n"), "\n", ...
-                    'CollapseDelimiters', false);
-  for ii = 2:numel (lines)
-    if (! isempty (lines{ii}) && lines{ii}(1) == ' ')
-      nm = strtrim (lines{ii});
-      if (! isempty (nm))
-        names{end+1} = nm;
-      endif
-    endif
-  endfor
-endfunction
 
-## Print what happened, as much of it as the verbosity asks for
-function __show_report__ (report, options)
-  if (strcmp (options.Verbosity, 'none'))
-    return;
-  endif
-  f = report.findings;
-  if (strcmp (options.Verbosity, 'all'))
-    for ii = 1:numel (f)
-      printf ('%s:%d: %s: %s (%s)\n', f(ii).file, f(ii).line, ...
-              f(ii).severity, f(ii).message, f(ii).rule);
-    endfor
-  endif
-  printf ('%s: %d added, %d updated, %d removed, %d findings\n', ...
-          report.cache, numel (report.added), numel (report.updated), ...
-          numel (report.removed), numel (f));
-endfunction
 
 ## The cases write a fixture into a temporary directory and cd into it, since
 ## the function writes the cache of the directory it stands in and the current

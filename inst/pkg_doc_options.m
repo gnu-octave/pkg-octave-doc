@@ -245,7 +245,23 @@ classdef pkg_doc_options
 
   methods (Access = public)
 
-    ## Class constructor
+    ## -*- texinfo -*-
+    ## @deftypefn  {pkg_doc_options} {@var{obj} =} pkg_doc_options ()
+    ## @deftypefnx {pkg_doc_options} {@var{obj} =} pkg_doc_options (@var{filename})
+    ##
+    ## Create a settings object for the documentation builders.
+    ##
+    ## @code{@var{obj} = pkg_doc_options ()} returns an object holding the
+    ## default settings.
+    ##
+    ## @code{@var{obj} = pkg_doc_options (@var{filename})} reads a JSON file
+    ## over those defaults, taking a bare name in the current directory or an
+    ## absolute path anywhere.  The file holds only the settings a package
+    ## differs from the defaults in, which is what @code{save_to_json} writes.
+    ## A key that is not a property is reported and ignored, so a file written
+    ## for an earlier release does not stop a documentation build.
+    ##
+    ## @end deftypefn
     function this = pkg_doc_options (filename)
 
       ## Input validation

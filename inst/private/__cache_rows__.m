@@ -51,7 +51,9 @@ function [rows, findings] = __cache_rows__ (name, text, opts)
     error ("__cache_rows__: OPTS must be a pkg_doc_options object.");
   endif
 
-  [html, findings] = __texi2html__ (text, name, {}, opts);
+  ## A cache entry links to nothing, so the cross-reference list is empty, but
+  ## it must carry its two columns: the renderer indexes the first of them
+  [html, findings] = __texi2html__ (text, name, cell (0, 2), opts);
   plain = htmlToText (html);
   summary = firstSentence (text);
   rows = {name; plain; summary};
