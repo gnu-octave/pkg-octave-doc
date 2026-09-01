@@ -41,8 +41,8 @@
 ## For a class, use @code{classdef_texi2cache}, which writes the class and all
 ## of its members together.
 ##
-## @var{options} is a @code{pkg_doc_options} object.  Its @code{Index} property
-## never decides what is written here: the function named is always cached, and
+## @var{options} is a @code{pkg_doc_options} object.  Its
+## @code{IndexLocation} property never decides what is written here: the function named is always cached, and
 ## an @file{INDEX} given only adds a warning when the function is not listed in
 ## it.
 ##
@@ -110,7 +110,7 @@ function report = function_texi2cache (fcnname, options)
 
   ## Read the help from the file rather than from the session
   clear functions;
-  [listed, pkgname] = __index_info__ (options);
+  [listed, pkgname, why] = __index_info__ (options);
   [rows, findings] = __function_entry__ ('function_texi2cache', fcnname, ...
                                          srcfile, options, pkgname);
   if (isempty (rows))
@@ -126,6 +126,7 @@ function report = function_texi2cache (fcnname, options)
                 'file', srcfile);
     findings(end+1) = f;
   endif
+  findings = [__index_notfound__(options, why), findings];
   report.findings = findings;
 
   ## Place the entry and write the file
@@ -284,7 +285,7 @@ endfunction
 %! unwind_protect
 %!   cd (d);
 %!   o = pkg_doc_options ();
-%!   o.Index = fullfile (d, 'INDEX');
+%!   o.IndexLocation = fullfile (d, 'INDEX');
 %!   r = function_texi2cache ('bistother', o);
 %!   assert (r.added, {'bistother'});
 %!   assert (numel (r.findings), 1);

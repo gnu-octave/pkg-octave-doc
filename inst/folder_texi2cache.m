@@ -94,7 +94,8 @@ function report = folder_texi2cache (varargin)
 
   ## Read the definitions from the tree rather than from the session
   clear functions;
-  [listed, pkgname] = __index_info__ (options);
+  [listed, pkgname, why] = __index_info__ (options);
+  seed = __index_notfound__ (options, why);
 
   ## '-auto' narrows the work to what git reports as changed, where it can be
   ## asked at all
@@ -110,6 +111,9 @@ function report = folder_texi2cache (varargin)
 
   report = __folder_cache__ ('folder_texi2cache', here, options, listed, ...
                              pkgname, auto, changed, check);
+  if (! isempty (seed))
+    report.findings = [seed, report.findings];
+  endif
 
   if (nargout == 0)
     __show_report__ (report, options);
@@ -226,7 +230,7 @@ endfunction
 %! unwind_protect
 %!   cd (d);
 %!   o = pkg_doc_options ();
-%!   o.Index = fullfile (d, 'INDEX');
+%!   o.IndexLocation = fullfile (d, 'INDEX');
 %!   r = folder_texi2cache (o);
 %!   s = load ('doc-cache');
 %!   cached = s.cache(1,:);

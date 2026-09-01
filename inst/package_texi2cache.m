@@ -109,18 +109,25 @@ function [status, report] = package_texi2cache (varargin)
       options = pkg_doc_options ();
     endif
   endif
-  if (isempty (options.Index))
+  ## Only an unspecified location is filled in from the root: '' asks for no
+  ## INDEX at all, which is a decision and not an omission
+  why = '';
+  if (! ischar (options.IndexLocation))
     index = fullfile (root, 'INDEX');
     if (exist (index, 'file'))
-      options.Index = index;
-    elseif (! strcmp (options.IndexNotFound, 'off'))
-      warning ("package_texi2cache: this package carries no INDEX.");
+      options.IndexLocation = index;
+    else
+      why = 'this package carries no INDEX';
     endif
   endif
 
   ## Read the definitions from the tree rather than from the session
   clear functions;
-  [listed, pkgname] = __index_info__ (options);
+  [listed, pkgname, badindex] = __index_info__ (options);
+  if (! isempty (badindex))
+    why = badindex;
+  endif
+  seed = __index_notfound__ (options, why);
 
   ## '-auto' narrows the work to what git reports as changed, where it can be
   ## asked at all
@@ -151,6 +158,9 @@ function [status, report] = package_texi2cache (varargin)
     if (rep.changed)
       status += 1;
     endif
+    if (ii == 1 && ! isempty (seed))
+      rep.findings = [seed, rep.findings];
+    endif
     report(end+1) = rep;
   endfor
 
@@ -162,9 +172,9 @@ function [status, report] = package_texi2cache (varargin)
                      orphans{ii});
       f = struct ('rule', 'IndexOrphanEntry', ...
                   'severity', options.IndexOrphanEntry, 'line', 1, ...
-                  'message', msg, 'file', options.Index);
+                  'message', msg, 'file', options.IndexLocation);
       if (isempty (report))
-        report = struct ('cache', options.Index, 'added', {{}}, ...
+        report = struct ('cache', options.IndexLocation, 'added', {{}}, ...
                          'updated', {{}}, 'removed', {{}}, 'changed', ...
                          false, 'findings', f);
       else
@@ -310,6 +320,60 @@ endfunction
 %!     rules = [rules, {rep(ii).findings.rule}];
 %!   endfor
 %!   assert (! any (strcmp (rules, 'BodyColumns')));
+%! unwind_protect_cleanup
+%!   cd (old);
+%! end_unwind_protect
+
+%!test  # turning the rule off stops the filtering, not just the message
+%! d = fullfile (tempdir (), 'pkg_octave_doc_pk_bist');
+%! fid = fopen (fullfile (d, 'inst', 'bistloose.m'), 'w');
+%! fprintf (fid, '## -*- texinfo -*-\n');
+%! fprintf (fid, '## @deftypefn {bistpkg} {} bistloose ()\n##\n');
+%! fprintf (fid, '## A function INDEX does not list.\n##\n');
+%! fprintf (fid, '## A body line that is distinctive enough to look for.\n');
+%! fprintf (fid, '##\n## @end deftypefn\n');
+%! fprintf (fid, 'function bistloose ()\nendfunction\n');
+%! fclose (fid);
+%! old = pwd ();
+%! unwind_protect
+%!   cd (d);
+%!   [~, rep] = package_texi2cache ('-check');
+%!   assert (any (strcmp ({rep(1).findings.rule}, 'IndexMissingEntry')));
+%!   assert (! any (strcmp (rep(1).added, 'bistloose')));
+%!   o = pkg_doc_options ();
+%!   o.IndexMissingEntry = 'off';
+%!   [~, rep] = package_texi2cache ('-check', o);
+%!   assert (! any (strcmp ({rep(1).findings.rule}, 'IndexMissingEntry')));
+%!   assert (any (strcmp (rep(1).added, 'bistloose')));
+%! unwind_protect_cleanup
+%!   cd (old);
+%! end_unwind_protect
+
+%!test  # an INDEX named but answering to nothing is reported, not passed over
+%! d = fullfile (tempdir (), 'pkg_octave_doc_pk_bist');
+%! old = pwd ();
+%! unwind_protect
+%!   cd (d);
+%!   o = pkg_doc_options ();
+%!   o.IndexLocation = fullfile (d, 'no_such_INDEX');
+%!   [~, rep] = package_texi2cache ('-check', o);
+%!   assert (any (strcmp ({rep(1).findings.rule}, 'IndexNotFound')));
+%!   assert (any (strcmp (rep(1).added, 'bistloose')));
+%! unwind_protect_cleanup
+%!   cd (old);
+%! end_unwind_protect
+
+%!test  # asking for no INDEX is a decision, so it is honoured and silent
+%! d = fullfile (tempdir (), 'pkg_octave_doc_pk_bist');
+%! old = pwd ();
+%! unwind_protect
+%!   cd (d);
+%!   o = pkg_doc_options ();
+%!   o.IndexLocation = '';
+%!   [~, rep] = package_texi2cache ('-check', o);
+%!   assert (! any (strcmp ({rep(1).findings.rule}, 'IndexMissingEntry')));
+%!   assert (! any (strcmp ({rep(1).findings.rule}, 'IndexNotFound')));
+%!   assert (any (strcmp (rep(1).added, 'bistloose')));
 %! unwind_protect_cleanup
 %!   cd (old);
 %! end_unwind_protect

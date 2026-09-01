@@ -59,39 +59,6 @@ classdef pkg_doc_options
   properties
 
     ## -*- texinfo -*-
-    ## @deftp {pkg_doc_options} {property} Index
-    ##
-    ## Location of the package's @file{INDEX} file
-    ##
-    ## Location of the package's @file{INDEX} file, specified as a character
-    ## vector holding an absolute path, as @qcode{''} to use no @file{INDEX}
-    ## even where one exists, or as @code{[]}, the default, to leave it
-    ## unspecified.
-    ##
-    ## The three states are distinct because @file{INDEX} decides what a whole
-    ## scope caches: left unspecified, @code{package_texi2cache} reads the
-    ## @file{INDEX} of the package root it is standing in, whereas @qcode{''}
-    ## switches that off and caches whatever the tree holds.
-    ##
-    ## @end deftp
-    Index = []
-
-    ## -*- texinfo -*-
-    ## @deftp {pkg_doc_options} {property} Verbosity
-    ##
-    ## How much a run prints
-    ##
-    ## How much a run prints, specified as @qcode{'all'}, the default, which
-    ## prints every finding and then the summary; @qcode{'summary'}, which
-    ## prints the summary alone; or @qcode{'none'}, which prints nothing.
-    ##
-    ## Findings are returned in the report at every setting, so @qcode{'none'}
-    ## is for a programmatic caller rather than a way of hiding them.
-    ##
-    ## @end deftp
-    Verbosity = 'all'
-
-    ## -*- texinfo -*-
     ## @deftp {pkg_doc_options} {property} WrappedHeader
     ##
     ## A @code{@@deftypefn} header wrapped across lines
@@ -204,6 +171,24 @@ classdef pkg_doc_options
     SeealsoInMember = 'off'
 
     ## -*- texinfo -*-
+    ## @deftp {pkg_doc_options} {property} IndexLocation
+    ##
+    ## Location of the package's @file{INDEX} file
+    ##
+    ## Location of the package's @file{INDEX} file, specified as a character
+    ## vector holding an absolute path, as @qcode{''} to use no @file{INDEX}
+    ## even where one exists, or as @code{[]}, the default, to leave it
+    ## unspecified.
+    ##
+    ## The three states are distinct because @file{INDEX} decides what a whole
+    ## scope caches: left unspecified, @code{package_texi2cache} reads the
+    ## @file{INDEX} of the package root it is standing in, whereas @qcode{''}
+    ## switches that off and caches whatever the tree holds.
+    ##
+    ## @end deftp
+    IndexLocation = []
+
+    ## -*- texinfo -*-
     ## @deftp {pkg_doc_options} {property} IndexMissingEntry
     ##
     ## A name in the tree absent from @file{INDEX}
@@ -240,6 +225,21 @@ classdef pkg_doc_options
     ##
     ## @end deftp
     IndexNotFound = 'warning'
+
+    ## -*- texinfo -*-
+    ## @deftp {pkg_doc_options} {property} Verbosity
+    ##
+    ## How much a run prints
+    ##
+    ## How much a run prints, specified as @qcode{'all'}, the default, which
+    ## prints every finding and then the summary; @qcode{'summary'}, which
+    ## prints the summary alone; or @qcode{'none'}, which prints nothing.
+    ##
+    ## Findings are returned in the report at every setting, so @qcode{'none'}
+    ## is for a programmatic caller rather than a way of hiding them.
+    ##
+    ## @end deftp
+    Verbosity = 'all'
 
   endproperties
 
@@ -404,14 +404,14 @@ classdef pkg_doc_options
 
     ## Print the settings, grouped, marking what differs from the defaults
     function __print__ (this)
-      groups = {'Location and output', {'Index', 'Verbosity'}; ...
-                'Structural rules', {'WrappedHeader', 'EndTrailingText', ...
+      groups = {'Structural rules', {'WrappedHeader', 'EndTrailingText', ...
                                      'BareAt', 'UnbalancedBrace', ...
                                      'UnclosedBlock'}; ...
                 'Convention rules', {'CategoryLabel', 'MissingDocstring', ...
                                      'BodyColumns', 'SeealsoInMember'}; ...
-                'INDEX rules', {'IndexMissingEntry', 'IndexOrphanEntry', ...
-                                'IndexNotFound'}};
+                'INDEX rules', {'IndexLocation', 'IndexMissingEntry', ...
+                                'IndexOrphanEntry', 'IndexNotFound'}; ...
+                'Output', {'Verbosity'}};
       changed = fieldnames (differences (this));
 
       ## A severity fits the value column and a path does not, so a value too
@@ -451,13 +451,13 @@ classdef pkg_doc_options
   methods (Access = public, Hidden)
 
     ## Validate on assignment
-    function this = set.Index (this, val)
+    function this = set.IndexLocation (this, val)
       if (! (isempty (val) && isnumeric (val)) ...
           && ! (ischar (val) && (isrow (val) || isempty (val))))
-        error (strcat ("pkg_doc_options: INDEX must be a character vector", ...
-                       " or an empty matrix."));
+        error (strcat ("pkg_doc_options: INDEXLOCATION must be a", ...
+                       " character vector or an empty matrix."));
       endif
-      this.Index = val;
+      this.IndexLocation = val;
     endfunction
 
     function this = set.Verbosity (this, val)
@@ -545,7 +545,7 @@ endfunction
 ## for the detail this cannot carry.
 function str = summaryOf (name)
   switch (name)
-    case 'Index'
+    case 'IndexLocation'
       str = "path to the package's INDEX";
     case 'Verbosity'
       str = 'how much a run prints';
@@ -598,7 +598,7 @@ endfunction
 %!test  # defaults
 %! o = pkg_doc_options ();
 %! assert (isa (o, 'pkg_doc_options'));
-%! assert (isempty (o.Index) && isnumeric (o.Index));
+%! assert (isempty (o.IndexLocation) && isnumeric (o.IndexLocation));
 %! assert (o.Verbosity, 'all');
 %! assert (o.WrappedHeader, 'error');
 %! assert (o.CategoryLabel, 'warning');
@@ -623,13 +623,13 @@ endfunction
 %! assert (o.BodyColumns, 'off');
 %! assert (p.BodyColumns, 100);
 
-%!test  # the three states of Index are distinct
+%!test  # the three states of IndexLocation are distinct
 %! o = pkg_doc_options ();
-%! assert (isnumeric (o.Index) && isempty (o.Index));
-%! o.Index = '';
-%! assert (ischar (o.Index) && isempty (o.Index));
-%! o.Index = '/tmp/INDEX';
-%! assert (o.Index, '/tmp/INDEX');
+%! assert (isnumeric (o.IndexLocation) && isempty (o.IndexLocation));
+%! o.IndexLocation = '';
+%! assert (ischar (o.IndexLocation) && isempty (o.IndexLocation));
+%! o.IndexLocation = '/tmp/INDEX';
+%! assert (o.IndexLocation, '/tmp/INDEX');
 
 %!test  # BodyColumns takes a positive integer or 'off'
 %! o = pkg_doc_options ();
@@ -658,7 +658,7 @@ endfunction
 %! d = fullfile (tempdir (), 'pkg_octave_doc_opt_bist');
 %! f = fullfile (d, 'trip.json');
 %! o = pkg_doc_options ();
-%! o.Index = '/pkg/INDEX';
+%! o.IndexLocation = '/pkg/INDEX';
 %! o.Verbosity = 'summary';
 %! o.BodyColumns = 72;
 %! save_to_json (o, f);
@@ -704,8 +704,8 @@ endfunction
 %! pkg_doc_options ({'a.json'})
 %!error<pkg_doc_options: cannot read file 'no_such_file_here.json'.> ...
 %! pkg_doc_options ('no_such_file_here.json')
-%!error<pkg_doc_options: INDEX must be a character vector or an empty matrix.> ...
-%! o = pkg_doc_options (); o.Index = 5;
+%!error<pkg_doc_options: INDEXLOCATION must be a character vector or an empty matrix.> ...
+%! o = pkg_doc_options (); o.IndexLocation = 5;
 %!error<pkg_doc_options: VERBOSITY must be 'all', 'summary', or 'none'.> ...
 %! o = pkg_doc_options (); o.Verbosity = 'loud';
 %!error<pkg_doc_options: VERBOSITY must be 'all', 'summary', or 'none'.> ...

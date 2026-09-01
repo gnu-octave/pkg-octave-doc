@@ -76,20 +76,23 @@ function [report, names] = __folder_cache__ (caller, dirpath, opts, listed, ...
       items = items(keep);
     endif
 
+    ## INDEX decides what a whole scope caches, and the rule that reports a
+    ## name it leaves out is what turns that on: silencing the report would
+    ## otherwise drop names with nothing said, so the two go together.
+    filtering = ! isempty (listed) ...
+                && ! strcmp (opts.IndexMissingEntry, 'off');
+
     entries = cell (3, 0);
     findings = report.findings;
     for ii = 1:numel (items)
       name = items(ii).name;
 
-      ## INDEX decides what a whole scope caches
-      if (! isempty (listed) && ! any (strcmp (name, listed)))
-        if (! strcmp (opts.IndexMissingEntry, 'off'))
-          msg = sprintf ("'%s' is absent from INDEX and is not cached", name);
-          findings(end+1) = struct ('rule', 'IndexMissingEntry', ...
-                                    'severity', opts.IndexMissingEntry, ...
-                                    'line', 1, 'message', msg, ...
-                                    'file', items(ii).file);
-        endif
+      if (filtering && ! any (strcmp (name, listed)))
+        msg = sprintf ("'%s' is absent from INDEX and is not cached", name);
+        findings(end+1) = struct ('rule', 'IndexMissingEntry', ...
+                                  'severity', opts.IndexMissingEntry, ...
+                                  'line', 1, 'message', msg, ...
+                                  'file', items(ii).file);
         continue;
       endif
 

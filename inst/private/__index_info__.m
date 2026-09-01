@@ -16,7 +16,7 @@
 ## this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
-## @deftypefn {pkg-octave-doc} {[@var{names}, @var{pkgname}] =} __index_info__ (@var{opts})
+## @deftypefn {pkg-octave-doc} {[@var{names}, @var{pkgname}, @var{why}] =} __index_info__ (@var{opts})
 ##
 ## Private function reading the @file{INDEX} an options object points at.
 ##
@@ -26,9 +26,15 @@
 ## same reason.  Reading it here is what keeps the package's name out of
 ## @file{DESCRIPTION}, which nothing in this family opens.
 ##
+## @var{why} is set only when a file was named and could not be read, and is
+## the one case that must be reported: a path that answers to nothing turns
+## off the rule deciding what a whole scope caches, and a run that said
+## nothing about it would look exactly like a clean one.  Asking for no
+## @file{INDEX}, or naming none at all, is deliberate and says nothing.
+##
 ## @end deftypefn
 
-function [names, pkgname] = __index_info__ (opts)
+function [names, pkgname, why] = __index_info__ (opts)
 
   ## Input validation
   if (nargin != 1)
@@ -40,13 +46,20 @@ function [names, pkgname] = __index_info__ (opts)
 
   names = {};
   pkgname = '';
-  if (isempty (opts.Index) || ! ischar (opts.Index) ...
-      || ! exist (opts.Index, 'file'))
+  why = '';
+
+  ## [] leaves it unspecified and '' asks for none, both deliberate
+  if (! ischar (opts.IndexLocation) || isempty (opts.IndexLocation))
+    return;
+  endif
+  if (! exist (opts.IndexLocation, 'file'))
+    why = sprintf ("INDEX was named as '%s', which answers to no file", ...
+                   opts.IndexLocation);
     return;
   endif
 
-  lines = strsplit (strrep (fileread (opts.Index), "\r\n", "\n"), "\n", ...
-                    'CollapseDelimiters', false);
+  lines = strsplit (strrep (fileread (opts.IndexLocation), "\r\n", "\n"), ...
+                    "\n", 'CollapseDelimiters', false);
   if (isempty (lines))
     return;
   endif

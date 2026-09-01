@@ -44,8 +44,8 @@
 ## texinfo help, each of the latter reported under @code{MissingDocstring} as
 ## it is skipped.
 ##
-## @var{options} is a @code{pkg_doc_options} object.  Its @code{Index} property
-## never decides what is written here: the class named is always cached, and an
+## @var{options} is a @code{pkg_doc_options} object.  Its
+## @code{IndexLocation} property never decides what is written here: the class named is always cached, and an
 ## @file{INDEX} given only adds a warning when the class is not listed in it.
 ##
 ## An inherited property is cached, its help text belonging to the superclass
@@ -98,7 +98,7 @@ function report = classdef_texi2cache (clsname, options)
 
   ## Read the definitions from the tree rather than from the session
   clear functions;
-  [listed, pkgname] = __index_info__ (options);
+  [listed, pkgname, why] = __index_info__ (options);
   [entries, findings] = __class_entries__ ('classdef_texi2cache', clsname, ...
                                            srcfile, options, pkgname);
 
@@ -111,6 +111,7 @@ function report = classdef_texi2cache (clsname, options)
                 'file', srcfile);
     findings(end+1) = f;
   endif
+  findings = [__index_notfound__(options, why), findings];
   report.findings = findings;
 
   ## Replace every entry this class owns, so a renamed member leaves with it
@@ -253,7 +254,7 @@ endfunction
 %! unwind_protect
 %!   cd (d);
 %!   o = pkg_doc_options ();
-%!   o.Index = fullfile (d, 'INDEX');
+%!   o.IndexLocation = fullfile (d, 'INDEX');
 %!   r = classdef_texi2cache ('BistDerived', o);
 %!   assert (any (strcmp ({r.findings.rule}, 'IndexMissingEntry')));
 %!   s = load ('doc-cache');
