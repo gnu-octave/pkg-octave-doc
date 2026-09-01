@@ -106,7 +106,7 @@ function [entries, findings] = __class_entries__ (caller, clsname, srcfile, ...
 
     [rows, found] = __cache_rows__ (name, text, opts);
     if (! isempty (srclines))
-      ctx = struct ('package', pkgname, 'class', stem, 'member', member);
+      ctx = struct ('package', pkgname, 'class', clsname, 'member', member);
       found = [found, __source_lint__(srclines, opts, ctx)];
     endif
     if (! isempty (found))

@@ -81,9 +81,23 @@ function findings = __source_lint__ (srclines, opts, ctx)
   if (! isempty (ctx.package))
     allowed{end+1} = ctx.package;
     if (! isempty (ctx.class))
+      ## A class inside a namespace is documented under either spelling, the
+      ## qualified one that help takes or the bare one the file is named for,
+      ## and the class itself under whatever contains it, which is the
+      ## namespace where there is one and the package where there is not
       allowed{end+1} = ctx.class;
+      parts = strsplit (ctx.class, '.');
+      if (numel (parts) > 1)
+        allowed{end+1} = parts{end};
+        allowed{end+1} = strjoin (parts(1:end-1), '.');
+      endif
     endif
   endif
+
+  ## A category label is checked because it reaches a reader on a published
+  ## page.  A private helper has no page, and packages label theirs by their
+  ## own conventions, so there is nothing there for the rule to protect.
+  published = ! isfield (ctx, 'published') || ctx.published;
 
   isHeader = false (1, numel (srclines));
   for ii = 1:numel (srclines)
@@ -93,7 +107,8 @@ function findings = __source_lint__ (srclines, opts, ctx)
                   'tokens', 'once');
     if (! isempty (tok))
       isHeader(ii) = true;
-      if (! strcmp (opts.CategoryLabel, 'off') && ! isempty (allowed))
+      if (! strcmp (opts.CategoryLabel, 'off') && ! isempty (allowed) ...
+          && published)
         lab = strtrim (tok{1});
         if (! any (strcmp (lab, allowed)))
           msg = sprintf (strcat ("the category label '%s' names neither", ...
