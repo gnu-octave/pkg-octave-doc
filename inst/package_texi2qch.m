@@ -111,7 +111,14 @@
 ##
 ## @item @qcode{'Options'} @tab A @code{pkg_doc_options} object giving each
 ## rule the severity the package asks for, the defaults being used when none
-## is given.
+## is given.  Unlike @code{package_texi2cache} and @code{check_texi_docs},
+## which read @file{doc-options.json} from the package root they are run in,
+## this reads no settings file: it works from the @strong{installed} package,
+## and a file at a source root is not installed, only the contents of
+## @file{inst} together with @file{doc} and @file{packinfo} being carried
+## there.  So a package's own conventions reach this route by being handed to
+## it, and the rules that are on by default, which are the ones wrong in any
+## package, apply either way.
 ## @end multitable
 ##
 ## Every help text is checked as it is read, and what is found is reported
