@@ -42,6 +42,24 @@ function [rows, findings] = __function_entry__ (caller, name, srcfile, opts, ...
   findings = struct ('rule', {}, 'severity', {}, 'line', {}, 'message', {}, ...
                      'file', {});
 
+  ## A compiled help text lives inside the built file and nowhere else, so a
+  ## missing or stale one would be cached as it was at the last build, which is
+  ## worse than saying so
+  if (numel (srcfile) > 4 && strcmp (srcfile(end-3:end), '.oct'))
+    cc = [srcfile(1:end-4) '.cc'];
+    if (! exist (srcfile, 'file'))
+      error ("%s: '%s' has not been built.", caller, srcfile);
+    endif
+    if (exist (cc, 'file'))
+      a = dir (srcfile);
+      b = dir (cc);
+      if (a.datenum < b.datenum)
+        error (strcat ("%s: '%s' is older than its source, build the", ...
+                       " package first."), caller, srcfile);
+      endif
+    endif
+  endif
+
   [text, format] = get_help_text (name);
   if (isempty (text) || ! strcmp (format, 'texinfo'))
     if (! strcmp (opts.MissingDocstring, 'off'))

@@ -38,6 +38,13 @@
 ## nothing could read one, so its names are written into the cache of the
 ## nearest ordinary directory above it.
 ##
+## @file{src} is written too, and its cache belongs to it: a build installs
+## the compiled files into an architecture directory of their own, and the
+## cache goes with them, which is why it is not folded into the cache of
+## @file{inst}.  A @code{DEFUN_DLD} help text lives inside the compiled file,
+## so an entry is written for one whose @file{.oct} is present and newer than
+## its source, and a stale or missing one stops the run and asks for a build.
+##
 ## @qcode{'-auto'} rebuilds only what changed, taking the work from
 ## @code{git}: everything that differs from @code{HEAD}, staged and unstaged
 ## alike, together with the untracked files, since a function written but never
@@ -143,7 +150,8 @@ function [status, report] = package_texi2cache (varargin)
 
   dirs = __cache_dirs__ (root);
   if (isempty (dirs))
-    error ("package_texi2cache: this package has no inst directory.");
+    error (strcat ("package_texi2cache: this package has neither an inst", ...
+                   " nor a src directory."));
   endif
 
   status = 0;
@@ -194,14 +202,21 @@ function [status, report] = package_texi2cache (varargin)
 endfunction
 
 ## Every directory below a package root that can hold a cache of its own, so
-## the ones the load path reaches and none of the ones it does not
+## the ones the load path reaches and none of the ones it does not.  A
+## @file{src} directory is one of them: its compiled files are installed into
+## an architecture directory of their own, which the load path reaches, and
+## the cache written beside them here is the cache that is copied there.  It
+## is not walked below, since only what a build produces is installed.
 function dirs = __cache_dirs__ (root)
   dirs = {};
   base = fullfile (root, 'inst');
-  if (! isfolder (base))
-    return;
+  if (isfolder (base))
+    dirs = __walk__ ({base}, base);
   endif
-  dirs = __walk__ ({base}, base);
+  src = fullfile (root, 'src');
+  if (isfolder (src))
+    dirs{end+1} = src;
+  endif
 endfunction
 
 function dirs = __walk__ (dirs, here)
