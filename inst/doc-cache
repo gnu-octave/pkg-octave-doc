@@ -1,0 +1,1552 @@
+# doc-cache created by Octave 11.2.0
+# name: cache
+# type: cell
+# rows: 3
+# columns: 30
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 11
+build_DEMOS
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3629
+pkg-octave-doc: html = build_DEMOS ( fcnname )
+pkg-octave-doc: html = build_DEMOS ( fcnname , collapsed )
+pkg-octave-doc: html = build_DEMOS (&hellip;, Name , Value )
+
+Build notebook-style HTML for the DEMO blocks of a function or class member.
+
+build_DEMOS collects every %!demo block of fcnname and
+returns html , a char string with the generated HTML for all of them.
+fcnname is a char string with the name of a function or, for a class
+member, a "class/method" path. Each demo is wrapped in the
+demos_template.html card, titled Example: N and given the HTML
+anchor fcnname -exampleN (with every non-alphanumeric character of
+fcnname , such as the . of a "Class.method" name, mapped
+to _ so the id is safe in a CSS selector). A docstring can therefore
+link to one of its own demos with the
+short form @url{#exampleN} : the HTML converter expands the bare
+#exampleN fragment to this fully-qualified anchor, which keeps the
+reference readable in the command-line help while staying unique on a
+page that carries several members&rsquo; demos.
+
+The optional collapsed is a logical scalar. When true , each
+example card renders collapsed by default (used for lumped classdef members to
+keep the page short); a viewer expands it with the card header, and a
+#exampleN link opens it automatically. When omitted or false ,
+the card renders expanded. When fcnname has no demos, html is
+returned empty.
+
+Optional Name/Value pairs
+
+Name Value
+'figformat' The file format the demo figures are printed
+in, either 'png' (default) or 'svg' . 'png' is
+printed at twice the nominal size so it stays sharp on a high-density
+display. 'svg' keeps the figures resolution independent, at the cost
+of very large files for figures rich in filled areas.
+
+Notebook layout
+
+Each demo is rendered as an interleaved notebook instead of a single
+code block trailed by its aggregated output. The demo is split into cells
+and laid out as a vertical stack of boxes:
+
+Comment lines become prose (see the Markdown subset below).
+Code statements become input boxes. Consecutive statements
+that print nothing are merged into a single box, so muted setup code reads as
+one block.
+Output produced by a statement is shown in an output box
+directly beneath it, rather than at the end of the demo. A statement prints
+when it is left unterminated by a semicolon or when it calls disp ,
+printf , and the like.
+Figures are saved under the assets/ folder of the
+working directory, shown right after the code that drew them. They are named
+after their owner as its HTML page is, so the figures of
+prob.NormalDistribution.pdf are prob.NormalDistribution.pdf-N
+beside prob.NormalDistribution.pdf.html . The figure number is
+separated with a - , since _ already stands for the file
+separator of an old-style "@class/method" name and a function name
+may itself contain one.
+
+Markdown in comments
+
+Comment text uses a small subset of Markdown , not texinfo, so
+that the same demo stays readable in the terminal when it is run with the
+demo command. The supported constructs are:
+
+inline code `code` rendered as <code> ;
+bold **text** and italic *text* emphasis;
+links [text](url) ;
+paragraphs, separated by a blank comment line;
+unordered lists, whose items start with a - or *
+marker, and ordered lists, whose items start with a 1. marker.
+
+All comment text is HTML-escaped before the markup is applied. The following
+are deliberately not supported: any texinfo markup; underscore
+emphasis _text_ , which would mangle identifier names such as
+a_b_c ; and # headings, which would clash with the Octave
+comment marker.
+
+See also:
+find_DEMOS,
+function_texi2html,
+classdef_texi2html
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 76
+Build notebook-style HTML for the DEMO blocks of a function or class member.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 15
+check_texi_docs
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1795
+pkg-octave-doc: check_texi_docs ()
+pkg-octave-doc: check_texi_docs ( options )
+pkg-octave-doc: status = check_texi_docs (&hellip;)
+pkg-octave-doc: [ status , report ] = check_texi_docs (&hellip;)
+
+Check the texinfo help texts of a tree, writing nothing.
+
+Every help text below the current directory is parsed and reported on, and
+no file of any kind is produced. It is the way to examine a package whose
+documentation is built as HTML, that route writing pages rather than
+reporting on what it rendered, and it is the fastest of the three: nothing
+is rendered and no definition is loaded, so a tree is read straight from
+disk.
+
+It runs from wherever it is called and works downwards, so a package root
+covers the whole package and inst covers only what is below it. A
+src directory is passed over, a DEFUN_DLD help text living
+inside the compiled file rather than the source, as are tests ,
+demos and datasets , which carry none.
+
+Unlike the documentation builders, it checks everything it finds ,
+a Hidden member and a private helper included. Those are the help
+texts no reader ever meets and nothing else looks at, so they are the ones
+that rot unnoticed.
+
+options is a pkg_doc_options object, and without one the
+settings are read from doc-options.json in the current directory if
+there is one. The INDEX of the current directory is read unless the
+object names another, which is what the category label rule is checked
+against; where no INDEX can be found that rule stands down rather
+than guess.
+
+status is the number of findings and is zero when nothing was found.
+report is a struct array of them, carrying 'rule' ,
+'severity' , 'file' , 'line' and 'message' .
+With no output requested they are printed.
+
+See also:
+package_texi2cache,
+package_texi2html,
+package_texi2qch,
+pkg_doc_options
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 56
+Check the texinfo help texts of a tree, writing nothing.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 19
+classdef_texi2cache
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 2155
+pkg-octave-doc: classdef_texi2cache ( clsname )
+pkg-octave-doc: classdef_texi2cache ( clsname , options )
+pkg-octave-doc: report = classdef_texi2cache (&hellip;)
+
+Write a class and its documented members into this directory&rsquo;s doc-cache.
+
+clsname is a class, qualified by its package when it lives in one, as
+in 'prob.NormalDistribution' . Its own entry and one per member are
+written into the doc-cache of the current directory , and the
+entries the class no longer has are dropped, so a method renamed inside a
+class needs only the class named once.
+
+The class file must live in the current directory, or in a +pkg
+directory below it. A +pkg directory is never itself the place to
+stand: a cache inside one can be read by nothing, so a namespaced class is
+written from the directory holding the +pkg .
+
+The members are the ones the class documents: its public constructor, the
+methods declared in the class&rsquo;s own file, and the properties reported by
+properties , inherited ones included. This is what
+classdef_texi2html publishes, so a class reads the same way online
+and in lookfor , and it is not an arbitrary choice: help
+resolves an inherited property on a subclass but not an inherited method, so
+these are exactly the members a cache entry can be built for. Members of a
+Hidden or private block are left out, as are those carrying no
+texinfo help, each of the latter reported under MissingDocstring as
+it is skipped.
+
+options is a pkg_doc_options object. Its
+IndexLocation property never decides what is written here: the class
+named is always cached, and an INDEX given only adds a warning when
+the class is not listed in it.
+
+An inherited property is cached, its help text belonging to the superclass
+that declares it, but only the rules a renderer can apply are run on it: the
+rules that measure a file are left to the run that covers the file it is
+written in.
+
+report is a struct with the fields 'cache' , 'added' ,
+'updated' , 'removed' , 'changed' and
+'findings' . With no output requested the same information is
+printed.
+
+See also:
+package_texi2cache,
+folder_texi2cache,
+function_texi2cache,
+classdef_texi2html,
+pkg_doc_options
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 73
+Write a class and its documented members into this directory's doc-cache.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 18
+classdef_texi2html
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3921
+pkg-octave-doc: classdef_texi2html ( clsname , pkgfcns , info )
+pkg-octave-doc: classdef_texi2html (&hellip;, Name , Value )
+
+Generate HTML page for a class definition.
+
+classdef_texi2html requires three input arguments: clsname , a
+char string with the class&rsquo; name; pkgfcns , a cell array with all
+available functions of a package; and info , a structure with relevant
+information about the package, which the function clsname belongs to.
+
+pkgfcns can be either a Nx2 or a Nx3 cell array, whose
+1st column list all available function names, the 2nd column list the each
+function&rsquo;s category, and the 3rd column contains the URL to the function&rsquo;s
+source code. pkgfcns is used to create relative references to other
+pages of functions which are listed in the seealso tag. When a third
+column is present, classdef_texi2html uses it to add a source code
+link of the the function in clsname .
+
+The info structure requires at least the following fields:
+
+Field Name Description
+PKG_ICON The relative reference to the package&rsquo;s logo
+image which must be either in .svg or .png format and it is located in the
+newly created assets/ folder inside the working directory.
+PKG_NAME The package&rsquo;s name (e.g. "pkg-octave-doc")
+PKG_TITLE The package&rsquo;s title (e.g. "Octave Package
+Documentation")
+OCTAVE_LOGO The relative reference to Octave&rsquo;s logo, also
+located inside the assets/ folder.
+
+To generate a suitable Nx2 cell array for a specific package, use the
+package_texi2html function and to populate is with the 3rd column use
+find_GHurls . The info structure can also be created with
+package_texi2html .
+
+Layout: grouped vs. lumped methods
+
+The class is rendered in one of two layouts, chosen automatically from the
+class source:
+
+A lumped classdef (the default) becomes a single page:
+the class help and its properties, then the constructor and one collapsible
+block per public method, each holding that method&rsquo;s help and demos.
+A grouped classdef &ndash; one whose methods are organised into
+named groups by banner comment blocks (see below) &ndash; becomes a main page with
+the class help, the properties, and one collapsible block per group .
+Each group lists its methods, each with a one-line description, linking to a
+standalone Class . method .html page. Every public method
+(the constructor included) gets such a page, laid out like a function page
+but with a class-scoped sidebar (the groups and their methods) and a
+breadcrumb back to the package index and the class page; its source-code link
+points to the class source file.
+
+A class counts as grouped when &ndash; and only when &ndash; its source holds at least
+one method-group banner ; this is never decided by the class&rsquo; size or
+line count. A banner is a comment block of the form
+
+################################################################
+## ** Group Name ** ##
+################################################################
+
+placed before a methods block, matching the convention used by the
+datatypes package, and never directly above a method: a comment run
+reaching down to one is that method&rsquo;s help text, so the banner would be
+documenting it. Each public method is assigned to the most recent banner
+above its definition; groups whose methods are all non-public ( Hidden
+or private) are omitted, and any public method before the first banner is
+collected under an "Other" group.
+
+The generated HTML is based on the classdef_template.html and
+default.html layouts; a grouped classdef additionally uses
+group_template.html for the method groups and
+methodpage_template.html for the per-method pages.
+
+Optional Name/Value pairs
+
+Name Value
+'figformat' The file format the demo figures are printed
+in, either 'png' (default) or 'svg' . It applies to the demo
+figures of the class page and of every per-method page alike.
+
+See also:
+package_texi2html,
+function_texi2html,
+find_GHurls,
+build_DEMOS
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 42
+Generate HTML page for a class definition.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 10
+find_DEMOS
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 356
+pkg-octave-doc: demos = find_DEMOS ( fcnname )
+
+Retrieve the DEMO code blocks from a particular function.
+
+fcnname is a char string with the function&rsquo;s name.
+
+demos is cell array with each cell containing a char string with the
+code block of each DEMO available in fcnname .
+
+See also:
+build_DEMOS,
+function_texi2html,
+classdef_texi2html,
+find_GHurls
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 57
+Retrieve the DEMO code blocks from a particular function.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 11
+find_GHurls
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1395
+pkg-octave-doc: pkgfcns = find_GHurls ( pkgurl , pkgfcns )
+
+Retrieve unique URLs to every function&rsquo;s location within the package&rsquo;s GitHub
+repository.
+
+find_GHurls requires two input arguments, pkgurl , a char string
+with the URL to the root directory to the package&rsquo;s GitHub repository and
+pkgfcns , a Nx2 cell array containing the package&rsquo;s available functions
+(1st column) and their respective category (2nd column).
+
+Note: find_GHurls explicitly works with repositories hosted on GitHub!
+pkgurl can be easily retrieved from the PKG_URL field of the
+info structure returned from package_texi2html .
+
+find_GHurls returns a cell array, pkgfcns , by appending a third
+column to the input pkgfcns with the URLs to the source code location
+of each individual function listed in the 1st column of pkgfcns .
+find_GHurls relies on curl and tar , which must be
+installed and available to the system&rsquo;s $PATH , and an active internet
+connection to download and extract the targeted repository to a temporary
+directory. If either curl or tar fail for any reason,
+find_GHurls returns a verbatim copy of the input pkgfcns .
+
+Use the following example to obtain a cell array with each function&rsquo;s URL to
+its source code location at GitHub:
+
+[pkgfcns, info] = package_texi2html ("pkg-octave-doc");
+pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
+
+See also:
+function_texi2html
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 89
+Retrieve unique URLs to every function's location within the package's GitHub repository.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 17
+folder_texi2cache
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 2512
+pkg-octave-doc: folder_texi2cache ()
+pkg-octave-doc: folder_texi2cache ( '-auto' )
+pkg-octave-doc: folder_texi2cache ( '-check' )
+pkg-octave-doc: folder_texi2cache (&hellip;, options )
+pkg-octave-doc: report = folder_texi2cache (&hellip;)
+
+Rebuild the doc-cache of the current directory.
+
+Every function and class in the current directory is written afresh, along
+with the members of each class and the contents of any +pkg or
+@class directory below it, and any entry that no longer corresponds
+to a file is dropped. A doc-cache is a per-directory file, so this
+is the whole of one, which is what makes it the unit worth having: a
+directory rebuilt this way is in the state a full package rebuild would
+leave it in.
+
+The current directory must be a function directory of a package, so a
+package root, a +pkg or @class directory, and private ,
+tests , demos or datasets are all refused, the middle
+two because their cache could be read by nothing.
+
+'-auto' narrows the work to what git reports as changed
+within this directory, and is the form to reach for while working in one: a
+directory holding many classes takes minutes to rebuild whole and seconds to
+refresh for the two files just edited. Where there is no git to ask,
+or the tree is not a repository, it is ignored with a warning and the whole
+directory is rebuilt, which is what would have been asked for had the
+question been answerable. A file that moved between
+directories is only half of its own rename here, the departure seen in the
+directory it left and the arrival in the one it joined, so run it in both or
+reach for package_texi2cache instead.
+
+'-check' writes nothing and reports what would change, and may be
+given together with '-auto' to ask whether the files just edited are
+already accounted for.
+
+options is a pkg_doc_options object. Unlike the per-item
+functions, an INDEX given through it decides what is cached :
+only the names it lists are written, so the cache holds the package&rsquo;s public
+surface rather than whatever the directory happens to carry. A name found
+here but absent from INDEX is skipped and reported. An INDEX
+entry answering to no file is not reported at this scope, since a directory
+cannot tell one naming a file elsewhere from one naming nothing at all.
+
+report is a struct with the fields 'cache' , 'added' ,
+'updated' , 'removed' , 'changed' and
+'findings' . With no output requested the same information is
+printed.
+
+See also:
+package_texi2cache,
+classdef_texi2cache,
+function_texi2cache,
+pkg_doc_options
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 47
+Rebuild the doc-cache of the current directory.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 19
+function_texi2cache
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1853
+pkg-octave-doc: function_texi2cache ( fcnname )
+pkg-octave-doc: function_texi2cache ( fcnname , options )
+pkg-octave-doc: report = function_texi2cache (&hellip;)
+
+Write one function&rsquo;s entry into this directory&rsquo;s doc-cache.
+
+fcnname is a function, whether an m-file or a compiled one, a function
+inside a package as 'pkg.fcnname' , or a method of an old-style class
+as '@cls/method' , each spelled the way help takes it. Its
+entry is written into the doc-cache of the current
+directory , leaving every other entry in that file alone. The file must
+live here, or in a +pkg or @class directory below, neither of
+which can hold a cache of its own.
+
+A name that no longer resolves is treated as removed and its entry dropped,
+which is how a deleted or renamed function is cleared out of the cache it
+still sits in.
+
+A compiled function is read from its .oct , which must exist and be
+newer than its .cc , since that is the only place a DEFUN_DLD
+docstring lives.
+
+For a class, use classdef_texi2cache , which writes the class and all
+of its members together.
+
+options is a pkg_doc_options object. Its
+IndexLocation property never decides what is written here: the
+function named is always cached, and an INDEX given only adds a
+warning when the function is not listed in it.
+
+The help text is read from the file rather than from the session:
+clear functions is issued first, and what the interpreter then
+answers must carry a distinctive run of the docstring in the file, so that
+neither a definition held from earlier nor a copy installed elsewhere can be
+cached unnoticed.
+
+report is a struct with the fields 'cache' , 'added' ,
+'updated' , 'removed' , 'changed' and
+'findings' . With no output requested the same information is
+printed.
+
+See also:
+package_texi2cache,
+folder_texi2cache,
+classdef_texi2cache,
+function_texi2html,
+pkg_doc_options
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 59
+Write one function's entry into this directory's doc-cache.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 18
+function_texi2html
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1989
+pkg-octave-doc: function_texi2html ( fcnname , pkgfcns , info )
+pkg-octave-doc: function_texi2html (&hellip;, Name , Value )
+
+Generate HTML page for a particular function.
+
+function_texi2html requires three input arguments: fcnname , a
+char string with the function&rsquo;s name; pkgfcns , a cell array with all
+available functions of a package; and info , a structure with relevant
+information about the package, which the function fcnname belongs to.
+
+pkgfcns can be either a Nx2 or a Nx3 cell array, whose
+1st column list all available function names, the 2nd column list the each
+function&rsquo;s category, and the 3rd column contains the URL to the function&rsquo;s
+source code. pkgfcns is used to relative references to other pages of
+functions which are listed in the See also tag. When a 3rd column is
+present, function_texi2html uses it to add a source code link of the
+the function in fcnname .
+
+The info structure requires at least the following fields:
+
+Field Name Description
+PKG_ICON The relative reference to the package&rsquo;s logo
+image which must be either in .svg or .png format and it is located in the
+newly created assets/ folder inside the working directory.
+PKG_NAME The package&rsquo;s name (e.g. "pkg-octave-doc")
+PKG_TITLE The package&rsquo;s title (e.g. "Octave Package
+Documentation")
+OCTAVE_LOGO The relative reference to Octave&rsquo;s logo, also
+located inside the assets/ folder.
+
+To generate a suitable Nx2 cell array for a specific package, use the
+package_texi2html function and to populate is with the 3rd column use
+find_GHurls . The info structure can also be created with
+package_texi2html .
+
+The generated HTML code is based on the function_template.html
+and default.html layouts.
+
+Optional Name/Value pairs
+
+Name Value
+'figformat' The file format the demo figures are printed
+in, either 'png' (default) or 'svg' . It applies to every
+figure of the function&rsquo;s demos.
+
+See also:
+package_texi2html,
+classdef_texi2html,
+find_GHurls,
+build_DEMOS
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 45
+Generate HTML page for a particular function.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 13
+list_packages
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 914
+pkg-octave-doc: valid_packages = list_packages ()
+pkg-octave-doc: valid_packages = list_packages ( index )
+
+List pkg -installable packages from Octave Packages.
+
+valid_packages = list_packages () returns an Nx2 cell
+array naming every package at Octave Packages that is installable with the
+pkg command, against the URL of its latest release. A package
+qualifies by declaring pkg among the dependencies of that release.
+The index is fetched from Octave Packages, and a fetch that does not
+succeed is an error saying so.
+
+valid_packages = list_packages ( index ) reads the index
+from index instead of fetching it, given either as the JSON text or
+as the structure jsondecode returns for it. This is what makes the
+selection testable without reaching the network, and it is useful against a
+copy of the index taken earlier.
+
+An index in which nothing qualifies returns an empty cell array rather than
+nothing at all.
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 51
+List pkg-installable packages from Octave Packages.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 18
+package_texi2cache
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3503
+pkg-octave-doc: package_texi2cache ()
+pkg-octave-doc: package_texi2cache ( '-auto' )
+pkg-octave-doc: package_texi2cache ( '-check' )
+pkg-octave-doc: package_texi2cache (&hellip;, options )
+pkg-octave-doc: status = package_texi2cache (&hellip;)
+pkg-octave-doc: [ status , report ] = package_texi2cache (&hellip;)
+
+Regenerate the doc-cache files of a package from its source tree.
+
+A doc-cache is the file lookfor searches. Octave builds one
+per directory, resolving every file by its bare name, so a class contributes
+a single entry and its methods and properties contribute none: they are
+invisible to lookfor and to everything built on it. This writes them
+in, choosing exactly the members classdef_texi2html publishes, so a
+class reads the same way online and in a search.
+
+Run it at the package root, which is where INDEX lives. Every cache
+below the root is written, one per directory that can be reached by the load
+path; a +pkg or @class directory has none of its own, since
+nothing could read one, so its names are written into the cache of the
+nearest ordinary directory above it.
+
+src is written too, and its cache belongs to it: a build installs
+the compiled files into an architecture directory of their own, and the
+cache goes with them, which is why it is not folded into the cache of
+inst . A DEFUN_DLD help text lives inside the compiled file,
+so an entry is written for one whose .oct is present and newer than
+its source, and a stale or missing one stops the run and asks for a build.
+
+'-auto' rebuilds only what changed, taking the work from
+git : everything that differs from HEAD , staged and unstaged
+alike, together with the untracked files, since a function written but never
+committed is invisible to a diff. Where there is no git to ask, or
+the tree is not a repository, it is ignored with a warning and the whole
+package is rebuilt.
+
+'-check' writes nothing and reports what would change, so that a
+tree can be tested for a stale cache without touching it. It may be given
+together with '-auto' , which asks the same question of the changed
+files alone. Since every docstring is checked as it is parsed, this is also
+how a package is examined for broken texinfo without writing anything.
+
+options is a pkg_doc_options object. Called without one, the
+settings are read from doc-options.json at the package root if it
+carries one, and are the defaults if it does not, so a package&rsquo;s own
+conventions are applied by anyone who builds its documentation. The
+INDEX of the root is read unless the object names another, and it
+decides what is cached: only the names it lists are written.
+
+status is the number of cache files that changed, or under
+'-check' would change, and is therefore zero when the tree is
+current. report is a struct array with one element per cache file
+touched, carrying the fields 'cache' , 'added' ,
+'updated' , 'removed' , 'changed' and
+'findings' . With no output requested the same information is
+printed.
+
+Every directory below the root is walked, but only those where a
+doc-cache was written or already stands are reported: most of them
+hold nothing to cache, and a line saying nothing happened in one would
+announce a file that is not there.
+
+This is the only form that reports an INDEX entry answering to no
+file, a single directory being unable to tell one naming a file elsewhere
+from one naming nothing at all.
+
+See also:
+folder_texi2cache,
+classdef_texi2cache,
+function_texi2cache,
+package_texi2html,
+pkg_doc_options,
+doc_cache_create,
+lookfor
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 65
+Regenerate the doc-cache files of a package from its source tree.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 17
+package_texi2html
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3443
+pkg-octave-doc: package_texi2html ( pkgname )
+pkg-octave-doc: package_texi2html ( pkgname , Name , Value )
+pkg-octave-doc: [ pkgfcns , info ] = package_texi2html ( pkgname )
+
+Generate HTML pages for an entire package.
+
+package_texi2html takes a single input argument, pkgname , which
+is a char string with the package&rsquo;s name whose HTML documentation need to be
+generated. The function considers the current working path as the root
+directory of the built pages. It creates an index.html page with the
+available functions (and their subdivision into separate categories) of the
+package according to its INDEX file. Although the INDEX file (if absent) is
+automatically generated during the package&rsquo;s installation, it is best
+practice to include one in the package&rsquo;s source so there is full comtrol of
+the categorization among the functions. Individual functions HTML pages area
+generated with function_texi2html . Note that every existing HTML file
+matching an '.html' extension as well as an /assets named
+folder inside the current working path are purged.
+
+The generated pages follow the template of the Octave Packages GitHub Pages
+based on bootstrap 5 and the generated HTML code is based on the
+index_template.html and default.html layouts.
+
+For packages whose repository is available at GitHub, individual URLs to each
+function&rsquo;s location within the reposity are retrieved and used to add a link
+to source code in each function&rsquo;s page. This requires an internet connection
+and git installed and available to the system&rsquo;s $PATH . If not
+available, the source code link is omitted and the functions&rsquo; HTML pages are
+generated without it.
+
+Optionally, package_texi2html can return two output arguments, namely
+pkgfcns and info , which are necessary for the find_GHurls
+and function_texi2html functions. In such case, the HTML pages
+generation is skipped. This is useful for building individual function pages
+without the need to regenerate the package&rsquo;s entire documentation.
+
+Examples:
+
+[pkgfcns, info] = package_texi2html ("pkg-octave-doc");
+pkgfcns = find_GHurls (info.PKG_URL, pkgfcns);
+function_texi2html ("find_GHurls", pkgfcns, info);
+
+Returning arguments:
+
+pkgfcns is a Nx2 cell array containing the package&rsquo;s available
+functions (1st column) and their respective category (2nd column).
+
+info is a structure with the following fields:
+
+Field Name Description
+PKG_URL The URL to the package&rsquo;s repository at GitHub.
+PKG_ICON The relative reference to the package&rsquo;s logo
+image which must be either in .svg or .png format and it is located in the
+newly created assets/ folder inside the working directory.
+PKG_NAME The package&rsquo;s name (e.g. "pkg-octave-doc")
+PKG_TITLE The package&rsquo;s title (e.g. "Octave Package
+Documentation")
+OCTAVE_LOGO The relative reference to Octave&rsquo;s logo, also
+located inside the assets/ folder.
+
+Optional Name/Value pairs
+
+Name Value
+'figformat' The file format the demo figures are printed
+in, either 'png' (default) or 'svg' . It is passed on to
+every page the build generates. 'png' is printed at twice the
+nominal size, so it stays sharp on a high-density display, and keeps the
+documentation small. 'svg' keeps the figures resolution independent,
+but a figure rich in filled areas can cost tens of MB and, on a large
+package, exhaust the memory of the graphics back end.
+
+See also:
+function_texi2html,
+find_GHurls,
+build_DEMOS
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 42
+Generate HTML pages for an entire package.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 16
+package_texi2qch
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 5391
+pkg-octave-doc: package_texi2qch ( pkgname )
+pkg-octave-doc: package_texi2qch ( pkgname , Name , Value )
+
+Generate a Qt compressed help file for an entire package.
+
+package_texi2qch takes a single input argument, pkgname , which
+is a char string with the package&rsquo;s name whose Qt help file needs to be
+generated, and writes pkgname .qch into the current working
+directory. Octave&rsquo;s GUI reads such a file to populate its documentation
+tab: pkg load registers doc/ pkgname .qch from the
+package&rsquo;s installation directory and pkg unload unregisters it, so
+the generated file must be placed in the package&rsquo;s doc/ directory
+before the release tarball is built for it to have any effect.
+
+The help text of every function listed in the package&rsquo;s INDEX file is
+rendered to HTML, one page per INDEX category, and each function is
+registered as a keyword pointing at its own anchor within that page.
+
+A classdef is not rendered onto its category page. It keeps the category
+its INDEX entry puts it in, and is given a page tree of its own beneath it,
+whatever its size:
+
+<Class>.html carries the class help text and a list of links to the
+pages below it.
+
+<Class>_properties.html carries one section per property, and is
+absent from a class that declares none.
+
+<Class>_methods.html carries one section per method. A
+grouped classdef, one that sorts its methods under
+** Group Name ** banner blocks as classdef_texi2html reads
+them, takes one page per group instead, named after it and carrying that
+group&rsquo;s methods, in the order the class declares them.
+
+The contents tree of the documentation browser therefore nests a class
+under its own category, and is entered rather than scrolled past among its
+neighbours, which is what a category holding a few dozen classdefs would
+otherwise ask of a reader. A category page carries its plain functions and
+a list of links to the classes it owns.
+
+Functions are grouped by category rather than given a page each because
+every file inside a .qch is compressed on its own, so fragmenting
+what the pages share inflates the archive: for the statistics
+package the same documentation measures 0.57 MB at one page per category
+against 1.89 MB at one page per function. The page tree a classdef is
+given costs a part of that difference and buys the navigation back.
+
+Demos are not included , neither their code nor their figures. A
+.qch is an offline reference to be shipped inside the package, where
+the rendered figures of a package the size of statistics would cost
+more than the rest of the documentation put together. Demos remain
+available through demo and through the online pages that
+package_texi2html builds.
+
+A @tex formula is rendered as its @ifnottex
+alternative, and dropped when it has none. The documentation browser of
+the GUI runs no JavaScript, so the MathJax that typesets a formula in the
+online pages is not available to it, and the TeX would reach the reader as
+source. This is what makeinfo does for every output that is not
+TeX, and what help prints in the terminal for the same docstring.
+
+package_texi2qch requires the qhelpgenerator program of the Qt
+toolkit, which is located on the system&rsquo;s $PATH unless the
+'generator' option names it explicitly. The program is looked up
+before any page is rendered and, if it cannot be found, an error is raised
+and nothing is written, rather than spending the build on documentation that
+cannot be packaged.
+
+Example:
+
+package_texi2qch ("statistics");
+
+Optional Name/Value pairs
+
+Name Value
+'Generator' The qhelpgenerator executable, given
+as a char string. By default the program is looked up on the system&rsquo;s
+$PATH . Name it explicitly on a system carrying more than one Qt
+version, since a file built by one Qt major version may not register with a
+GUI linked against another.
+'KeepHTML' A logical scalar specifying whether the
+intermediate HTML pages and the Qt help project file are kept beside the
+generated .qch , which is false by default. They are useful
+for inspecting what was rendered before shipping it.
+'Options' A pkg_doc_options object giving each
+rule the severity the package asks for, the defaults being used when none
+is given. Unlike package_texi2cache and check_texi_docs ,
+which read doc-options.json from the package root they are run in,
+this reads no settings file: it works from the installed package,
+and a file at a source root is not installed, only the contents of
+inst together with doc and packinfo being carried
+there. So a package&rsquo;s own conventions reach this route by being handed to
+it, and the rules that are on by default, which are the ones wrong in any
+package, apply either way.
+
+Every help text is checked as it is read, and what is found is reported
+with the name it belongs to and a line counted from the first line of that
+help text. A finding never stops the build: a page is written from a help
+text whatever it says, since refusing would leave the package with no
+documentation over a defect the reader would have met anyway.
+
+Only the rules a help text can be judged by on its own are applied here.
+The rest measure the file a help text was written in, which this route
+never opens, working as it does from the installed package; help is
+its source and check_texi_docs is where those rules live.
+
+See also:
+package_texi2html,
+function_texi2html,
+classdef_texi2html,
+check_texi_docs,
+pkg_doc_options
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 57
+Generate a Qt compressed help file for an entire package.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 15
+pkg_doc_options
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1601
+pkg-octave-doc: pkg_doc_options
+
+Settings for the documentation builders of a package.
+
+A pkg_doc_options object carries the location of a package&rsquo;s
+INDEX file, how much a run prints, and the severity of each rule the
+documentation builders check a docstring against. Every property is
+public, so the object is itself the list of what a maintainer may
+configure, and each carries its own help text describing what it controls.
+
+opts = pkg_doc_options () returns an object holding the
+default settings. opts = pkg_doc_options ( filename )
+reads a JSON file over those defaults, taking a bare name in the current
+directory or an absolute path anywhere. Anything in it this release
+cannot use, whether a key that is not a property or a value a property
+will not take, is reported and passed over, and the rest of the file is
+read: a settings file outlives the release that wrote it, and one written
+for a later release must not stop a documentation build under an earlier
+one.
+
+It is a value class, so an assignment returns a modified copy:
+
+opts = pkg_doc_options ();
+opts.BodyColumns = 80;
+opts.SeealsoInMember = 'error';
+
+save_to_json writes the settings back, storing only the properties
+that differ from the defaults, so a rule added in a later release cannot be
+pinned to an old value by a file already written.
+
+A severity is 'error' , 'warning' or 'off' . It says
+how a finding is reported and never whether a run continues: a docstring
+defect is reported, counted and returned, and the run goes on.
+
+See also:
+package_texi2cache,
+folder_texi2cache,
+classdef_texi2cache,
+function_texi2cache
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 53
+Settings for the documentation builders of a package.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 22
+pkg_doc_options.BareAt
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 263
+pkg_doc_options: property BareAt
+
+A literal @ that is neither doubled nor a command
+
+Severity of a literal @ that is neither doubled nor the start of
+a known texinfo command, as an anonymous function written inside
+@code without doubling it. Defaults to 'error' .
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 49
+A literal @ that is neither doubled nor a command
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 27
+pkg_doc_options.BodyColumns
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 485
+pkg_doc_options: property BodyColumns
+
+Width limit of a docstring body line
+
+Width limit of a docstring body line, specified as a positive integer
+giving the column past which a line is reported, or as 'off' , the
+default, which does not check the width at all. A @deftypefn or
+@deftypefnx header is never measured, being allowed to run over.
+
+This is a house rule of the packages maintained alongside this one rather
+than a defect, which is why it is off unless a package asks for it.
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 36
+Width limit of a docstring body line
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 29
+pkg_doc_options.CategoryLabel
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 263
+pkg_doc_options: property CategoryLabel
+
+A category label naming no class in the package
+
+Severity of a category label that names no class in the package, or that
+is not an identifier at all, as a literal format specifier left in the
+text. Defaults to 'warning' .
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 47
+A category label naming no class in the package
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 31
+pkg_doc_options.EndTrailingText
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 229
+pkg_doc_options: property EndTrailingText
+
+Body text on an @end line
+
+Severity of an @end command carrying body text on the same line,
+as in @end itemize and more text , which is not a valid closing
+command. Defaults to 'error' .
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 25
+Body text on an @end line
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 29
+pkg_doc_options.IndexLocation
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 517
+pkg_doc_options: property IndexLocation
+
+Location of the package&rsquo;s INDEX file
+
+Location of the package&rsquo;s INDEX file, specified as a character
+vector holding an absolute path, as '' to use no INDEX
+even where one exists, or as [] , the default, to leave it
+unspecified.
+
+The three states are distinct because INDEX decides what a whole
+scope caches: left unspecified, package_texi2cache reads the
+INDEX of the package root it is standing in, whereas ''
+switches that off and caches whatever the tree holds.
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 36
+Location of the package's INDEX file
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 33
+pkg_doc_options.IndexMissingEntry
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 320
+pkg_doc_options: property IndexMissingEntry
+
+A name in the tree absent from INDEX
+
+Severity of a documented name found in the tree but absent from the
+package&rsquo;s INDEX , which leaves it out of the published
+documentation and, where INDEX decides what is cached, out of the
+doc-cache as well. Defaults to 'warning' .
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 36
+A name in the tree absent from INDEX
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 29
+pkg_doc_options.IndexNotFound
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 241
+pkg_doc_options: property IndexNotFound
+
+No INDEX where one was expected
+
+Severity of a run that reads INDEX finding none to read.
+Defaults to 'warning' , and is the rule to switch off for a
+package that deliberately ships without an INDEX .
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 31
+No INDEX where one was expected
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 32
+pkg_doc_options.IndexOrphanEntry
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 319
+pkg_doc_options: property IndexOrphanEntry
+
+An INDEX entry answering to no file
+
+Severity of an INDEX entry that answers to no file in the package,
+which is reported only by a run covering the whole package, a single
+directory being unable to tell such an entry from one naming a file
+elsewhere. Defaults to 'warning' .
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 35
+An INDEX entry answering to no file
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 32
+pkg_doc_options.MissingDocstring
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 261
+pkg_doc_options: property MissingDocstring
+
+A public member carrying no docstring
+
+Severity of a public function or class member with no help text, for
+which help answers that it is undocumented and which no cache
+entry can be built for. Defaults to 'warning' .
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 37
+A public member carrying no docstring
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 31
+pkg_doc_options.SeealsoInMember
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 261
+pkg_doc_options: property SeealsoInMember
+
+@seealso in the help of a class member
+
+Severity of a @seealso command in the help text of a class
+member. Defaults to 'off' , this being a house rule of the
+packages maintained alongside this one rather than a defect.
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 38
+@seealso in the help of a class member
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 31
+pkg_doc_options.UnbalancedBrace
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 222
+pkg_doc_options: property UnbalancedBrace
+
+A brace that never closes, or closes too often
+
+Severity of an unbalanced brace in a docstring, which swallows the text
+following it or ends a command early. Defaults to 'error' .
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 46
+A brace that never closes, or closes too often
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 29
+pkg_doc_options.UnclosedBlock
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 199
+pkg_doc_options: property UnclosedBlock
+
+A block opened and never ended
+
+Severity of a block command, such as @itemize or
+@example , opened and never closed by a matching @end .
+Defaults to 'error' .
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 30
+A block opened and never ended
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 25
+pkg_doc_options.Verbosity
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 371
+pkg_doc_options: property Verbosity
+
+How much a run prints
+
+How much a run prints, specified as 'all' , the default, which
+prints every finding and then the summary; 'summary' , which
+prints the summary alone; or 'none' , which prints nothing.
+
+Findings are returned in the report at every setting, so 'none'
+is for a programmatic caller rather than a way of hiding them.
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 21
+How much a run prints
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 29
+pkg_doc_options.WrappedHeader
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 272
+pkg_doc_options: property WrappedHeader
+
+A @deftypefn header wrapped across lines
+
+Severity of a @deftypefn or @deftypefnx header broken
+across two or more lines, which makeinfo does not accept and which
+therefore breaks help for the whole docstring. Defaults to
+'error' .
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 40
+A @deftypefn header wrapped across lines
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 31
+pkg_doc_options.pkg_doc_options
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 653
+pkg_doc_options: obj = pkg_doc_options ()
+pkg_doc_options: obj = pkg_doc_options ( filename )
+
+Create a settings object for the documentation builders.
+
+obj = pkg_doc_options () returns an object holding the
+default settings.
+
+obj = pkg_doc_options ( filename ) reads a JSON file
+over those defaults, taking a bare name in the current directory or an
+absolute path anywhere. The file holds only the settings a package
+differs from the defaults in, which is what save_to_json writes.
+Anything the running release cannot use, a key that is not a property
+or a value a property will not take, is reported and passed over while
+the rest of the file is read.
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 56
+Create a settings object for the documentation builders.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 28
+pkg_doc_options.save_to_json
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 570
+pkg_doc_options: save_to_json ( obj , filename )
+
+Save the settings that differ from the defaults to a JSON file.
+
+save_to_json ( obj , filename ) writes the properties of
+obj that differ from the default settings to filename , taking
+a bare name in the current directory or an absolute path anywhere. An
+object holding nothing but defaults writes an empty JSON object.
+
+Only the differences are stored, so a property added in a later release
+is not pinned to an old value by a file already written, and the file
+stays readable as a statement of what a package asks for.
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 63
+Save the settings that differ from the defaults to a JSON file.
+
+
+
+
+
