@@ -17,6 +17,8 @@
 
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {@var{html_txt} =} __texi2html__ (@var{text}, @var{fcnname}, @var{pkgfcns})
+## @deftypefnx {pkg-octave-doc} {[@var{html_txt}, @var{findings}] =} __texi2html__ (@dots{})
+## @deftypefnx {pkg-octave-doc} {[@dots{}] =} __texi2html__ (@var{text}, @var{fcnname}, @var{pkgfcns}, @var{opts})
 ##
 ## Private function to generate HTML text from texinfo.
 ##
@@ -28,9 +30,26 @@
 ## function list) is used to resolve @code{@@ref}/@code{@@xref}/@code{@@seealso}
 ## cross references to other pages.
 ##
+## A second output requests the structural findings of @var{text}, which are
+## produced by @code{__texi_lint__} and reported with a line counted from the
+## first line of @var{text}, so that a caller which knows where the docstring
+## began can name a line of the file it read.  @var{opts} is a
+## @code{pkg_doc_options} object giving each rule its severity, defaulting to
+## the default settings.  Asking for the findings does not change the rendered
+## output in any way, and neither does passing @var{opts}.
+##
 ## @end deftypefn
 
-function html_txt = __texi2html__ (text, fcnname, pkgfcns)
+function [html_txt, findings] = __texi2html__ (text, fcnname, pkgfcns, opts)
+
+  ## Collect the structural findings before anything is rewritten, so that a
+  ## reported line counts from the first line of the text as it was handed in
+  if (nargout > 1)
+    if (nargin < 4)
+      opts = pkg_doc_options ();
+    endif
+    findings = __texi_lint__ (text, opts);
+  endif
 
   ## Normalise line endings.
   text = strrep (text, "\r\n", "\n");
