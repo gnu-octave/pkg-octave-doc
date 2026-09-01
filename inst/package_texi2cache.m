@@ -73,6 +73,11 @@
 ## @qcode{'findings'}.  With no output requested the same information is
 ## printed.
 ##
+## Every directory below the root is walked, but only those where a
+## @file{doc-cache} was written or already stands are reported: most of them
+## hold nothing to cache, and a line saying nothing happened in one would
+## announce a file that is not there.
+##
 ## This is the only form that reports an @file{INDEX} entry answering to no
 ## file, a single directory being unable to tell one naming a file elsewhere
 ## from one naming nothing at all.
@@ -166,11 +171,28 @@ function [status, report] = package_texi2cache (varargin)
     if (rep.changed)
       status += 1;
     endif
-    if (ii == 1 && ! isempty (seed))
+
+    ## A directory holding nothing to cache has no cache and is not reported.
+    ## Every directory below the root is walked, but most of them are not
+    ## places a doc-cache belongs, and a line saying nothing happened in one
+    ## announces a file that is not there.
+    if (! rep.changed && ! exist (rep.cache, 'file'))
+      continue;
+    endif
+
+    if (isempty (report) && ! isempty (seed))
       rep.findings = [seed, rep.findings];
+      seed = [];
     endif
     report(end+1) = rep;
   endfor
+
+  ## Nothing was reported, so whatever was found about INDEX still must be
+  if (! isempty (seed))
+    report(end+1) = struct ('cache', '', 'added', {{}}, 'updated', {{}}, ...
+                            'removed', {{}}, 'changed', false, ...
+                            'findings', seed);
+  endif
 
   ## An INDEX entry answering to no file, which only this scope can tell
   if (! isempty (listed) && ! strcmp (options.IndexOrphanEntry, 'off'))
