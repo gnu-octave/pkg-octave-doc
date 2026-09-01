@@ -4,6 +4,7 @@ Documentation
  classdef_texi2html
  find_DEMOS
  find_GHurls
+ function_texi2cache
  function_texi2html
  list_packages
  package_texi2html

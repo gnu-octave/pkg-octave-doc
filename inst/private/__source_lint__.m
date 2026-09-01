@@ -75,9 +75,14 @@ function findings = __source_lint__ (srclines, opts, ctx)
   ## A label names either the class owning the item or the package itself,
   ## and nothing else.  A class documents itself under the package's name and
   ## its members under its own, which is what the two allowances are.
-  allowed = {ctx.package};
-  if (! isempty (ctx.class))
-    allowed{end+1} = ctx.class;
+  ## With no package name to compare against, the rule cannot know what a
+  ## label ought to be, so it stands down rather than guess
+  allowed = {};
+  if (! isempty (ctx.package))
+    allowed{end+1} = ctx.package;
+    if (! isempty (ctx.class))
+      allowed{end+1} = ctx.class;
+    endif
   endif
 
   isHeader = false (1, numel (srclines));
@@ -88,7 +93,7 @@ function findings = __source_lint__ (srclines, opts, ctx)
                   'tokens', 'once');
     if (! isempty (tok))
       isHeader(ii) = true;
-      if (! strcmp (opts.CategoryLabel, 'off'))
+      if (! strcmp (opts.CategoryLabel, 'off') && ! isempty (allowed))
         lab = strtrim (tok{1});
         if (! any (strcmp (lab, allowed)))
           msg = sprintf (strcat ("the category label '%s' names neither", ...
