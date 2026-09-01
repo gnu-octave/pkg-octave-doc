@@ -98,79 +98,9 @@ function report = classdef_texi2cache (clsname, options)
 
   ## Read the definitions from the tree rather than from the session
   clear functions;
-  blocks = __class_blocks__ (srcfile);
-
-  try
-    MTHDS = methods (clsname);
-  catch
-    error ("classdef_texi2cache: '%s' is not a classdef.", clsname);
-  end_try_catch
-  MTHDS(strcmp (MTHDS, parts{end})) = [];
-  MTHDS = get_methods_ordered (clsname, MTHDS);
-  PROPS = properties (clsname);
-  PROPS = get_properties_ordered (clsname, PROPS);
-
-  ## The class, its constructor, then its methods and properties
-  names = [{clsname}, {[clsname '.' parts{end}]}];
-  for ii = 1:numel (MTHDS)
-    names{end+1} = [clsname '.' MTHDS{ii}];
-  endfor
-  for ii = 1:numel (PROPS)
-    names{end+1} = [clsname '.' PROPS{ii}];
-  endfor
-
   [listed, pkgname] = __index_info__ (options);
-  entries = cell (3, 0);
-  findings = report.findings;
-
-  for ii = 1:numel (names)
-    name = names{ii};
-    member = '';
-    if (ii > 1)
-      member = name(numel (clsname) + 2:end);
-    endif
-
-    [text, format] = get_help_text (name);
-    if (isempty (text) || ! strcmp (format, 'texinfo'))
-      if (! strcmp (options.MissingDocstring, 'off'))
-        msg = sprintf ("'%s' carries no texinfo help", name);
-        f = struct ('rule', 'MissingDocstring', ...
-                    'severity', options.MissingDocstring, 'line', 1, ...
-                    'message', msg, 'file', srcfile);
-        findings(end+1) = f;
-      endif
-      continue;
-    endif
-
-    ## The block this member is documented by, which an inherited property
-    ## does not have here because it is declared in another file
-    srclines = {};
-    atline = 0;
-    for jj = 1:numel (blocks)
-      if (strcmp (blocks(jj).member, member))
-        srclines = blocks(jj).lines;
-        atline = blocks(jj).line;
-        break;
-      endif
-    endfor
-
-    __verify_help__ ('classdef_texi2cache', name, srcfile, text, srclines);
-
-    [rows, found] = __cache_rows__ (name, text, options);
-    if (! isempty (srclines))
-      ctx = struct ('package', pkgname, 'class', parts{end}, ...
-                    'member', member);
-      found = [found, __source_lint__(srclines, options, ctx)];
-    endif
-    if (! isempty (found))
-      for jj = 1:numel (found)
-        found(jj).line += atline;
-        found(jj).file = srcfile;
-      endfor
-      findings = [findings, found];
-    endif
-    entries(:,end+1) = rows;
-  endfor
+  [entries, findings] = __class_entries__ ('classdef_texi2cache', clsname, ...
+                                           srcfile, options, pkgname);
 
   ## An INDEX given never gates what is written here, it only reports
   if (! isempty (listed) && ! any (strcmp (clsname, listed)) ...

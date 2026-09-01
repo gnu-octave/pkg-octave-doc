@@ -110,18 +110,12 @@ function report = function_texi2cache (fcnname, options)
 
   ## Read the help from the file rather than from the session
   clear functions;
-  text = get_help_text (fcnname);
-  srclines = __help_block__ (srcfile);
-  __verify_help__ ('function_texi2cache', fcnname, srcfile, text, srclines);
-
-  ## Build the entry, collecting what the renderer finds while it converts
-  [rows, findings] = __cache_rows__ (fcnname, text, options);
   [listed, pkgname] = __index_info__ (options);
-  ctx = struct ('package', pkgname, 'class', '', 'member', '');
-  findings = [findings, __source_lint__(srclines, options, ctx)];
-  for ii = 1:numel (findings)
-    findings(ii).file = srcfile;
-  endfor
+  [rows, findings] = __function_entry__ ('function_texi2cache', fcnname, ...
+                                         srcfile, options, pkgname);
+  if (isempty (rows))
+    error ("function_texi2cache: '%s' carries no texinfo help.", fcnname);
+  endif
 
   ## An INDEX given never gates what is written here, it only reports
   if (! isempty (listed) && ! any (strcmp (fcnname, listed)) ...
@@ -189,32 +183,6 @@ function srcfile = __locate_name__ (name)
   endif
 endfunction
 
-## The leading texinfo comment block of an m-file, as it appears in the file
-function srclines = __help_block__ (srcfile)
-  srclines = {};
-  if (numel (srcfile) < 2 || ! strcmp (srcfile(end-1:end), '.m'))
-    return;                              # a compiled docstring has no source
-  endif
-  lines = strsplit (strrep (fileread (srcfile), "\r\n", "\n"), "\n", ...
-                    'CollapseDelimiters', false);
-  at = 0;
-  for ii = 1:numel (lines)
-    marker = regexp (strtrim (lines{ii}), '^##\s*-\*-\s*texinfo', 'once');
-    if (! isempty (marker))
-      at = ii;
-      break;
-    endif
-  endfor
-  if (at == 0)
-    return;
-  endif
-  for ii = at+1:numel (lines)
-    if (isempty (regexp (lines{ii}, '^\s*##', 'once')))
-      break;
-    endif
-    srclines{end+1} = lines{ii};
-  endfor
-endfunction
 
 
 
