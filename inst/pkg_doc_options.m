@@ -30,9 +30,12 @@ classdef pkg_doc_options
   ## @code{@var{opts} = pkg_doc_options ()} returns an object holding the
   ## default settings.  @code{@var{opts} = pkg_doc_options (@var{filename})}
   ## reads a JSON file over those defaults, taking a bare name in the current
-  ## directory or an absolute path anywhere.  A key that is not a property is
-  ## reported and ignored, so a file written for an older release does not stop
-  ## a documentation build.
+  ## directory or an absolute path anywhere.  Anything in it this release
+  ## cannot use, whether a key that is not a property or a value a property
+  ## will not take, is reported and passed over, and the rest of the file is
+  ## read: a settings file outlives the release that wrote it, and one written
+  ## for a later release must not stop a documentation build under an earlier
+  ## one.
   ##
   ## It is a value class, so an assignment returns a modified copy:
   ##
@@ -258,8 +261,9 @@ classdef pkg_doc_options
     ## over those defaults, taking a bare name in the current directory or an
     ## absolute path anywhere.  The file holds only the settings a package
     ## differs from the defaults in, which is what @code{save_to_json} writes.
-    ## A key that is not a property is reported and ignored, so a file written
-    ## for an earlier release does not stop a documentation build.
+    ## Anything the running release cannot use, a key that is not a property
+    ## or a value a property will not take, is reported and passed over while
+    ## the rest of the file is read.
     ##
     ## @end deftypefn
     function this = pkg_doc_options (filename)
@@ -292,16 +296,26 @@ classdef pkg_doc_options
         error ("pkg_doc_options: '%s' must hold a JSON object.", filename);
       endif
 
-      ## Assign what the file names, reporting anything unknown
+      ## Assign what the file names.  A settings file outlives the release
+      ## that wrote it, so neither a name this release does not know nor a
+      ## value it cannot accept is fatal: the one is reported and passed over
+      ## and the rest of the file is read, which is what lets a package carry
+      ## one file for several releases of this one.
       known = properties (this);
       given = fieldnames (data);
       for ii = 1:numel (given)
-        if (any (strcmp (given{ii}, known)))
-          this.(given{ii}) = data.(given{ii});
-        else
+        if (! any (strcmp (given{ii}, known)))
           warning (strcat ("pkg_doc_options: ignoring unknown setting", ...
                            " '%s' in '%s'."), given{ii}, filename);
+          continue;
         endif
+        try
+          this.(given{ii}) = data.(given{ii});
+        catch err
+          warning (strcat ("pkg_doc_options: ignoring '%s' in '%s',", ...
+                           " which this release cannot take: %s"), ...
+                   given{ii}, filename, err.message);
+        end_try_catch
       endfor
 
     endfunction
@@ -671,6 +685,26 @@ endfunction
 %! save_to_json (o, f);
 %! assert (strtrim (fileread (f)), '{}');
 %! assert (isequal (pkg_doc_options (f), o));
+
+%!test  # a file written for another release is read for what it can be
+%! d = fullfile (tempdir (), 'pkg_octave_doc_opt_bist');
+%! if (! isfolder (d))
+%!   mkdir (d);
+%! endif
+%! f = fullfile (d, 'future.json');
+%! fid = fopen (f, 'w');
+%! fputs (fid, '{"FutureRule": "error", "BodyColumns": [80, "error"], ');
+%! fputs (fid, '"Verbosity": "verbose", "SeealsoInMember": "warning"}');
+%! fclose (fid);
+%! warning ('off', 'all');
+%! unwind_protect
+%!   o = pkg_doc_options (f);
+%! unwind_protect_cleanup
+%!   warning ('on', 'all');
+%! end_unwind_protect
+%! assert (o.SeealsoInMember, 'warning');
+%! assert (o.BodyColumns, 'off');
+%! assert (o.Verbosity, 'all');
 
 %!test  # a setting that is no longer a property is reported and ignored
 %! d = fullfile (tempdir (), 'pkg_octave_doc_opt_bist');
