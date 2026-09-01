@@ -97,7 +97,7 @@ function [status, report] = check_texi_docs (options)
 
   status = numel (report);
   if (nargout == 0)
-    __show_findings__ (report, options, here);
+    __show_findings__ (report, options, here, numel (files), 'files');
     clear status;
   endif
 

@@ -162,6 +162,7 @@ function package_texi2qch (pkgname, varargin)
   endif
   findings = struct ('rule', {}, 'severity', {}, 'line', {}, 'message', {}, ...
                      'file', {});
+  examined = 0;
 
   ## Resolve the Qt help generator before anything is rendered, so that a
   ## system without it costs nothing instead of failing after the work
@@ -260,9 +261,11 @@ function package_texi2qch (pkgname, varargin)
   for i = 1:numel (cat)
     txt = i_page_head (cat(i).name, pkgname);
     for j = 1:numel (cat(i).fcns)
-      [frag, first, found] = i_render (cat(i).fcns{j}, "h2", pkgfcns, ...
-                                       qchmap, docopts);
+      [frag, first, found, ex] = i_render (cat(i).fcns{j}, "h2", pkgfcns, ...
+                                           qchmap, docopts);
       findings = [findings, found];
+      examined += ex;
+
       txt = [txt, frag];
       firsts(end+1,:) = {cat(i).fcns{j}, first};
     endfor
@@ -282,9 +285,11 @@ function package_texi2qch (pkgname, varargin)
   ## scrolled past among its neighbours.
   for k = 1:numel (cls)
     txt = i_page_head (cls(k).name, pkgname);
-    [frag, first, found] = i_render (cls(k).name, "h2", pkgfcns, qchmap, ...
-                                     docopts);
+    [frag, first, found, ex] = i_render (cls(k).name, "h2", pkgfcns, ...
+                                         qchmap, docopts);
     findings = [findings, found];
+    examined += ex;
+
     txt = [txt, frag];
     firsts(end+1,:) = {cls(k).name, first};
     txt = [txt, "<h2>Contents</h2>\n<ul>\n"];
@@ -304,9 +309,10 @@ function package_texi2qch (pkgname, varargin)
       txt = i_page_head ([cls(k).name, " properties"], pkgname);
       for p = 1:numel (cls(k).props)
         nm = [cls(k).name, ".", cls(k).props{p}];
-        [frag, ~, found] = i_render (nm, "h2", pkgfcns, qchmap, docopts);
+        [frag, ~, found, ex] = i_render (nm, "h2", pkgfcns, qchmap, docopts);
         txt = [txt, frag];
         findings = [findings, found];
+        examined += ex;
       endfor
       tmpfiles{end+1} = i_finish (cls(k).proppage, txt);
     endif
@@ -317,9 +323,10 @@ function package_texi2qch (pkgname, varargin)
       txt = i_page_head ([cls(k).name, " ", cls(k).subs(t).title], pkgname);
       for m = 1:numel (cls(k).subs(t).methods)
         nm = [cls(k).name, ".", cls(k).subs(t).methods{m}];
-        [frag, ~, found] = i_render (nm, "h2", pkgfcns, qchmap, docopts);
+        [frag, ~, found, ex] = i_render (nm, "h2", pkgfcns, qchmap, docopts);
         txt = [txt, frag];
         findings = [findings, found];
+        examined += ex;
       endfor
       tmpfiles{end+1} = i_finish (cls(k).subs(t).page, txt);
     endfor
@@ -353,7 +360,7 @@ function package_texi2qch (pkgname, varargin)
 
   ## Say what the help texts turned out to be, the pages having been built
   ## from them whatever they said
-  __show_findings__ (findings, docopts, pkgname);
+  __show_findings__ (findings, docopts, pkgname, examined, 'help texts');
 
   ## Leave the package as it was found
   if (pkg_loaded)
@@ -439,9 +446,10 @@ endfunction
 
 ## Render one documented name into a titled, anchored HTML block, and report
 ## the first sentence of its help text for the landing page to list it by.
-function [html, first, findings] = i_render (name, tag, pkgfcns, qchmap, ...
-                                            docopts)
+function [html, first, findings, examined] = i_render (name, tag, pkgfcns, ...
+                                                      qchmap, docopts)
   first = "";
+  examined = 0;
   findings = struct ('rule', {}, 'severity', {}, 'line', {}, 'message', {}, ...
                      'file', {});
   ## The anchor and the heading are emitted whatever the help text turns out
@@ -452,6 +460,7 @@ function [html, first, findings] = i_render (name, tag, pkgfcns, qchmap, ...
           "</", tag, ">\n"];
   [text, format] = get_help_text (name);
   if (strcmp (format, "texinfo"))
+    examined = 1;
     ## The help text is checked as it was written, not as it is rendered: the
     ## TeX blocks are taken out below, which would move every line after them
     found = __texi_lint__ (text, docopts);
