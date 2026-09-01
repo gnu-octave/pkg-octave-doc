@@ -108,9 +108,25 @@
 ## intermediate HTML pages and the Qt help project file are kept beside the
 ## generated @qcode{.qch}, which is @qcode{false} by default.  They are useful
 ## for inspecting what was rendered before shipping it.
+##
+## @item @qcode{'Options'} @tab A @code{pkg_doc_options} object giving each
+## rule the severity the package asks for, the defaults being used when none
+## is given.
 ## @end multitable
 ##
-## @seealso{package_texi2html, function_texi2html, classdef_texi2html}
+## Every help text is checked as it is read, and what is found is reported
+## with the name it belongs to and a line counted from the first line of that
+## help text.  A finding never stops the build: a page is written from a help
+## text whatever it says, since refusing would leave the package with no
+## documentation over a defect the reader would have met anyway.
+##
+## Only the rules a help text can be judged by on its own are applied here.
+## The rest measure the file a help text was written in, which this route
+## never opens, working as it does from the installed package; @code{help} is
+## its source and @code{check_texi_docs} is where those rules live.
+##
+## @seealso{package_texi2html, function_texi2html, classdef_texi2html,
+## check_texi_docs, pkg_doc_options}
 ## @end deftypefn
 
 function package_texi2qch (pkgname, varargin)
@@ -123,8 +139,8 @@ function package_texi2qch (pkgname, varargin)
   endif
 
   ## Parse optional Name/Value paired arguments
-  names = {'Generator', 'KeepHTML'};
-  dflts = {'', false};
+  names = {'Generator', 'KeepHTML', 'Options'};
+  dflts = {'', false, []};
   [opts, args] = parse_pairs (names, dflts, varargin);
   if (! isempty (args))
     print_usage ();
@@ -137,6 +153,15 @@ function package_texi2qch (pkgname, varargin)
                                       || isnumeric (opts.KeepHTML))))
     error ("package_texi2qch: 'KeepHTML' must be a logical scalar.");
   endif
+  docopts = opts.Options;
+  if (isempty (docopts))
+    docopts = pkg_doc_options ();
+  elseif (! isa (docopts, 'pkg_doc_options'))
+    error (strcat ("package_texi2qch: 'Options' must be a pkg_doc_options", ...
+                   " object."));
+  endif
+  findings = struct ('rule', {}, 'severity', {}, 'line', {}, 'message', {}, ...
+                     'file', {});
 
   ## Resolve the Qt help generator before anything is rendered, so that a
   ## system without it costs nothing instead of failing after the work
@@ -235,7 +260,9 @@ function package_texi2qch (pkgname, varargin)
   for i = 1:numel (cat)
     txt = i_page_head (cat(i).name, pkgname);
     for j = 1:numel (cat(i).fcns)
-      [frag, first] = i_render (cat(i).fcns{j}, "h2", pkgfcns, qchmap);
+      [frag, first, found] = i_render (cat(i).fcns{j}, "h2", pkgfcns, ...
+                                       qchmap, docopts);
+      findings = [findings, found];
       txt = [txt, frag];
       firsts(end+1,:) = {cat(i).fcns{j}, first};
     endfor
@@ -255,7 +282,9 @@ function package_texi2qch (pkgname, varargin)
   ## scrolled past among its neighbours.
   for k = 1:numel (cls)
     txt = i_page_head (cls(k).name, pkgname);
-    [frag, first] = i_render (cls(k).name, "h2", pkgfcns, qchmap);
+    [frag, first, found] = i_render (cls(k).name, "h2", pkgfcns, qchmap, ...
+                                     docopts);
+    findings = [findings, found];
     txt = [txt, frag];
     firsts(end+1,:) = {cls(k).name, first};
     txt = [txt, "<h2>Contents</h2>\n<ul>\n"];
@@ -275,7 +304,9 @@ function package_texi2qch (pkgname, varargin)
       txt = i_page_head ([cls(k).name, " properties"], pkgname);
       for p = 1:numel (cls(k).props)
         nm = [cls(k).name, ".", cls(k).props{p}];
-        txt = [txt, i_render(nm, "h2", pkgfcns, qchmap)];
+        [frag, ~, found] = i_render (nm, "h2", pkgfcns, qchmap, docopts);
+        txt = [txt, frag];
+        findings = [findings, found];
       endfor
       tmpfiles{end+1} = i_finish (cls(k).proppage, txt);
     endif
@@ -286,7 +317,9 @@ function package_texi2qch (pkgname, varargin)
       txt = i_page_head ([cls(k).name, " ", cls(k).subs(t).title], pkgname);
       for m = 1:numel (cls(k).subs(t).methods)
         nm = [cls(k).name, ".", cls(k).subs(t).methods{m}];
-        txt = [txt, i_render(nm, "h2", pkgfcns, qchmap)];
+        [frag, ~, found] = i_render (nm, "h2", pkgfcns, qchmap, docopts);
+        txt = [txt, frag];
+        findings = [findings, found];
       endfor
       tmpfiles{end+1} = i_finish (cls(k).subs(t).page, txt);
     endfor
@@ -317,6 +350,10 @@ function package_texi2qch (pkgname, varargin)
       unlink (tmpfiles{i});
     endfor
   endif
+
+  ## Say what the help texts turned out to be, the pages having been built
+  ## from them whatever they said
+  __show_findings__ (findings, docopts, pkgname);
 
   ## Leave the package as it was found
   if (pkg_loaded)
@@ -402,8 +439,11 @@ endfunction
 
 ## Render one documented name into a titled, anchored HTML block, and report
 ## the first sentence of its help text for the landing page to list it by.
-function [html, first] = i_render (name, tag, pkgfcns, qchmap)
+function [html, first, findings] = i_render (name, tag, pkgfcns, qchmap, ...
+                                            docopts)
   first = "";
+  findings = struct ('rule', {}, 'severity', {}, 'line', {}, 'message', {}, ...
+                     'file', {});
   ## The anchor and the heading are emitted whatever the help text turns out
   ## to be: the keyword was registered before rendering, so a name that is
   ## skipped here would leave the documentation browser with nowhere to land.
@@ -412,6 +452,15 @@ function [html, first] = i_render (name, tag, pkgfcns, qchmap)
           "</", tag, ">\n"];
   [text, format] = get_help_text (name);
   if (strcmp (format, "texinfo"))
+    ## The help text is checked as it was written, not as it is rendered: the
+    ## TeX blocks are taken out below, which would move every line after them
+    found = __texi_lint__ (text, docopts);
+    for ii = 1:numel (found)
+      found(ii).file = name;
+    endfor
+    if (! isempty (found))
+      findings = [findings, found];
+    endif
     try
       frag = __texi2html__ (i_untex (text), name, pkgfcns);
       body = qch_postprocess (frag, name, qchmap);

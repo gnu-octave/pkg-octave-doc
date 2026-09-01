@@ -208,30 +208,6 @@ function files = __gather__ (files, here)
   endfor
 endfunction
 
-## Print the findings and a tally, as much as the verbosity asks for
-function __show_findings__ (findings, options, root)
-  if (strcmp (options.Verbosity, 'none'))
-    return;
-  endif
-  if (strcmp (options.Verbosity, 'all'))
-    for ii = 1:numel (findings)
-      printf ('%s:%d: %s: %s (%s)\n', findings(ii).file, findings(ii).line, ...
-              findings(ii).severity, findings(ii).message, findings(ii).rule);
-    endfor
-  endif
-  if (isempty (findings))
-    printf ('%s: nothing found.\n', root);
-    return;
-  endif
-  rules = unique ({findings.rule});
-  parts = cell (1, numel (rules));
-  for ii = 1:numel (rules)
-    n = sum (strcmp ({findings.rule}, rules{ii}));
-    parts{ii} = sprintf ('%s %d', rules{ii}, n);
-  endfor
-  printf ('%d findings: %s\n', numel (findings), strjoin (parts, ', '));
-endfunction
-
 ## The cases build a small tree in a temporary place and cd into it.  Nothing
 ## is written by the function, so each case asserts on what came back and the
 ## last one checks the tree was left as it was found.
