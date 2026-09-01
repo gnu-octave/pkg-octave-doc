@@ -8,3 +8,4 @@ Documentation
  list_packages
  package_texi2html
  package_texi2qch
+ pkg_doc_options
