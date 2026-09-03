@@ -425,6 +425,44 @@ endfunction
 %! rmdir (d, 's');
 %! assert (! isfolder (d));
 
+%!test  # several names on one INDEX line are read as several names
+%! d = fullfile (tempdir (), 'pkg_octave_doc_pk_multi');
+%! if (isfolder (d))
+%!   confirm_recursive_rmdir (false, 'local');
+%!   rmdir (d, 's');
+%! endif
+%! mkdir (d);
+%! mkdir (fullfile (d, 'inst'));
+%! fid = fopen (fullfile (d, 'DESCRIPTION'), 'w');
+%! fputs (fid, "Name: multipkg\nVersion: 1.0.0\n");
+%! fclose (fid);
+%! for nm = {'multione', 'multitwo'}
+%!   fid = fopen (fullfile (d, 'inst', [nm{1} '.m']), 'w');
+%!   fprintf (fid, '## -*- texinfo -*-\n');
+%!   fprintf (fid, '## @deftypefn {multipkg} {} %s ()\n##\n', nm{1});
+%!   fprintf (fid, '## A function written for the package tests.\n##\n');
+%!   fprintf (fid, '## A body line that is distinctive enough to look for.\n');
+%!   fprintf (fid, '##\n## @end deftypefn\n');
+%!   fprintf (fid, 'function %s ()\nendfunction\n', nm{1});
+%!   fclose (fid);
+%! endfor
+%! fid = fopen (fullfile (d, 'INDEX'), 'w');
+%! fputs (fid, "multipkg >> Multi Package\nDocumentation\n");
+%! fputs (fid, " multione multitwo\n");
+%! fclose (fid);
+%! old = pwd ();
+%! unwind_protect
+%!   cd (d);
+%!   [st, rep] = package_texi2cache ();
+%!   assert (st, 1);
+%!   s = load (fullfile (d, 'inst', 'doc-cache'));
+%!   assert (any (strcmp (s.cache(1,:), 'multione')));
+%!   assert (any (strcmp (s.cache(1,:), 'multitwo')));
+%!   assert (! any (strcmp ({rep(1).findings.rule}, 'IndexOrphanEntry')));
+%! unwind_protect_cleanup
+%!   cd (old);
+%! end_unwind_protect
+
 ## Test input validation
 %!error<package_texi2cache: arguments are '-auto', '-check', and a pkg_doc_options object.> ...
 %! package_texi2cache ('-nosuchflag')

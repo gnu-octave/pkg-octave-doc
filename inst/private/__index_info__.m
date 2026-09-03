@@ -21,9 +21,11 @@
 ## Private function reading the @file{INDEX} an options object points at.
 ##
 ## @var{names} is a cell array of every name the file lists and is empty when
-## no @file{INDEX} is in play.  @var{pkgname} is the package's name, which the
-## file carries on its first line as @code{name >> Title}, and is empty for the
-## same reason.  Reading it here is what keeps the package's name out of
+## no @file{INDEX} is in play.  An indented line carries one name or several
+## separated by whitespace, both being the supported format, and each name is
+## read on its own.  @var{pkgname} is the package's name, which the file
+## carries on its first line as @code{name >> Title}, and is empty for the same
+## reason.  Reading it here is what keeps the package's name out of
 ## @file{DESCRIPTION}, which nothing in this family opens.
 ##
 ## @var{why} is set only when a file was named and could not be read, and is
@@ -69,13 +71,12 @@ function [names, pkgname, why] = __index_info__ (opts)
     pkgname = tok{1};
   endif
 
-  ## A name is indented, a category label is not
+  ## A name is indented, a category label is not, and an indented line carries
+  ## as many names as fit on it, which is the format core's own parser accepts
   for ii = 2:numel (lines)
     if (! isempty (lines{ii}) && (lines{ii}(1) == ' ' || lines{ii}(1) == "\t"))
-      nm = strtrim (lines{ii});
-      if (! isempty (nm))
-        names{end+1} = nm;
-      endif
+      nms = regexp (lines{ii}, '\S+', 'match');
+      names = [names, nms];
     endif
   endfor
 
