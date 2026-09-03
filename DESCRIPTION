@@ -1,14 +1,17 @@
 name: pkg-octave-doc
-version: 0.8.0
-date: 2026-09-01
+version: 0.8.1
+date: 2026-09-03
 author: Andreas Bertsatos
 maintainer: Andreas Bertsatos <abertsatos@biol.uoa.gr>
 title: Octave Package Documentation
 description: This package provides functions for generating HTML pages that
  contain the help texts of the functions of an octave package. The package is
  designed to work with installed packages and use their INDEX file for creating
- the respective functions' HTML pages. The default layout is based on boootstrap
- 5 and it follows the design of the Octave Packages GitHub page.
+ the respective functions' HTML pages. The default layout is based on bootstrap
+ 5 and it follows the design of the Octave Packages GitHub page. Besides the
+ HTML pages, the package also builds the Qt help file read by the GUI
+ documentation tab and the doc-cache searched by lookfor, both from the same
+ texinfo help texts.
 categories: package
 Depends: octave (>= 9.1.0)
 License: GPLv3+
