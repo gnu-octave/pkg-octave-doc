@@ -1,9 +1,41 @@
-Summary of important user-visible changes for pkg-octave-doc 0.8.1:
+Summary of important user-visible changes for pkg-octave-doc 0.8.2:
 -------------------------------------------------------------------
 
- ** An `INDEX` line carrying several names is read as several names.  The
-    doc-cache builders took the whole line as one name, which answered to no
-    file, so every function listed on such a line went uncached and the line
-    was reported as an entry answering to nothing.  In the `statistics`
-    package, which puts several names on 70 of its 428 name lines, 221
-    functions were hidden from the caches.
+ ** A cross-reference naming a class member now resolves.  An `@seealso`,
+    `@xref`, `@ref` or `@pxref` naming a method or a property links to it,
+    whether the name is bare, qualified, namespaced or an old style
+    `@class/member`.  A method of a grouped class links to its own page; a
+    property, and a method of a flat class, link to the class page and to the
+    collapsible holding them, which the page expands and scrolls to.  Only
+    names the package documents resolve, so a hidden member and a class
+    absent from `INDEX` are left as text.
+
+ ** Incompatible: the collapsible holding a property or a method on a class
+    page is named after the member, `Class_member`, where it was numbered by
+    position, `collapseMethod3`.  A link to an anchor of an earlier build no
+    longer resolves, and a class page must be rebuilt for its own links to.
+
+ ** What a class member is owed is stated in the README and applied by the
+    builders: a docstring on every public member and on a constructor whether
+    or not it is hidden; a `doc-cache` entry for the class, for its
+    constructor where the file declares one, and for what `methods` and
+    `properties` report; and a published page for nothing hidden at all.  A
+    hidden constructor is therefore documented and cached but not published,
+    and is the only member of that kind.
+
+ ** A class page in the Qt help file names every property and method the
+    class holds, each linked to its own anchor and given the first sentence
+    of its help text.  It listed the titles of its subpages, which the
+    contents tree already shows.
+
+ ** A constructor declared in a `methods (Hidden)` block was published:
+    rendered on the page of a flat class, and given a page of its own on a
+    grouped one.
+
+ ** A class inside a namespace listed its constructor among its public
+    methods and rendered no constructor section.
+
+ ** A class declaring no constructor was reported as `MissingDocstring` for a
+    member that does not exist, and the entry of a constructor declared
+    `Hidden` was written only because every class was given one.  The class
+    file now decides.
