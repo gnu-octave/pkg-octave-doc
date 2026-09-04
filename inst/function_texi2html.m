@@ -193,6 +193,7 @@ function function_texi2html (fcnname, pkgfcns, info, varargin)
     fnc_template = strrep (fnc_template, "{{OCTAVE_LOGO}}", info.OCTAVE_LOGO);
     fnc_template = strrep (fnc_template, "{{FCN_LIST}}", fcn_list);
     fnc_template = strrep (fnc_template, "{{FCN_NAME}}", fcnname);
+    fcn_text = __retarget_members__ (fcn_text);
     fnc_template = strrep (fnc_template, "{{FCN_TEXT}}", fcn_text);
 
     ## Populate default template

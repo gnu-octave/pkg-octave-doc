@@ -109,6 +109,7 @@ function method_texi2html (clsname, method, groups, pkgfcns, info, figformat)
     tmpl = strrep (tmpl, "{{FCN_LIST}}", fcn_list);
     tmpl = strrep (tmpl, "{{FCN_NAME}}", method_name);
     tmpl = strrep (tmpl, "{{BREADCRUMB}}", breadcrumb);
+    fcn_text = __retarget_members__ (fcn_text);
     tmpl = strrep (tmpl, "{{FCN_TEXT}}", fcn_text);
 
     ## Populate default template

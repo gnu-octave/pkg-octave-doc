@@ -51,6 +51,11 @@ function [html_txt, findings] = __texi2html__ (text, fcnname, pkgfcns, opts)
     findings = __texi_lint__ (text, opts);
   endif
 
+  ## A page belonging to a class resolves the bare name of one of its own
+  ## members, which is how a sibling is named in a docstring.  The rows are
+  ## appended, so a package name is matched first and keeps its own page.
+  pkgfcns = i_add_siblings (pkgfcns, fcnname);
+
   ## Normalise line endings.
   text = strrep (text, "\r\n", "\n");
   text = strrep (text, "\r", "\n");
@@ -324,6 +329,87 @@ function dt = i_parse_sig (line, pkgfcns)
         "</code></h5></dt>"];
 endfunction
 
+## --- cross-reference targets ---------------------------------------------
+## The file a documented name is linked to, without its ".html" suffix, or
+## empty for a name this package does not document.  A member of a class is
+## named by the class and the member throughout, whichever of the two layouts
+## the class is rendered in; the caller retargets that at the page and anchor
+## its own output uses.
+function f = i_target (s, pkgfcns)
+  f = "";
+  idx = find (strcmp (pkgfcns(:,1), s), 1);
+  if (! isempty (idx))
+    if (columns (pkgfcns) > 2 && ! isempty (pkgfcns{idx,3}))
+      f = strrep (pkgfcns{idx,3}, filesep, "_");
+    else
+      f = strrep (s, filesep, "_");
+    endif
+    return;
+  endif
+  at = strfind (s, ".");
+  if (isempty (at))
+    return;
+  endif
+
+  ## A qualified member of a classdef the package documents
+  info = __member_info__ (s);
+  if (info.found && any (strcmp (pkgfcns(:,1), info.class)))
+    f = strrep (s, filesep, "_");
+    return;
+  endif
+
+  ## An old style class documents its members as "@class/member"
+  old = ["@" s(1:at(end)-1) filesep s(at(end)+1:end)];
+  if (any (strcmp (pkgfcns(:,1), old)))
+    f = strrep (old, filesep, "_");
+  endif
+endfunction
+
+## The bare names of the members of the class this page belongs to, each
+## carrying the qualified name it is documented under.
+function pkgfcns = i_add_siblings (pkgfcns, fcnname)
+  if (! (ischar (fcnname) && isrow (fcnname) && ! isempty (fcnname)))
+    return;
+  endif
+  ## The class the page belongs to, and how its members are named
+  sep = strfind (fcnname, filesep);
+  info = __member_info__ (fcnname);
+  if (info.found)
+    clsname = info.class;                   # a page of one member of a class
+    qualify = @(m) [clsname "." m];
+  elseif (! isempty (sep) && fcnname(1) == "@")
+    clsname = fcnname(2:sep(end)-1);        # a page of an old style method
+    qualify = @(m) ["@" clsname filesep m];
+  else
+    clsname = fcnname;                      # the page of the class itself
+    qualify = @(m) [clsname "." m];
+  endif
+  try
+    MEMBERS = methods (clsname)(:);
+  catch
+    return;
+  end_try_catch
+  try
+    MEMBERS = [MEMBERS; properties(clsname)(:)];
+  catch
+    ## An old style class has no properties to report
+  end_try_catch
+  parts = strsplit (clsname, ".");
+  stem = parts{end};
+  MEMBERS(strcmp (MEMBERS, stem)) = [];     # the constructor is the class name
+  if (isempty (MEMBERS))
+    return;
+  endif
+  rows = cell (numel (MEMBERS), 3);
+  for i = 1:numel (MEMBERS)
+    rows(i,:) = {MEMBERS{i}, "", qualify(MEMBERS{i})};
+  endfor
+  if (columns (pkgfcns) == 2)
+    pkgfcns(:,3) = {""};
+  endif
+  pkgfcns = [pkgfcns; rows];
+endfunction
+
 ## --- @seealso extraction -------------------------------------------------
 function [body_lines, html] = i_extract_seealso (body_lines, pkgfcns)
   html = "";
@@ -345,8 +431,8 @@ function html = i_seealso_html (names, pkgfcns)
   html = "<p> <strong>See also: </strong>\n";
   for i = 1:numel (names)
     s = strrep (names{i}, "@@", "@");
-    if (any (strcmp (pkgfcns(:,1), s)))
-      f = strrep (s, filesep, "_");
+    f = i_target (s, pkgfcns);
+    if (! isempty (f))
       link = ["  <a href=\"", f, ".html\">", s, "</a>"];
     else
       link = s;
@@ -957,8 +1043,8 @@ function out = i_render_ref (cmd, content, pkgfcns)
   out = prefix;
   for i = 1:numel (names)
     s = strrep (names{i}, "@@", "@");
-    if (any (strcmp (pkgfcns(:,1), s)))
-      f = strrep (s, filesep, "_");
+    f = i_target (s, pkgfcns);
+    if (! isempty (f))
       link = ["<a href=\"", f, ".html\">", s, "</a>"];
     else
       link = s;

@@ -289,7 +289,7 @@ function classdef_texi2html (clsname, pkgfcns, info, varargin)
       endif
       ## Populate property template
       prop_template = strrep (template, "{{PROPERTY_NAME}}", PROPS{p});
-      prop_num = sprintf ("collapseProperty%d", p);
+      prop_num = __member_anchor__ (clsname, PROPS{p});
       prop_template = strrep (prop_template, "{{PROPERTY_NUMBER}}", prop_num);
       prop_template = strrep (prop_template, "{{PROPERTY_FS}}", prop_fs);
       prop_template = strrep (prop_template, "{{PROPERTY_HELP}}", prop_text);
@@ -411,7 +411,7 @@ function classdef_texi2html (clsname, pkgfcns, info, varargin)
       endif
       ## Populate method template
       mtds_template = strrep (template, "{{METHOD_NAME}}", MTHDS{m});
-      mtds_num = sprintf ("collapseMethod%d", m);
+      mtds_num = __member_anchor__ (clsname, MTHDS{m});
       mtds_template = strrep (mtds_template, "{{METHOD_NUMBER}}", mtds_num);
       mtds_template = strrep (mtds_template, "{{METHOD_FS}}", mtds_fs);
       mtds_template = strrep (mtds_template, "{{METHOD_HELP}}", mtds_text);
@@ -560,6 +560,7 @@ function classdef_texi2html (clsname, pkgfcns, info, varargin)
   fnc_template = strrep (fnc_template, "{{OCTAVE_LOGO}}", info.OCTAVE_LOGO);
   fnc_template = strrep (fnc_template, "{{FCN_LIST}}", fcn_list);
   fnc_template = strrep (fnc_template, "{{CLS_NAME}}", clsname);
+  cls_text = __retarget_members__ (cls_text);
   fnc_template = strrep (fnc_template, "{{CLS_TEXT}}", cls_text);
 
   ## Populate default template
@@ -665,6 +666,8 @@ endfunction
 %!        '    ## -*- texinfo -*-', ...
 %!        '    ## @deftypefn {} {} m1 (@var{obj})', ...
 %!        '    ## First method.', ...
+%!        '    ## @seealso{m2, BistFlat.m1, BistDerived.OwnProp,', ...
+%!        '    ## BistGrouped.BistGrouped}', ...
 %!        '    ## @end deftypefn', ...
 %!        '    function m1 (this)', ...
 %!        '    endfunction', ...
@@ -916,21 +919,24 @@ endfunction
 %! rehash ();
 %! info = struct ("PKG_ICON", "pkg.png", "PKG_NAME", "bist", ...
 %!                "PKG_TITLE", "Bist", "OCTAVE_LOGO", "octave-logo.svg");
+%! pf = {"BistGrouped", "Cat"; "BistFlat", "Cat"; "BistHash", "Cat"; ...
+%!       "BistDerived", "Cat"; "BistBase", "Cat"; "BistPlain", "Cat"; ...
+%!       "BistHidCtor", "Cat"; "BistGrpHid", "Cat"; "bistns.BistNs", "Cat"};
 %! oldpwd = pwd ();
 %! unwind_protect
 %!   cd (d);
-%!   classdef_texi2html ("BistGrouped", {"BistGrouped", "Cat"}, info);
-%!   classdef_texi2html ("BistFlat", {"BistFlat", "Cat"}, info);
-%!   classdef_texi2html ("BistHash", {"BistHash", "Cat"}, info);
-%!   classdef_texi2html ("BistDerived", {"BistDerived", "Cat"}, info);
-%!   classdef_texi2html ("BistBase", {"BistBase", "Cat"}, info);
-%!   classdef_texi2html ("BistHidCtor", {"BistHidCtor", "Cat"}, info);
-%!   classdef_texi2html ("BistGrpHid", {"BistGrpHid", "Cat"}, info);
-%!   classdef_texi2html ("bistns.BistNs", {"bistns.BistNs", "Cat"}, info);
+%!   classdef_texi2html ("BistGrouped", pf, info);
+%!   classdef_texi2html ("BistFlat", pf, info);
+%!   classdef_texi2html ("BistHash", pf, info);
+%!   classdef_texi2html ("BistDerived", pf, info);
+%!   classdef_texi2html ("BistBase", pf, info);
+%!   classdef_texi2html ("BistHidCtor", pf, info);
+%!   classdef_texi2html ("BistGrpHid", pf, info);
+%!   classdef_texi2html ("bistns.BistNs", pf, info);
 %!   ## A class documenting its methods outside texinfo used to raise rather
 %!   ## than render, so its failure is kept to the two tests that own it.
 %!   try
-%!     classdef_texi2html ("BistPlain", {"BistPlain", "Cat"}, info);
+%!     classdef_texi2html ("BistPlain", pf, info);
 %!     plain = fileread ("BistPlain.html");
 %!   catch
 %!     plain = "";
@@ -1038,8 +1044,8 @@ endfunction
 
 %!test  # a constructor declared Hidden is neither published nor listed
 %! assert (isempty (strfind (hidc, "colapsibleConstructor")));
-%! assert (! isempty (strfind (hidc, "collapseMethod1")));
-%! assert (isempty (strfind (hidc, "collapseMethod2")));
+%! assert (! isempty (strfind (hidc, "id=\"BistHidCtor_pubm\"")));
+%! assert (isempty (strfind (hidc, "id=\"BistHidCtor_BistHidCtor\"")));
 
 %!test  # a grouped class gives no page to a constructor declared Hidden
 %! assert (! any (strcmp (files, "BistGrpHid.BistGrpHid.html")));
@@ -1047,8 +1053,22 @@ endfunction
 
 %!test  # a namespaced class publishes its constructor rather than listing it
 %! assert (! isempty (strfind (nsc, "colapsibleConstructor")));
-%! assert (! isempty (strfind (nsc, "collapseMethod1")));
-%! assert (isempty (strfind (nsc, "collapseMethod2")));
+%! assert (! isempty (strfind (nsc, "id=\"bistns_BistNs_nsm\"")));
+%! assert (isempty (strfind (nsc, "id=\"bistns_BistNs_BistNs\"")));
+
+%!test  # a bare sibling name resolves to that method's page
+%! assert (! isempty (strfind (mthd, "href=\"BistGrouped.m2.html\"")));
+
+%!test  # a method of a flat class resolves to the class page and its anchor
+%! assert (! isempty (strfind (mthd, "href=\"BistFlat.html#BistFlat_m1\"")));
+
+%!test  # a property resolves to the anchor of the collapsible holding it
+%! tgt = "href=\"BistDerived.html#BistDerived_OwnProp\"";
+%! assert (! isempty (strfind (mthd, tgt)));
+
+%!test  # the constructor of a grouped class resolves to its own page
+%! tgt = "href=\"BistGrouped.BistGrouped.html\"";
+%! assert (! isempty (strfind (mthd, tgt)));
 
 %!test  # remove the fixture directory
 %! d = fullfile (tempdir (), "pkg_octave_doc_cls_bist");
