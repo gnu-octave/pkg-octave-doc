@@ -287,55 +287,72 @@ function package_texi2qch (pkgname, varargin)
     tmpfiles{end+1} = i_finish (cat(i).page, txt);
   endfor
 
-  ## A classdef owns a page of its own carrying its class help text and a
-  ## link to each of its subpages, so that a class is entered rather than
-  ## scrolled past among its neighbours.
+  ## A classdef owns a page of its own carrying its class help text and, under
+  ## it, what each of its subpages holds, so that a class is entered rather
+  ## than scrolled past among its neighbours.  The subpages are rendered first,
+  ## the class page listing their members by the first sentence each turns out
+  ## to have.
   for k = 1:numel (cls)
-    txt = i_page_head (cls(k).name, pkgname);
+    clstxt = i_page_head (cls(k).name, pkgname);
     [frag, first, found, ex] = i_render (cls(k).name, "h2", pkgfcns, ...
                                          qchmap, docopts);
     findings = [findings, found];
     examined += ex;
-
-    txt = [txt, frag];
+    clstxt = [clstxt, frag];
     firsts(end+1,:) = {cls(k).name, first};
-    txt = [txt, "<h2>Contents</h2>\n<ul>\n"];
-    if (! isempty (cls(k).proppage))
-      txt = [txt, "<li><a href=\"", cls(k).proppage, "\">Properties</a>", ...
-             "</li>\n"];
-    endif
-    for t = 1:numel (cls(k).subs)
-      txt = [txt, "<li><a href=\"", cls(k).subs(t).page, "\">", ...
-             cls(k).subs(t).title, "</a></li>\n"];
-    endfor
-    txt = [txt, "</ul>\n"];
-    tmpfiles{end+1} = i_finish (cls(k).page, txt);
 
     ## The properties of the class, one subpage
+    proptxt = "";
     if (! isempty (cls(k).proppage))
-      txt = i_page_head ([cls(k).name, " properties"], pkgname);
+      proptxt = i_page_head ([cls(k).name, " properties"], pkgname);
       for p = 1:numel (cls(k).props)
         nm = [cls(k).name, ".", cls(k).props{p}];
-        [frag, ~, found, ex] = i_render (nm, "h2", pkgfcns, qchmap, docopts);
-        txt = [txt, frag];
+        [frag, fs, found, ex] = i_render (nm, "h2", pkgfcns, qchmap, docopts);
+        proptxt = [proptxt, frag];
+        firsts(end+1,:) = {nm, fs};
         findings = [findings, found];
         examined += ex;
       endfor
-      tmpfiles{end+1} = i_finish (cls(k).proppage, txt);
     endif
 
     ## Its methods, one subpage for a flat classdef and one per banner group
     ## for a grouped one
+    subtxt = cell (1, numel (cls(k).subs));
     for t = 1:numel (cls(k).subs)
-      txt = i_page_head ([cls(k).name, " ", cls(k).subs(t).title], pkgname);
+      subtxt{t} = i_page_head ([cls(k).name, " ", cls(k).subs(t).title], ...
+                               pkgname);
       for m = 1:numel (cls(k).subs(t).methods)
         nm = [cls(k).name, ".", cls(k).subs(t).methods{m}];
-        [frag, ~, found, ex] = i_render (nm, "h2", pkgfcns, qchmap, docopts);
-        txt = [txt, frag];
+        [frag, fs, found, ex] = i_render (nm, "h2", pkgfcns, qchmap, docopts);
+        subtxt{t} = [subtxt{t}, frag];
+        firsts(end+1,:) = {nm, fs};
         findings = [findings, found];
         examined += ex;
       endfor
-      tmpfiles{end+1} = i_finish (cls(k).subs(t).page, txt);
+    endfor
+
+    ## The contents of the class, a table per subpage laid out as the landing
+    ## page lays out a category.  The contents tree names the subpages and
+    ## stops there, so the members are what this adds to it.
+    if (! isempty (cls(k).proppage) || ! isempty (cls(k).subs))
+      clstxt = [clstxt, "<h2>Contents</h2>\n"];
+    endif
+    if (! isempty (cls(k).proppage))
+      clstxt = [clstxt, i_contents(cls(k).proppage, "Properties", ...
+                                   cls(k).name, cls(k).props, qchmap, firsts)];
+    endif
+    for t = 1:numel (cls(k).subs)
+      clstxt = [clstxt, i_contents(cls(k).subs(t).page, ...
+                                   cls(k).subs(t).title, cls(k).name, ...
+                                   cls(k).subs(t).methods, qchmap, firsts)];
+    endfor
+
+    tmpfiles{end+1} = i_finish (cls(k).page, clstxt);
+    if (! isempty (cls(k).proppage))
+      tmpfiles{end+1} = i_finish (cls(k).proppage, proptxt);
+    endif
+    for t = 1:numel (cls(k).subs)
+      tmpfiles{end+1} = i_finish (cls(k).subs(t).page, subtxt{t});
     endfor
   endfor
 
@@ -562,7 +579,23 @@ endfunction
 
 ## One row of the landing page: a name against the first sentence of its help
 ## text, linking to the anchor that name owns.
-function row = i_index_row (name, qchmap, firsts)
+## One subpage of a class, named and linked, then a row per member it holds.
+function html = i_contents (page, title, clsname, members, qchmap, firsts)
+  html = ["<h3><a href=\"", page, "\">", i_xml(title), "</a></h3>\n", ...
+          "<table>\n"];
+  for i = 1:numel (members)
+    html = [html, i_index_row([clsname, ".", members{i}], qchmap, firsts, ...
+                              members{i})];
+  endfor
+  html = [html, "</table>\n"];
+endfunction
+
+## LABEL is what the row shows, the name itself unless the reader already has
+## it from the page they are on, as a member has its class.
+function row = i_index_row (name, qchmap, firsts, label)
+  if (nargin < 4)
+    label = name;
+  endif
   idx = find (strcmp (qchmap(:,1), name), 1);
   href = [qchmap{idx,2}, "#", qchmap{idx,3}];
   fidx = find (strcmp (firsts(:,1), name), 1);
@@ -571,7 +604,7 @@ function row = i_index_row (name, qchmap, firsts)
   else
     first = firsts{fidx,2};
   endif
-  row = ["<tr><td><code><a href=\"", href, "\">", i_xml(name), ...
+  row = ["<tr><td><code><a href=\"", href, "\">", i_xml(label), ...
          "</a></code></td><td>", first, "</td></tr>\n"];
 endfunction
 
