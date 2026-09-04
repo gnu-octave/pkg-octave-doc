@@ -27,9 +27,10 @@
 ## and it is what @code{help} can answer for, an inherited property resolving on
 ## a subclass where an inherited method does not.
 ##
-## A member of a @code{Hidden} or private block is never seen, @code{methods}
-## and @code{properties} not reporting one, and a member carrying no texinfo
-## help is reported rather than written.
+## The constructor is the only member of a @code{Hidden} or private block that
+## is ever seen; @code{methods} and @code{properties} report no other, and it is
+## found in the file rather than in what they answer with.  A member carrying no
+## texinfo help is reported rather than written.
 ##
 ## An inherited property is cached, but only the rules a renderer can apply are
 ## run on it: it is declared in another file, so the rules that measure a file
@@ -59,17 +60,16 @@ function [entries, findings] = __class_entries__ (caller, clsname, srcfile, ...
     error ("%s: '%s' is not a classdef.", caller, clsname);
   end_try_catch
 
-  ## A class declaring no constructor has none to document
-  isctor = strcmp (MTHDS, stem);
-  hasctor = any (isctor);
-  MTHDS(isctor) = [];
+  MTHDS(strcmp (MTHDS, stem)) = [];
   MTHDS = get_methods_ordered (clsname, MTHDS);
   PROPS = properties (clsname);
   PROPS = get_properties_ordered (clsname, PROPS);
 
-  ## The class, its constructor where declared, then its methods and properties
+  ## The class, its constructor where the file declares one, then its methods
+  ## and its properties.  The file is the test, since methods does not report a
+  ## constructor declared in a Hidden block and one is still documented.
   names = {clsname};
-  if (hasctor)
+  if (__declares_ctor__ (srcfile, stem))
     names{end+1} = [clsname '.' stem];
   endif
   for ii = 1:numel (MTHDS)
@@ -124,6 +124,21 @@ function [entries, findings] = __class_entries__ (caller, clsname, srcfile, ...
       findings = [findings, found];
     endif
     entries(:,end+1) = rows;
+  endfor
+
+endfunction
+
+function tf = __declares_ctor__ (srcfile, stem)
+
+  tf = false;
+  lines = strsplit (strrep (fileread (srcfile), "\r\n", "\n"), "\n");
+  pat = '^function\s+(?:\[[^\]]*\]\s*=\s*|[\w.]+\s*=\s*)?([A-Za-z]\w*)';
+  for ii = 1:numel (lines)
+    tok = regexp (strtrim (lines{ii}), pat, 'tokens', 'once');
+    if (! isempty (tok) && strcmp (tok{1}, stem))
+      tf = true;
+      return;
+    endif
   endfor
 
 endfunction

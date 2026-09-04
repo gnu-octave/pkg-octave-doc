@@ -300,6 +300,35 @@ endfunction
 %!   rmpath (d);
 %! end_unwind_protect
 
+%!test  # a constructor declared Hidden is given its entry
+%! d = fullfile (tempdir (), 'pkg_octave_doc_cc_bist');
+%! fid = fopen (fullfile (d, 'BistCacheHidden.m'), 'w');
+%! fprintf (fid, 'classdef BistCacheHidden\n');
+%! fprintf (fid, '  ## -*- texinfo -*-\n');
+%! fprintf (fid, '  ## @deftp {bistpkg} BistCacheHidden\n  ##\n');
+%! fprintf (fid, '  ## A class hiding the constructor it declares.\n  ##\n');
+%! fprintf (fid, '  ## @end deftp\n  methods (Hidden)\n');
+%! fprintf (fid, '    ## -*- texinfo -*-\n');
+%! fprintf (fid, '    ## @deftypefn {BistCacheHidden} ');
+%! fprintf (fid, '{@var{obj} =} BistCacheHidden ()\n    ##\n');
+%! fprintf (fid, '    ## Construct an object of this class.\n');
+%! fprintf (fid, '    ##\n    ## @end deftypefn\n');
+%! fprintf (fid, '    function this = BistCacheHidden ()\n    endfunction\n');
+%! fprintf (fid, '  endmethods\nendclassdef\n');
+%! fclose (fid);
+%! old = pwd ();
+%! addpath (d);
+%! unwind_protect
+%!   cd (d);
+%!   assert (! any (strcmp (methods ('BistCacheHidden'), 'BistCacheHidden')));
+%!   classdef_texi2cache ('BistCacheHidden');
+%!   s = load ('doc-cache');
+%!   assert (any (strcmp (s.cache(1,:), 'BistCacheHidden.BistCacheHidden')));
+%! unwind_protect_cleanup
+%!   cd (old);
+%!   rmpath (d);
+%! end_unwind_protect
+
 %!test  # INDEX never gates the class named, it only reports
 %! d = fullfile (tempdir (), 'pkg_octave_doc_cc_bist');
 %! fid = fopen (fullfile (d, 'INDEX'), 'w');
