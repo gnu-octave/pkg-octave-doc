@@ -150,6 +150,31 @@ save_to_json (opts, "doc-options.json")
 there, so a package's own conventions are applied by anyone who runs them; `package_texi2qch` takes
 the object through its `'Options'` pair.
 
+## General documentation guidelines
+
+Three obligations govern a class member, and they are nested rather than identical: a member can be documented without being cached, and cached without being published. Knowing which is which is what tells you where a docstring you write will end up.
+
+**A docstring.** Every public member carries a texinfo docstring: the class itself, every method `methods` reports and every property `properties` reports. A constructor carries one whether or not it is hidden, its parameters, their order and their defaults being specific to the class and unguessable, and `help` reaching it either way. Nothing else that is hidden is obliged to carry one, since none of it is cached or published; whether it does is the package's own convention.
+
+**A `doc-cache` entry**, which is what `lookfor` searches. A cache holds the class, its constructor where the file declares one, the methods `methods` reports and the properties `properties` reports, inherited ones included. The constructor is the only hidden member that is ever cached. `INDEX` gates this at folder and package scope, so a name it does not list is skipped and reported.
+
+**A published page.** The HTML pages and the `.qch` file carry no hidden member at all, the constructor included. Being hidden keeps a member off the published pages; it does not excuse it from `help`.
+
+| Member | Docstring | `doc-cache` | Published |
+|--------|-----------|-------------|-----------|
+| The class itself | required | yes | yes |
+| A public method or property | required | yes | yes |
+| A constructor that is not hidden | required | yes | yes |
+| A constructor declared `Hidden` | required | yes | **no** |
+| Any other hidden method or property | not required | no | no |
+| A helper under any `private/` folder | not required | no | no |
+
+**Visibility is yours to choose, and these rules follow it rather than the member's name.** Nothing here singles out `disp`, `display` or a `set.<Property>` method: they go unpublished in a package that declares them `Hidden`, and a package declaring one of them public has it documented, cached and published like any other public method.
+
+The one place the three diverge is worth stating on its own: a hidden constructor is documented and cached but not published, and it is the only member of that kind. Everything else is either public, and so documented, cached and published alike, or hidden, and so absent from all three.
+
+Private helpers are outside all three obligations, and this covers every `private/` folder in a package, wherever it stands, not `inst/private` alone. `check_texi_docs` still inspects them, because it writes nothing and is bound by neither `INDEX` nor visibility; that is also how it covers the blind spot the other two routes leave, namely that what the cache and the pages skip they do not check either.
+
 ## Guidelines for texinfo docstrings
 
 
