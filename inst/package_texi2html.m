@@ -328,13 +328,27 @@ function [varargout] = package_texi2html (pkgname, varargin)
       fcnfirst = get_first_help_sentence (fcnname, 240);
       tmp_fcn = sprintf ("                 <td>%s</td>\n", fcnfirst);
       fcn_list = [fcn_list tmp_fcn tmp_7];
-      ## Build individual function of classdef html
+      ## Build individual function of classdef html.  What the source
+      ## declares is what decides, since an old style class answers methods
+      ## and carries no properties at all, its constructor and its methods
+      ## being INDEX entries of their own documented as functions.  A class
+      ## that fails to render is named rather than quietly published as a
+      ## function, which is what one catch doing both jobs used to do.
+      is_cls = false;
       try
-        MTDS = methods (fcnname);
-        classdef_texi2html (fcnname, pkgfcns, info, 'figformat', figformat);
+        is_cls = __is_classdef__ (which (fcnname));
       catch
-        function_texi2html (fcnname, pkgfcns, info, 'figformat', figformat);
       end_try_catch
+      if (is_cls)
+        try
+          classdef_texi2html (fcnname, pkgfcns, info, 'figformat', figformat);
+        catch
+          printf ("Unable to build the page of class '%s':\n %s\n", ...
+                  fcnname, lasterr ());
+        end_try_catch
+      else
+        function_texi2html (fcnname, pkgfcns, info, 'figformat', figformat);
+      endif
     endfor
     fcn_list = [fcn_list tmp_8 tmp_9];
   endfor

@@ -431,21 +431,7 @@ function [MTHDS, PROPS, GROUPS, ISCLS] = i_class_members (name)
   PROPS = {};
   GROUPS = [];
   ISCLS = false;
-  fname = which (name);
-  ## Only a classdef source can carry methods; anything else, a compiled
-  ## function above all, is not worth reading and would not parse as text.
-  if (isempty (fname) || numel (fname) < 2 || ! strcmp (fname(end-1:end), ".m"))
-    return;
-  endif
-  try
-    txt = fileread (fname);
-  catch
-    return;
-  end_try_catch
-  ## The classdef keyword is ASCII, and a source file carrying a byte that is
-  ## not valid UTF-8 makes regexp refuse the whole string, so drop them first.
-  txt(txt > 127) = " ";
-  if (isempty (regexp (txt, '^\s*classdef\s', "once", "lineanchors")))
+  if (! __is_classdef__ (which (name)))
     return;
   endif
   ISCLS = true;

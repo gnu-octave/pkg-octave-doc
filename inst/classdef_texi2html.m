@@ -150,12 +150,19 @@ function classdef_texi2html (clsname, pkgfcns, info, varargin)
     print_usage ();
   endif
 
-  ## Get methods while checking if clsname is an actual classdef
+  ## Get methods while checking if clsname is an actual classdef.  The source
+  ## is what decides and not methods, which answers for an old style class as
+  ## well: such a class carries no properties at all, and its constructor and
+  ## its methods are INDEX entries of their own, documented as functions.
   try
+    srcfile = which (clsname);
     MTHDS = methods (clsname);
   catch
     error ("classdef_texi2html: '%s' is not classdef name", clsname);
   end_try_catch
+  if (! __is_classdef__ (srcfile))
+    error ("classdef_texi2html: '%s' is not classdef name", clsname);
+  endif
 
   ## Remove constructor name from methods list.  A namespaced class is named
   ## by its stem in what methods reports, and a constructor kept out of the
@@ -915,6 +922,23 @@ endfunction
 %! fid = fopen (fullfile (d, "+bistns", "BistNs.m"), "w");
 %! fprintf (fid, "%s\n", src{:});
 %! fclose (fid);
+%! ## An old style class: an @ directory whose constructor file declares no
+%! ## classdef.  methods answers for it while properties does not, so what the
+%! ## source declares is what has to decide which route documents it.
+%! if (! isfolder (fullfile (d, "@BistOld")))
+%!   mkdir (fullfile (d, "@BistOld"));
+%! endif
+%! src = {'## -*- texinfo -*-', ...
+%!        '## @deftypefn {} {@var{obj} =} BistOld ()', ...
+%!        '## An old style class constructor.', ...
+%!        '## @end deftypefn', ...
+%!        'function this = BistOld ()', ...
+%!        '  this.x = 1;', ...
+%!        '  this = class (this, "BistOld");', ...
+%!        'endfunction'};
+%! fid = fopen (fullfile (d, "@BistOld", "BistOld.m"), "w");
+%! fprintf (fid, "%s\n", src{:});
+%! fclose (fid);
 %! addpath (d);
 %! rehash ();
 %! info = struct ("PKG_ICON", "pkg.png", "PKG_NAME", "bist", ...
@@ -1070,11 +1094,21 @@ endfunction
 %! tgt = "href=\"BistGrouped.BistGrouped.html\"";
 %! assert (! isempty (strfind (mthd, tgt)));
 
+%!test  # an old style class answers methods but is not a classdef
+%! assert (! isempty (methods ("BistOld")));
+
+%!error <classdef_texi2html: 'BistOld' is not classdef name>
+%! info = struct ("PKG_ICON", "pkg.png", "PKG_NAME", "bist", ...
+%!                "PKG_TITLE", "Bist", "OCTAVE_LOGO", "octave-logo.svg");
+%! classdef_texi2html ("BistOld", {"BistOld", "Cat"}, info);
+
 %!test  # remove the fixture directory
 %! d = fullfile (tempdir (), "pkg_octave_doc_cls_bist");
 %! rmpath (d);
 %! delete (fullfile (d, "+bistns", "*.m"));
 %! rmdir (fullfile (d, "+bistns"));
+%! delete (fullfile (d, "@BistOld", "*.m"));
+%! rmdir (fullfile (d, "@BistOld"));
 %! delete (fullfile (d, "*.m"));
 %! delete (fullfile (d, "*.html"));
 %! rmdir (d);

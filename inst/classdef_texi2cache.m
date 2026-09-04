@@ -97,6 +97,13 @@ function report = classdef_texi2cache (clsname, options)
     error ("classdef_texi2cache: '%s' is not in this directory.", clsname);
   endif
 
+  ## The source is what decides and not methods, which answers for an old style
+  ## class as well: such a class carries no properties at all, and its
+  ## constructor and its methods are INDEX entries of their own.
+  if (! __is_classdef__ (srcfile))
+    error ("classdef_texi2cache: '%s' is not a classdef.", clsname);
+  endif
+
   ## Read the definitions from the tree rather than from the session
   clear functions;
   [listed, pkgname, why] = __index_info__ (options);
