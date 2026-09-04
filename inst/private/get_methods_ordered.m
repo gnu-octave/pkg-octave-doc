@@ -18,8 +18,15 @@
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {@var{MTHDS} =} get_methods_ordered (@var{class}, @var{MTHDS})
 ##
-## Private function to order methods according to their order of appearance in
-## the classdef file.
+## Private function ordering the methods of a class by their appearance in its
+## source file.
+##
+## @var{MTHDS} comes back in the order the file of @var{class} declares them,
+## and it is also filtered: a name the file declares no function for is dropped
+## rather than kept where it stood.  A method @var{class} inherits is therefore
+## removed, being declared in the file of the class it comes from, which is what
+## keeps an inherited method out of the documentation while an inherited
+## property stays in it.
 ##
 ## @end deftypefn
 

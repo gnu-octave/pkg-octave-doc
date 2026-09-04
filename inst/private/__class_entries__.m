@@ -127,18 +127,3 @@ function [entries, findings] = __class_entries__ (caller, clsname, srcfile, ...
   endfor
 
 endfunction
-
-function tf = __declares_ctor__ (srcfile, stem)
-
-  tf = false;
-  lines = strsplit (strrep (fileread (srcfile), "\r\n", "\n"), "\n");
-  pat = '^function\s+(?:\[[^\]]*\]\s*=\s*|[\w.]+\s*=\s*)?([A-Za-z]\w*)';
-  for ii = 1:numel (lines)
-    tok = regexp (strtrim (lines{ii}), pat, 'tokens', 'once');
-    if (! isempty (tok) && strcmp (tok{1}, stem))
-      tf = true;
-      return;
-    endif
-  endfor
-
-endfunction
