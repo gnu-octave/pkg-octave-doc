@@ -21,11 +21,11 @@
 ## Private function building the doc-cache entries of a class.
 ##
 ## @var{entries} is a @math{3xN} cell array holding the class and one entry per
-## member it documents: its constructor, the methods declared in its own file,
-## and the properties @code{properties} reports, inherited ones included.  That
-## is what @code{classdef_texi2html} publishes, and it is what @code{help} can
-## answer for, an inherited property resolving on a subclass where an inherited
-## method does not.
+## member it documents: its constructor where one is declared, the methods
+## declared in its own file, and the properties @code{properties} reports,
+## inherited ones included.  That is what @code{classdef_texi2html} publishes,
+## and it is what @code{help} can answer for, an inherited property resolving on
+## a subclass where an inherited method does not.
 ##
 ## A member of a @code{Hidden} or private block is never seen, @code{methods}
 ## and @code{properties} not reporting one, and a member carrying no texinfo
@@ -58,13 +58,20 @@ function [entries, findings] = __class_entries__ (caller, clsname, srcfile, ...
   catch
     error ("%s: '%s' is not a classdef.", caller, clsname);
   end_try_catch
-  MTHDS(strcmp (MTHDS, stem)) = [];
+
+  ## A class declaring no constructor has none to document
+  isctor = strcmp (MTHDS, stem);
+  hasctor = any (isctor);
+  MTHDS(isctor) = [];
   MTHDS = get_methods_ordered (clsname, MTHDS);
   PROPS = properties (clsname);
   PROPS = get_properties_ordered (clsname, PROPS);
 
-  ## The class, its constructor, then its methods and its properties
-  names = [{clsname}, {[clsname '.' stem]}];
+  ## The class, its constructor where declared, then its methods and properties
+  names = {clsname};
+  if (hasctor)
+    names{end+1} = [clsname '.' stem];
+  endif
   for ii = 1:numel (MTHDS)
     names{end+1} = [clsname '.' MTHDS{ii}];
   endfor

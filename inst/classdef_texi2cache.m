@@ -248,6 +248,58 @@ endfunction
 %!   rmpath (d);
 %! end_unwind_protect
 
+%!test  # a class declaring no constructor is given no constructor entry
+%! d = fullfile (tempdir (), 'pkg_octave_doc_cc_bist');
+%! old = pwd ();
+%! addpath (d);
+%! unwind_protect
+%!   cd (d);
+%!   r = classdef_texi2cache ('BistCacheSub');
+%!   s = load ('doc-cache');
+%!   assert (! any (strcmp (s.cache(1,:), 'BistCacheSub.BistCacheSub')));
+%!   rules = {};
+%!   if (! isempty (r.findings))
+%!     rules = {r.findings.rule};
+%!   endif
+%!   assert (! any (strcmp (rules, 'MissingDocstring')));
+%! unwind_protect_cleanup
+%!   cd (old);
+%!   rmpath (d);
+%! end_unwind_protect
+
+%!test  # a class declaring a constructor is given its entry
+%! d = fullfile (tempdir (), 'pkg_octave_doc_cc_bist');
+%! fid = fopen (fullfile (d, 'BistCacheCtor.m'), 'w');
+%! fprintf (fid, 'classdef BistCacheCtor\n');
+%! fprintf (fid, '  ## -*- texinfo -*-\n');
+%! fprintf (fid, '  ## @deftp {bistpkg} BistCacheCtor\n  ##\n');
+%! fprintf (fid, '  ## A class declaring a constructor of its own.\n  ##\n');
+%! fprintf (fid, '  ## @end deftp\n  methods (Access = public)\n');
+%! fprintf (fid, '    ## -*- texinfo -*-\n');
+%! fprintf (fid, '    ## @deftypefn {BistCacheCtor} ');
+%! fprintf (fid, '{@var{obj} =} BistCacheCtor ()\n    ##\n');
+%! fprintf (fid, '    ## Construct an object of this class.\n');
+%! fprintf (fid, '    ##\n    ## @end deftypefn\n');
+%! fprintf (fid, '    function this = BistCacheCtor ()\n    endfunction\n');
+%! fprintf (fid, '  endmethods\nendclassdef\n');
+%! fclose (fid);
+%! old = pwd ();
+%! addpath (d);
+%! unwind_protect
+%!   cd (d);
+%!   r = classdef_texi2cache ('BistCacheCtor');
+%!   s = load ('doc-cache');
+%!   assert (any (strcmp (s.cache(1,:), 'BistCacheCtor.BistCacheCtor')));
+%!   rules = {};
+%!   if (! isempty (r.findings))
+%!     rules = {r.findings.rule};
+%!   endif
+%!   assert (! any (strcmp (rules, 'MissingDocstring')));
+%! unwind_protect_cleanup
+%!   cd (old);
+%!   rmpath (d);
+%! end_unwind_protect
+
 %!test  # INDEX never gates the class named, it only reports
 %! d = fullfile (tempdir (), 'pkg_octave_doc_cc_bist');
 %! fid = fopen (fullfile (d, 'INDEX'), 'w');
