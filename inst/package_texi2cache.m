@@ -461,6 +461,8 @@ endfunction
 %!   assert (! any (strcmp ({rep(1).findings.rule}, 'IndexOrphanEntry')));
 %! unwind_protect_cleanup
 %!   cd (old);
+%!   confirm_recursive_rmdir (false, 'local');
+%!   rmdir (d, 's');
 %! end_unwind_protect
 
 ## Test input validation

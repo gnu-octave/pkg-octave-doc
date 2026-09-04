@@ -321,7 +321,7 @@ endfunction
 %! unwind_protect
 %!   cd (d);
 %!   assert (! any (strcmp (methods ('BistCacheHidden'), 'BistCacheHidden')));
-%!   classdef_texi2cache ('BistCacheHidden');
+%!   r = classdef_texi2cache ('BistCacheHidden');
 %!   s = load ('doc-cache');
 %!   assert (any (strcmp (s.cache(1,:), 'BistCacheHidden.BistCacheHidden')));
 %! unwind_protect_cleanup
