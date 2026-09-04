@@ -40,43 +40,36 @@ function MTHDS = get_methods_ordered (class, MTHDS);
   txt = fscanf (fid, "%c", Inf);
   fclose (fid);
 
-  ## Find lines with function declarations
-  fcn_beg = strfind (txt, " function ");
-  endline = strfind (txt, "\n");
+  ## Find the function declarations in the order the file makes them.  A line
+  ## is what carries a declaration, so the file is read line by line: one
+  ## standing at the first column is a declaration just the same.
+  lines = strsplit (strrep (txt, "\r\n", "\n"), "\n");
   index = [];
-  for i = 1:numel (fcn_beg)
-    ## Get text line for each occurence of "function"
-    fcn_idx = fcn_beg(i);
-    fcn_line_beg = endline(find (endline < fcn_beg(i), 1, "last")) + 1;
-    fcn_line_end = endline(find (endline > fcn_beg(i), 1, "first")) - 1;
-    fcn_line = txt(fcn_line_beg:fcn_line_end);
-    ## Remove any leading spaces and check if line corresponds to a
-    ## valid function declaration (it should start with "function "
-    fcn_line = strtrim (fcn_line);
-    if (strncmp (fcn_line, "function ", 9))
-      ## Remove input arguments (to avoid input arguments named after a method)
-      end_line = strfind (fcn_line, "(");
-      if (! isempty (end_line))
-        end_line = end_line(1) - 1;
-        fcn_name = fcn_line(1:end_line);
-      else
-        fcn_name = fcn_line;
-      endif
-      ## Remove output arguments (if any) and the "function" tag
-      beg_line = strfind (fcn_name, "=");
-      if (! isempty (beg_line))
-        beg_line = beg_line(1) + 1;
-      else
-        beg_line = 10;
-      endif
-      fcn_name = fcn_name(beg_line:end);
-      fcn_name = strtrim (fcn_name);
-      ## Search for valid methods
-      method_idx = find (strcmp (MTHDS, fcn_name));
-      ## Keep only those available in public methods
-      if (! isempty (method_idx))
-        index = [index, method_idx];
-      endif
+  for i = 1:numel (lines)
+    fcn_line = strtrim (lines{i});
+    if (! strncmp (fcn_line, "function ", 9))
+      continue;
+    endif
+    ## Remove input arguments (to avoid input arguments named after a method)
+    end_line = strfind (fcn_line, "(");
+    if (! isempty (end_line))
+      fcn_name = fcn_line(1:end_line(1) - 1);
+    else
+      fcn_name = fcn_line;
+    endif
+    ## Remove output arguments (if any) and the "function" tag
+    beg_line = strfind (fcn_name, "=");
+    if (! isempty (beg_line))
+      beg_line = beg_line(1) + 1;
+    else
+      beg_line = 10;
+    endif
+    fcn_name = strtrim (fcn_name(beg_line:end));
+    ## Search for valid methods
+    method_idx = find (strcmp (MTHDS, fcn_name));
+    ## Keep only those available in public methods
+    if (! isempty (method_idx))
+      index = [index, method_idx];
     endif
   endfor
 
