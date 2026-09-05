@@ -56,7 +56,17 @@ function [entries, findings] = __class_entries__ (caller, clsname, srcfile, ...
 
   try
     MTHDS = methods (clsname);
-  catch
+  catch err
+    ## A file declaring a classdef that still cannot answer is one that does
+    ## not parse, and what Octave said of it is the diagnosis.  The verdict on
+    ## its own sends a reader after a class that is there all along.
+    if (__is_classdef__ (srcfile))
+      msg = strtrim (err.message);
+      if (isempty (msg) || msg(end) != ".")
+        msg = [msg "."];
+      endif
+      error ("%s: '%s' does not parse: %s", caller, clsname, msg);
+    endif
     error ("%s: '%s' is not a classdef.", caller, clsname);
   end_try_catch
 

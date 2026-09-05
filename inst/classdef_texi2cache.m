@@ -356,6 +356,37 @@ endfunction
 %!   rmpath (d);
 %! end_unwind_protect
 
+%!test  # a classdef that does not parse is named as one, not as a non class
+%! d = fullfile (tempdir (), 'pkg_octave_doc_cc_bist');
+%! fid = fopen (fullfile (d, 'BistCacheBroke.m'), 'w');
+%! fprintf (fid, 'classdef BistCacheBroke\n');
+%! fprintf (fid, '  ## -*- texinfo -*-\n');
+%! fprintf (fid, '  ## @deftp {bistpkg} BistCacheBroke\n  ##\n');
+%! fprintf (fid, '  ## A class whose body does not parse.\n  ##\n');
+%! fprintf (fid, '  ## @end deftp\n  methods\n');
+%! fprintf (fid, '    function this = BistCacheBroke ()\n');
+%! fprintf (fid, '      x = [1 2 ;\n    endfunction\n');
+%! fprintf (fid, '  endmethods\nendclassdef\n');
+%! fclose (fid);
+%! old = pwd ();
+%! addpath (d);
+%! unwind_protect
+%!   cd (d);
+%!   msg = '';
+%!   try
+%!     classdef_texi2cache ('BistCacheBroke');
+%!   catch e
+%!     msg = e.message;
+%!   end_try_catch
+%!   pat = strcat ("^classdef_texi2cache: 'BistCacheBroke' does not parse:", ...
+%!                 " syntax error.*\\.$");
+%!   assert (! isempty (regexp (msg, pat)));
+%! unwind_protect_cleanup
+%!   cd (old);
+%!   rmpath (d);
+%!   delete (fullfile (d, 'BistCacheBroke.m'));
+%! end_unwind_protect
+
 %!test  # remove the fixture directory
 %! d = fullfile (tempdir (), 'pkg_octave_doc_cc_bist');
 %! leftover = [dir(fullfile (d, '*.m')); dir(fullfile (d, 'doc-cache')); ...
