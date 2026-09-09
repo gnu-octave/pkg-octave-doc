@@ -47,8 +47,6 @@ function href = __member_href__ (name)
   page = strrep (info.class, filesep, "_");
   if (info.grouped && ! strcmp (info.kind, "property"))
     href = [page "." info.member ".html"];
-  elseif (strcmp (info.kind, "constructor"))
-    href = [page ".html#colapsibleConstructor"];
   else
     href = [page ".html#" __member_anchor__(info.class, info.member)];
   endif

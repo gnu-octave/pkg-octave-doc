@@ -358,6 +358,8 @@ function classdef_texi2html (clsname, pkgfcns, info, varargin)
       cntr_template = fileread (filename);
       ## Populate constructor template
       cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_NAME}}", clsname);
+      cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_NUMBER}}", ...
+                              __member_anchor__ (clsname, stem));
       cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_FS}}", cntr_fs);
       cntr_template = strrep (cntr_template, "{{CONSTRUCTOR_HELP}}", cntr_text);
       cls_text = [cls_text "\n" cntr_template];
@@ -1104,7 +1106,6 @@ endfunction
 %! assert (! isempty (strfind (derived, "Documented on the abstract base class.")));
 
 %!test  # a constructor declared Hidden is neither published nor listed
-%! assert (isempty (strfind (hidc, "colapsibleConstructor")));
 %! assert (! isempty (strfind (hidc, "id=\"BistHidCtor_pubm\"")));
 %! assert (isempty (strfind (hidc, "id=\"BistHidCtor_BistHidCtor\"")));
 
@@ -1113,9 +1114,8 @@ endfunction
 %! assert (any (strcmp (files, "BistGrpHid.m1.html")));
 
 %!test  # a namespaced class publishes its constructor rather than listing it
-%! assert (! isempty (strfind (nsc, "colapsibleConstructor")));
+%! assert (numel (strfind (nsc, "id=\"bistns_BistNs_BistNs\"")), 1);
 %! assert (! isempty (strfind (nsc, "id=\"bistns_BistNs_nsm\"")));
-%! assert (isempty (strfind (nsc, "id=\"bistns_BistNs_BistNs\"")));
 
 %!test  # a bare sibling name resolves to that method's page
 %! assert (! isempty (strfind (mthd, "href=\"BistGrouped.m2.html\"")));
