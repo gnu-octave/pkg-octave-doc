@@ -17,6 +17,7 @@
 
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {@var{MTHDS} =} get_methods_ordered (@var{class}, @var{MTHDS})
+## @deftypefnx {pkg-octave-doc} {[@var{MTHDS}, @var{LINES}] =} get_methods_ordered (@var{class}, @var{MTHDS})
 ##
 ## Private function ordering the methods of a class by their appearance in its
 ## source file.
@@ -28,9 +29,12 @@
 ## keeps an inherited method out of the documentation while an inherited
 ## property stays in it.
 ##
+## @var{LINES} holds, for each name in the returned @var{MTHDS}, the line of
+## the source file that declares it, counted from one.
+##
 ## @end deftypefn
 
-function MTHDS = get_methods_ordered (class, MTHDS);
+function [MTHDS, LINES] = get_methods_ordered (class, MTHDS);
 
   ## Get the path to the classdef
   pathname = which (class);
@@ -45,6 +49,7 @@ function MTHDS = get_methods_ordered (class, MTHDS);
   ## standing at the first column is a declaration just the same.
   lines = strsplit (strrep (txt, "\r\n", "\n"), "\n");
   index = [];
+  atline = [];
   for i = 1:numel (lines)
     fcn_line = strtrim (lines{i});
     if (! strncmp (fcn_line, "function ", 9))
@@ -70,6 +75,7 @@ function MTHDS = get_methods_ordered (class, MTHDS);
     ## Keep only those available in public methods
     if (! isempty (method_idx))
       index = [index, method_idx];
+      atline = [atline, i];
     endif
   endfor
 
@@ -81,5 +87,6 @@ function MTHDS = get_methods_ordered (class, MTHDS);
   ## command line.  Never make this a permutation the way the tail of
   ## get_properties_ordered is one; that would publish inherited methods.
   MTHDS = MTHDS(index);
+  LINES = atline;
 
 endfunction

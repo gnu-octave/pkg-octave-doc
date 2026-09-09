@@ -1176,6 +1176,43 @@ endfunction
 %!                "PKG_TITLE", "Bist", "OCTAVE_LOGO", "octave-logo.svg");
 %! classdef_texi2html ("BistOld", {"BistOld", "Cat"}, info);
 
+%!test  # a method page anchors the source link at the declaration
+%! d = fullfile (tempdir (), "pkg_octave_doc_cls_bist");
+%! info = struct ("PKG_ICON", "pkg.png", "PKG_NAME", "bist", ...
+%!                "PKG_TITLE", "Bist", "OCTAVE_LOGO", "octave-logo.svg");
+%! pf3 = {"BistGrouped", "Cat", ...
+%!        "https://github.com/o/r/blob/abc1234/inst/BistGrouped.m"};
+%! oldpwd = pwd ();
+%! unwind_protect
+%!   cd (d);
+%!   classdef_texi2html ("BistGrouped", pf3, info);
+%!   page = fileread ("BistGrouped.m1.html");
+%! unwind_protect_cleanup
+%!   cd (oldpwd);
+%! end_unwind_protect
+%! tok = regexp (page, "blob/abc1234/inst/BistGrouped\\.m#L(\\d+)", "tokens");
+%! assert (! isempty (tok));
+%! src = strsplit (fileread (fullfile (d, "BistGrouped.m")), "\n");
+%! assert (! isempty (strfind (src{str2double(tok{1}{1})}, "function")));
+%! assert (! isempty (strfind (src{str2double(tok{1}{1})}, "m1")));
+
+%!test  # a source link naming a branch carries no line number
+%! d = fullfile (tempdir (), "pkg_octave_doc_cls_bist");
+%! info = struct ("PKG_ICON", "pkg.png", "PKG_NAME", "bist", ...
+%!                "PKG_TITLE", "Bist", "OCTAVE_LOGO", "octave-logo.svg");
+%! pf3 = {"BistGrouped", "Cat", ...
+%!        "https://github.com/o/r/tree/HEAD/inst/BistGrouped.m"};
+%! oldpwd = pwd ();
+%! unwind_protect
+%!   cd (d);
+%!   classdef_texi2html ("BistGrouped", pf3, info);
+%!   page = fileread ("BistGrouped.m1.html");
+%! unwind_protect_cleanup
+%!   cd (oldpwd);
+%! end_unwind_protect
+%! assert (! isempty (strfind (page, "tree/HEAD/inst/BistGrouped.m")));
+%! assert (isempty (strfind (page, "#L")));
+
 %!test  # remove the fixture directory
 %! d = fullfile (tempdir (), "pkg_octave_doc_cls_bist");
 %! rmpath (d);

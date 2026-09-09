@@ -33,6 +33,14 @@
 ## @code{find_GHurls} returns a cell array, @var{pkgfcns}, by appending a third
 ## column to the input @var{pkgfcns} with the URLs to the source code location
 ## of each individual function listed in the 1st column of @var{pkgfcns}.
+##
+## A URL takes one of two forms, and which one it takes says whether a line
+## number may be appended to it.  @qcode{blob/@var{commit}} names the commit
+## the archive was cut from, and is used only where the archived file and the
+## installed file hold the same text, so a line counted in the one is the line
+## in the other.  @qcode{tree/HEAD} names the default branch instead, and is
+## used wherever the two differ or the commit could not be read; a line number
+## must not be appended to such a URL, the file it names being free to change.
 ## @code{find_GHurls} relies on @code{curl} and @code{tar}, which must be
 ## installed and available to the system's @code{$PATH}, and an active internet
 ## connection to download and extract the targeted repository to a temporary
@@ -73,13 +81,27 @@ function pkgfcns = find_GHurls (pkgurl, pkgfcns)
   ## Download repository in a temporary directory
   tmpDIR1 = tempdir();
   pkgname = fullfile (tmpDIR1, "package.tar.gz");
-  cmd = sprintf ("curl -L %s/tarball/master -o %s", pkgurl, pkgname);
+  cmd = sprintf ("curl -L %s/tarball/HEAD -o %s", pkgurl, pkgname);
   printf ("Downloading from %s\n", pkgurl);
   [status, ~] = unix (cmd);
   if (status)
     warning ("package_texi2html: unable to download from %s", pkgurl);
     warning ("Link to source code in HTML pages will be omitted.");
     return;
+  endif
+
+  ## The archive's top directory is named <owner>-<repo>-<commit>, so the
+  ## commit it was cut from is in hand without asking GitHub for it.  A commit
+  ## that could not be read leaves every URL naming the branch instead.
+  commit = "";
+  [status, topdir] = unix (sprintf ("tar tzf %s | head -1", pkgname));
+  if (! status)
+    parts = strsplit (strtrim (topdir), "-");
+    commit = strrep (parts{end}, "/", "");
+  endif
+  if (isempty (commit))
+    warning ("find_GHurls: unable to read the commit from the archive.");
+    warning ("Source code links will not carry a line number.");
   endif
 
   ## Extract to a newly created folder inside the temporary directory
@@ -161,7 +183,17 @@ function pkgfcns = find_GHurls (pkgurl, pkgfcns)
       ## Check that function exists in this directory level
       if (! isempty (fcn_idx))
         base_fd = strsplit (fcnurls{fcn_idx,2}, filesep)([end-level:end]);
-        path_fd = fullfile ("tree/main", base_fd(:){:});
+        ## Name the commit only where the archived file and the installed one
+        ## are the same text; a line number counted in one is meaningless for
+        ## the other otherwise, so such a URL names the branch and is not
+        ## anchored by any caller.
+        src = fullfile (fcnurls{fcn_idx,2}, fcnfilename);
+        if (! isempty (commit) && i_same_text (src, which (pkgfcns{i,1})))
+          root_fd = ["blob/" commit];
+        else
+          root_fd = "tree/HEAD";
+        endif
+        path_fd = fullfile (root_fd, base_fd(:){:});
         full_fd = fullfile (path_fd, fcnfilename);
         fcn_url = strcat (pkgurl, "/", full_fd);
         pkgfcns(i,3) = fcn_url;
@@ -186,6 +218,25 @@ function pkgfcns = find_GHurls (pkgurl, pkgfcns)
 
   endwhile
 
+endfunction
+
+## True when two files hold the same text, line endings aside.  A line counted
+## in one is the same line in the other exactly when this holds.
+function tf = i_same_text (fileA, fileB)
+  tf = false;
+  if (isempty (fileA) || isempty (fileB))
+    return;
+  endif
+  if (exist (fileA, "file") != 2 || exist (fileB, "file") != 2)
+    return;
+  endif
+  try
+    txtA = strrep (fileread (fileA), "\r\n", "\n");
+    txtB = strrep (fileread (fileB), "\r\n", "\n");
+  catch
+    return;
+  end_try_catch
+  tf = strcmp (txtA, txtB);
 endfunction
 
 %!error find_GHurls (1)

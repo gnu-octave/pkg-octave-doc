@@ -63,8 +63,18 @@ function method_texi2html (clsname, method, groups, pkgfcns, info, figformat)
     if (size (pkgfcns, 2) == 3 && ! isempty (cls_idx))
       url = pkgfcns{cls_idx, 3};
       if (! isempty (url))
+        ## A URL naming a commit is one find_GHurls found to match the
+        ## installed file, so the declaration's line there is its line here.
+        ## One naming a branch is left unanchored, the file being free to move.
+        anchor = "";
+        if (! isempty (strfind (url, "/blob/")))
+          [~, mline] = get_methods_ordered (clsname, {method});
+          if (! isempty (mline))
+            anchor = sprintf ("#L%d", mline(1));
+          endif
+        endif
         url_text = strcat ("<p><strong>Source Code: </strong>\n", ...
-                           "  <a href=""", url, """>", clsname, ...
+                           "  <a href=""", url, anchor, """>", clsname, ...
                            "</a>\n</div>");
         fcn_text = strrep (fcn_text, "</div>", url_text);
       endif
