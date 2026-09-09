@@ -140,9 +140,12 @@
        find-in-page.  Clear that one declaration, and only where the script
        above has found the attribute to be understood: an attribute selector
        matches a value the browser does not understand, so an ungated rule
-       would leave every panel of an older browser standing open. */
+       would leave every panel of an older browser standing open.  The
+       "!important" is required rather than decoration: the reboot carries
+       "[hidden] {display: none !important}", which the attribute itself brings
+       into play, and only another "!important" can outrank it. */
     html.until-found .collapse[hidden="until-found"]:not(.show) {
-      display: block;
+      display: block !important;
     }
     </style>
   </head>

@@ -1138,6 +1138,7 @@ endfunction
 %!test  # a page can reveal a collapsed panel to the browser's find-in-page
 %! assert (! isempty (strfind (flat, "onbeforematch")));
 %! assert (! isempty (strfind (flat, "[hidden=\"until-found\"]:not(.show)")));
+%! assert (! isempty (strfind (flat, "display: block !important")));
 
 %!test  # an old style class answers methods but is not a classdef
 %! assert (! isempty (methods ("BistOld")));
