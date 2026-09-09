@@ -73,7 +73,13 @@ function MTHDS = get_methods_ordered (class, MTHDS);
     endif
   endfor
 
-  ## Reorder methods in MTHDS cell array
+  ## Reorder methods in MTHDS cell array.  This also drops every method the
+  ## class file does not declare, which is deliberate rather than incidental:
+  ## core's help returns an inherited property's docstring and refuses an
+  ## inherited method's, so a subclass page documents the first and not the
+  ## second, which keeps the website and the Qt help consistent with the
+  ## command line.  Never make this a permutation the way the tail of
+  ## get_properties_ordered is one; that would publish inherited methods.
   MTHDS = MTHDS(index);
 
 endfunction

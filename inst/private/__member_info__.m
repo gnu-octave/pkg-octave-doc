@@ -83,12 +83,21 @@ function info = __member_info__ (name)
 
   parts = strsplit (clsname, ".");
   stem = parts{end};
-  if (any (strcmp (MTHDS, member)))
-    if (strcmp (member, stem))
-      info.kind = "constructor";
-    else
-      info.kind = "method";
-    endif
+
+  ## The methods this class file declares, which is what a page publishes:
+  ## get_methods_ordered drops whatever the class inherits.  A reference is
+  ## classified against this rather than against what methods reports, so a
+  ## reference to an inherited method does not resolve, there being nothing
+  ## on the subclass page to resolve it to.  See the note at that line in
+  ## get_methods_ordered for why an inherited method is not published.
+  MTHDS_own = MTHDS;
+  MTHDS_own(strcmp (MTHDS_own, stem)) = [];
+  MTHDS_own = get_methods_ordered (clsname, MTHDS_own);
+
+  if (strcmp (member, stem) && any (strcmp (MTHDS, member)))
+    info.kind = "constructor";
+  elseif (any (strcmp (MTHDS_own, member)))
+    info.kind = "method";
   elseif (any (strcmp (PROPS, member)))
     info.kind = "property";
   else
@@ -96,9 +105,7 @@ function info = __member_info__ (name)
   endif
 
   ## The layout the class is rendered in, as classdef_texi2html decides it
-  MTHDS_grp = MTHDS;
-  MTHDS_grp(strcmp (MTHDS_grp, stem)) = [];
-  MTHDS_grp = get_methods_ordered (clsname, MTHDS_grp);
+  MTHDS_grp = MTHDS_own;
   if (any (strcmp (MTHDS, stem)))
     MTHDS_grp{end+1} = stem;
   endif

@@ -643,7 +643,7 @@ endfunction
 ## a comment run reaching down to a method becomes that method's help text, so
 ## a banner written directly above one would be read as its documentation.
 
-%!shared grouped, mthd, flat, hashed, plain, derived, base, files, hidc, nsc, flush
+%!shared grouped, mthd, flat, hashed, plain, derived, base, files, hidc, nsc, flush, heir
 %! d = fullfile (tempdir (), "pkg_octave_doc_cls_bist");
 %! if (! isfolder (d))
 %!   mkdir (d);
@@ -840,9 +840,28 @@ endfunction
 %!        '    ## @end deftypefn', ...
 %!        '    function this = BistDerived ()', ...
 %!        '    endfunction', ...
+%!        '    ## -*- texinfo -*-', ...
+%!        '    ## @deftypefn {} {} inheritedm (@var{obj})', ...
+%!        '    ## A method a subclass inherits.', ...
+%!        '    ## @end deftypefn', ...
+%!        '    function inheritedm (this)', ...
+%!        '    endfunction', ...
 %!        '  endmethods', ...
 %!        'endclassdef'};
 %! fid = fopen (fullfile (d, "BistDerived.m"), "w");
+%! fprintf (fid, "%s\n", src{:});
+%! fclose (fid);
+%! ## A subclass whose docstring names the method it inherits.  The method is
+%! ## not published on this page, so the name must not become a link.
+%! src = {'## -*- texinfo -*-', ...
+%!        '## @deftypefn {} {@var{obj} =} BistHeir ()', ...
+%!        '## A fixture class inheriting a documented method.', ...
+%!        '##', ...
+%!        '## @seealso{BistHeir.inheritedm, BistHeir.OwnProp}', ...
+%!        '## @end deftypefn', ...
+%!        'classdef BistHeir < BistDerived', ...
+%!        'endclassdef'};
+%! fid = fopen (fullfile (d, "BistHeir.m"), "w");
 %! fprintf (fid, "%s\n", src{:});
 %! fclose (fid);
 %! src = {'classdef BistHidCtor', ...
@@ -982,7 +1001,7 @@ endfunction
 %! pf = {"BistGrouped", "Cat"; "BistFlat", "Cat"; "BistHash", "Cat"; ...
 %!       "BistDerived", "Cat"; "BistBase", "Cat"; "BistPlain", "Cat"; ...
 %!       "BistHidCtor", "Cat"; "BistGrpHid", "Cat"; "bistns.BistNs", "Cat"; ...
-%!       "BistFlush", "Cat"};
+%!       "BistFlush", "Cat"; "BistHeir", "Cat"};
 %! oldpwd = pwd ();
 %! unwind_protect
 %!   cd (d);
@@ -995,6 +1014,7 @@ endfunction
 %!   classdef_texi2html ("BistGrpHid", pf, info);
 %!   classdef_texi2html ("bistns.BistNs", pf, info);
 %!   classdef_texi2html ("BistFlush", pf, info);
+%!   classdef_texi2html ("BistHeir", pf, info);
 %!   ## A class documenting its methods outside texinfo used to raise rather
 %!   ## than render, so its failure is kept to the two tests that own it.
 %!   try
@@ -1013,6 +1033,7 @@ endfunction
 %!   hidc = fileread ("BistHidCtor.html");
 %!   nsc = fileread ("bistns.BistNs.html");
 %!   flush = fileread ("BistFlush.html");
+%!   heir = fileread ("BistHeir.html");
 %! unwind_protect_cleanup
 %!   cd (oldpwd);
 %! end_unwind_protect
@@ -1130,6 +1151,13 @@ endfunction
 %!test  # the constructor of a grouped class resolves to its own page
 %! tgt = "href=\"BistGrouped.BistGrouped.html\"";
 %! assert (! isempty (strfind (mthd, tgt)));
+
+%!test  # a reference to an inherited method is not made a link
+%! assert (! isempty (strfind (heir, "inheritedm")));
+%! assert (isempty (strfind (heir, "BistHeir_inheritedm")));
+
+%!test  # a reference to an inherited property still resolves
+%! assert (! isempty (strfind (heir, "BistHeir.html#BistHeir_OwnProp")));
 
 %!test  # a class declaring at the first column documents its methods
 %! assert (! isempty (strfind (flush, "BistFlush_fm1")));
