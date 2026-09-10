@@ -391,7 +391,7 @@ find_GHurls
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 1395
+# length: 1897
 pkg-octave-doc: pkgfcns = find_GHurls ( pkgurl , pkgfcns )
 
 Retrieve unique URLs to every function&rsquo;s location within the package&rsquo;s GitHub
@@ -409,6 +409,14 @@ info structure returned from package_texi2html .
 find_GHurls returns a cell array, pkgfcns , by appending a third
 column to the input pkgfcns with the URLs to the source code location
 of each individual function listed in the 1st column of pkgfcns .
+
+A URL takes one of two forms, and which one it takes says whether a line
+number may be appended to it. blob/ commit names the commit
+the archive was cut from, and is used only where the archived file and the
+installed file hold the same text, so a line counted in the one is the line
+in the other. tree/HEAD names the default branch instead, and is
+used wherever the two differ or the commit could not be read; a line number
+must not be appended to such a URL, the file it names being free to change.
 find_GHurls relies on curl and tar , which must be
 installed and available to the system&rsquo;s $PATH , and an active internet
 connection to download and extract the targeted repository to a temporary
