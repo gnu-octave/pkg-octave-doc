@@ -1,41 +1,45 @@
-Summary of important user-visible changes for pkg-octave-doc 0.8.2:
+Summary of important user-visible changes for pkg-octave-doc 0.8.3:
 -------------------------------------------------------------------
 
- ** A cross-reference naming a class member now resolves.  An `@seealso`,
-    `@xref`, `@ref` or `@pxref` naming a method or a property links to it,
-    whether the name is bare, qualified, namespaced or an old style
-    `@class/member`.  A method of a grouped class links to its own page; a
-    property, and a method of a flat class, link to the class page and to the
-    collapsible holding them, which the page expands and scrolls to.  Only
-    names the package documents resolve, so a hidden member and a class
-    absent from `INDEX` are left as text.
+ ** The browser's find-in-page reaches the text inside a collapsed member,
+    group or example panel and opens the panel on a match.  Where the
+    browser does not support it the page is unchanged.
 
- ** Incompatible: the collapsible holding a property or a method on a class
-    page is named after the member, `Class_member`, where it was numbered by
-    position, `collapseMethod3`.  A link to an anchor of an earlier build no
-    longer resolves, and a class page must be rebuilt for its own links to.
+ ** Incompatible: a class page anchors its constructor after its class,
+    `Class_Class`, where it was the fixed name `colapsibleConstructor`.  A
+    link to a constructor on a page built before this release no longer
+    resolves, and the page must be rebuilt.
 
- ** What a class member is owed is stated in the README and applied by the
-    builders: a docstring on every public member and on a constructor whether
-    or not it is hidden; a `doc-cache` entry for the class, for its
-    constructor where the file declares one, and for what `methods` and
-    `properties` report; and a published page for nothing hidden at all.  A
-    hidden constructor is therefore documented and cached but not published,
-    and is the only member of that kind.
+ ** A source code link names the commit the documentation was built from,
+    where it named the default branch, so it keeps pointing at the code the
+    page describes.  The commit is named only where the file on GitHub and
+    the installed file hold the same text; otherwise the branch is named as
+    before.
 
- ** A class page in the Qt help file names every property and method the
-    class holds, each linked to its own anchor and given the first sentence
-    of its help text.  It listed the titles of its subpages, which the
-    contents tree already shows.
+ ** A method page's source code link lands on the line that declares the
+    method, where it landed at the top of a class file that may hold dozens
+    of them.  A link is anchored only where it names a commit.
 
- ** A constructor declared in a `methods (Hidden)` block was published:
-    rendered on the page of a flat class, and given a page of its own on a
-    grouped one.
+ ** A class declaring its methods at the first column was documented with
+    none of them, on its html page and in its `doc-cache` entries alike, and
+    nothing was reported.  The declarations were searched for with a leading
+    space, so one standing at the first column was invisible.
 
- ** A class inside a namespace listed its constructor among its public
-    methods and rendered no constructor section.
+ ** An old style class reached the classdef renderer, which it left through
+    an unguarded `properties` call.  What a source file declares now decides
+    which route documents a name, so its constructor and its methods are
+    documented as the functions `INDEX` names them.
 
- ** A class declaring no constructor was reported as `MissingDocstring` for a
-    member that does not exist, and the entry of a constructor declared
-    `Hidden` was written only because every class was given one.  The class
-    file now decides.
+ ** A class that failed to render was published as a plain function page
+    with nothing reported, one `try` having answered both "this is not a
+    class" and "this class did not render".  The class is named now and the
+    build carries on.
+
+ ** A classdef carrying a syntax error was reported as not being a classdef,
+    discarding what Octave had said of it.  The reason the file gave is
+    reported now, naming the line that fails.
+
+ ** A reference to a method a class inherits was made a link to an anchor no
+    page carries, and on a class rendered with method groups to a page that
+    was never written.  Such a name renders as plain text now; an inherited
+    property is documented and still resolves.
