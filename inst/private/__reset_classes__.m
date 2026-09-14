@@ -31,6 +31,11 @@
 ## workspace (@code{clear classes} wipes the local variables of the frame it runs
 ## in, so it must not be called directly inside @code{build_DEMOS}).
 ##
+## @code{__folder_cache__} calls it too, on leaving the directory it cached.
+## A class examined there stays bound to that directory, which the load path
+## may not hold, so a later call to the class would fail to find its private
+## functions.
+##
 ## The underlying Octave core bug is tracked at
 ## @url{https://octave.discourse.group/t/octave-core-classdef-dispatch-bug/7633}.
 ## Minimal reproducer: @code{f = @@categorical; f (@{'a';'b'@}); categorical

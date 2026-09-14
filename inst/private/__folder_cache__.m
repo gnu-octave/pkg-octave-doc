@@ -152,6 +152,9 @@ function [report, names] = __folder_cache__ (caller, dirpath, opts, listed, ...
 
   unwind_protect_cleanup
     cd (here);
+    ## A class examined here stays bound to this directory, private functions
+    ## and all, even where the load path does not reach it
+    __reset_classes__ ();
   end_unwind_protect
 
 endfunction

@@ -284,6 +284,45 @@ endfunction
 %!   cd (old);
 %! end_unwind_protect
 
+%!test  # a class cached in a directory it then leaves resolves from the path
+%! d1 = fullfile (tempdir (), 'pkg_octave_doc_fd_left');
+%! d2 = fullfile (tempdir (), 'pkg_octave_doc_fd_path');
+%! mkdir (fullfile (d1, 'private'));
+%! mkdir (d2);
+%! for dd = {d1, d2}
+%!   fid = fopen (fullfile (dd{1}, 'bistreset.m'), 'w');
+%!   fputs (fid, "## -*- texinfo -*-\n## @deftypefn {bistpkg} {} bistreset ()\n");
+%!   fputs (fid, "##\n## A class written for the folder tests.\n##\n");
+%!   fputs (fid, "## A body line that is distinctive enough to look for.\n");
+%!   fputs (fid, "##\n## @end deftypefn\n");
+%!   fputs (fid, "classdef bistreset\n  methods\n");
+%!   fputs (fid, "    function v = bistval (this)\n");
+%!   if (strcmp (dd{1}, d1))
+%!     fputs (fid, "      v = bisthelper ();\n");
+%!   else
+%!     fputs (fid, "      v = 2;\n");
+%!   endif
+%!   fputs (fid, "    endfunction\n  endmethods\nendclassdef\n");
+%!   fclose (fid);
+%! endfor
+%! fid = fopen (fullfile (d1, 'private', 'bisthelper.m'), 'w');
+%! fputs (fid, "function v = bisthelper ()\n  v = 1;\nendfunction\n");
+%! fclose (fid);
+%! old = pwd ();
+%! addpath (d2);
+%! unwind_protect
+%!   cd (d1);
+%!   r = folder_texi2cache ();
+%!   cd (old);
+%!   assert (bistval (bistreset ()), 2);
+%! unwind_protect_cleanup
+%!   cd (old);
+%!   rmpath (d2);
+%!   confirm_recursive_rmdir (false, 'local');
+%!   rmdir (d1, 's');
+%!   rmdir (d2, 's');
+%! end_unwind_protect
+
 %!test  # remove the fixture directory
 %! d = fullfile (tempdir (), 'pkg_octave_doc_fd_bist');
 %! confirm_recursive_rmdir (false, 'local');
