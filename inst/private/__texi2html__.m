@@ -339,8 +339,10 @@ function f = i_target (s, pkgfcns)
   f = "";
   idx = find (strcmp (pkgfcns(:,1), s), 1);
   if (! isempty (idx))
-    if (columns (pkgfcns) > 2 && ! isempty (pkgfcns{idx,3}))
-      f = strrep (pkgfcns{idx,3}, filesep, "_");
+    ## The third column is the source URL a package build gives each entry;
+    ## only the fourth, which 'i_add_siblings' fills, is a link target.
+    if (columns (pkgfcns) > 3 && ! isempty (pkgfcns{idx,4}))
+      f = strrep (pkgfcns{idx,4}, filesep, "_");
     else
       f = strrep (s, filesep, "_");
     endif
@@ -366,7 +368,9 @@ function f = i_target (s, pkgfcns)
 endfunction
 
 ## The bare names of the members of the class this page belongs to, each
-## carrying the qualified name it is documented under.
+## carrying the qualified name it is documented under in a fourth column.  The
+## third is left to the source URL a package build puts there, which is not a
+## link target.
 function pkgfcns = i_add_siblings (pkgfcns, fcnname)
   if (! (ischar (fcnname) && isrow (fcnname) && ! isempty (fcnname)))
     return;
@@ -400,12 +404,12 @@ function pkgfcns = i_add_siblings (pkgfcns, fcnname)
   if (isempty (MEMBERS))
     return;
   endif
-  rows = cell (numel (MEMBERS), 3);
+  rows = cell (numel (MEMBERS), 4);
   for i = 1:numel (MEMBERS)
-    rows(i,:) = {MEMBERS{i}, "", qualify(MEMBERS{i})};
+    rows(i,:) = {MEMBERS{i}, "", "", qualify(MEMBERS{i})};
   endfor
-  if (columns (pkgfcns) == 2)
-    pkgfcns(:,3) = {""};
+  if (columns (pkgfcns) < 4)
+    pkgfcns(:,end+1:4) = {""};
   endif
   pkgfcns = [pkgfcns; rows];
 endfunction
