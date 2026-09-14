@@ -1,45 +1,13 @@
-Summary of important user-visible changes for pkg-octave-doc 0.8.3:
+Summary of important user-visible changes for pkg-octave-doc 0.8.4:
 -------------------------------------------------------------------
 
- ** The browser's find-in-page reaches the text inside a collapsed member,
-    group or example panel and opens the panel on a match.  Where the
-    browser does not support it the page is unchanged.
+ ** A cross-reference to a function or class the package documents
+    (`@seealso`, `@xref`, `@ref`, `@pxref`) links to its page again.  Since
+    0.8.2, `package_texi2html` linked every such name to a garbled form of its
+    source code URL, which resolves to nothing, so documentation built with
+    0.8.2 or 0.8.3 wants a rebuild.
 
- ** Incompatible: a class page anchors its constructor after its class,
-    `Class_Class`, where it was the fixed name `colapsibleConstructor`.  A
-    link to a constructor on a page built before this release no longer
-    resolves, and the page must be rebuilt.
-
- ** A source code link names the commit the documentation was built from,
-    where it named the default branch, so it keeps pointing at the code the
-    page describes.  The commit is named only where the file on GitHub and
-    the installed file hold the same text; otherwise the branch is named as
-    before.
-
- ** A method page's source code link lands on the line that declares the
-    method, where it landed at the top of a class file that may hold dozens
-    of them.  A link is anchored only where it names a commit.
-
- ** A class declaring its methods at the first column was documented with
-    none of them, on its html page and in its `doc-cache` entries alike, and
-    nothing was reported.  The declarations were searched for with a leading
-    space, so one standing at the first column was invisible.
-
- ** An old style class reached the classdef renderer, which it left through
-    an unguarded `properties` call.  What a source file declares now decides
-    which route documents a name, so its constructor and its methods are
-    documented as the functions `INDEX` names them.
-
- ** A class that failed to render was published as a plain function page
-    with nothing reported, one `try` having answered both "this is not a
-    class" and "this class did not render".  The class is named now and the
-    build carries on.
-
- ** A classdef carrying a syntax error was reported as not being a classdef,
-    discarding what Octave had said of it.  The reason the file gave is
-    reported now, naming the line that fails.
-
- ** A reference to a method a class inherits was made a link to an anchor no
-    page carries, and on a class rendered with method groups to a page that
-    was never written.  Such a name renders as plain text now; an inherited
-    property is documented and still resolves.
+ ** Building a `doc-cache` with `package_texi2cache`, `folder_texi2cache` or
+    `classdef_texi2cache` no longer breaks the first demo of a class
+    documented later in the same session, which failed to find the class's
+    private functions.
