@@ -348,7 +348,7 @@ endfunction
 %! addpath (d);
 %! unwind_protect
 %!   cd (d);
-%!   function_texi2cache ('bisttags');
+%!   r = function_texi2cache ('bisttags');
 %!   s = load ('doc-cache');
 %!   txt = s.cache{2, strcmp (s.cache(1,:), 'bisttags')};
 %!   assert (! isempty (strfind (txt, 'Use alpha, beta, or (x).')));
