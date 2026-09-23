@@ -78,6 +78,11 @@
 ## hold nothing to cache, and a line saying nothing happened in one would
 ## announce a file that is not there.
 ##
+## All of them are put on the load path before any is read, @file{src} first,
+## as loading the package would put them, so a class resolves a superclass
+## defined anywhere in the tree.  The load path is restored afterwards.  A
+## package this one depends on is not loaded, and must be loaded beforehand.
+##
 ## This is the only form that reports an @file{INDEX} entry answering to no
 ## file, a single directory being unable to tell one naming a file elsewhere
 ## from one naming nothing at all.
@@ -163,29 +168,52 @@ function [status, report] = package_texi2cache (varargin)
   report = struct ('cache', {}, 'added', {}, 'updated', {}, 'removed', {}, ...
                    'changed', {}, 'findings', {});
   cached = {};
-  for ii = 1:numel (dirs)
-    [rep, names] = __folder_cache__ ('package_texi2cache', dirs{ii}, ...
-                                     options, listed, pkgname, auto, ...
-                                     changed, check);
-    cached = [cached, names];
-    if (rep.changed)
-      status += 1;
+  ## The whole tree is on the load path before any of it is read, as loading
+  ## the package would put it, so a class resolves a superclass defined in a
+  ## directory walked later.  A directory already there is left where it is,
+  ## however it was spelled, since adding it again would run its PKG_ADD and
+  ## taking it off again its PKG_DEL, which removes what the caller had.
+  saved = strsplit (path (), pathsep ());
+  unwind_protect
+    known = cellfun (@make_absolute_filename, saved, 'UniformOutput', false);
+    fresh = dirs(! ismember (dirs, known));
+    if (! isempty (fresh))
+      addpath (fresh{:});
     endif
+    for ii = 1:numel (dirs)
+      [rep, names] = __folder_cache__ ('package_texi2cache', dirs{ii}, ...
+                                       options, listed, pkgname, auto, ...
+                                       changed, check);
+      cached = [cached, names];
+      if (rep.changed)
+        status += 1;
+      endif
 
-    ## A directory holding nothing to cache has no cache and is not reported.
-    ## Every directory below the root is walked, but most of them are not
-    ## places a doc-cache belongs, and a line saying nothing happened in one
-    ## announces a file that is not there.
-    if (! rep.changed && ! exist (rep.cache, 'file'))
-      continue;
-    endif
+      ## A directory holding nothing to cache has no cache and is not
+      ## reported.  Every directory below the root is walked, but most of
+      ## them are not places a doc-cache belongs, and a line saying nothing
+      ## happened in one announces a file that is not there.
+      if (! rep.changed && ! exist (rep.cache, 'file'))
+        continue;
+      endif
 
-    if (isempty (report) && ! isempty (seed))
-      rep.findings = [seed, rep.findings];
-      seed = [];
-    endif
-    report(end+1) = rep;
-  endfor
+      if (isempty (report) && ! isempty (seed))
+        rep.findings = [seed, rep.findings];
+        seed = [];
+      endif
+      report(end+1) = rep;
+    endfor
+  unwind_protect_cleanup
+    ## Only what was added is taken off, a PKG_ADD among them included.
+    ## Resetting the whole path would run every PKG_ADD on it again, and one
+    ## adding a directory of its own reorders it.
+    added = setdiff (strsplit (path (), pathsep ()), saved);
+    for ii = 1:numel (added)
+      if (any (strcmp (strsplit (path (), pathsep ()), added{ii})))
+        rmpath (added{ii});
+      endif
+    endfor
+  end_unwind_protect
 
   ## Nothing was reported, so whatever was found about INDEX still must be
   if (! isempty (seed))
@@ -232,16 +260,18 @@ endfunction
 ## @file{src} directory is one of them: its compiled files are installed into
 ## an architecture directory of their own, which the load path reaches, and
 ## the cache written beside them here is the cache that is copied there.  It
-## is not walked below, since only what a build produces is installed.
+## is not walked below, since only what a build produces is installed.  It
+## comes first, ahead of inst on the load path as its architecture directory
+## is once the package is loaded.
 function dirs = __cache_dirs__ (root)
   dirs = {};
-  base = fullfile (root, 'inst');
-  if (isfolder (base))
-    dirs = __walk__ ({base}, base);
-  endif
   src = fullfile (root, 'src');
   if (isfolder (src))
-    dirs{end+1} = src;
+    dirs = {src};
+  endif
+  base = fullfile (root, 'inst');
+  if (isfolder (base))
+    dirs = __walk__ ([dirs, {base}], base);
   endif
 endfunction
 
@@ -459,6 +489,52 @@ endfunction
 %!   assert (any (strcmp (s.cache(1,:), 'multione')));
 %!   assert (any (strcmp (s.cache(1,:), 'multitwo')));
 %!   assert (! any (strcmp ({rep(1).findings.rule}, 'IndexOrphanEntry')));
+%! unwind_protect_cleanup
+%!   cd (old);
+%!   confirm_recursive_rmdir (false, 'local');
+%!   rmdir (d, 's');
+%! end_unwind_protect
+
+%!test  # a superclass in a directory walked later resolves, the path restored
+%! d = fullfile (tempdir (), 'pkg_octave_doc_pk_super');
+%! if (isfolder (d))
+%!   confirm_recursive_rmdir (false, 'local');
+%!   rmdir (d, 's');
+%! endif
+%! mkdir (d);
+%! mkdir (fullfile (d, 'inst'));
+%! mkdir (fullfile (d, 'inst', 'Sub'));
+%! fid = fopen (fullfile (d, 'DESCRIPTION'), 'w');
+%! fputs (fid, "Name: superpkg\nVersion: 1.0.0\n");
+%! fclose (fid);
+%! spec = {fullfile(d, 'inst', 'PkgSuperChild.m'), ...
+%!         'PkgSuperChild < PkgSuperParent', 'PkgSuperChild'; ...
+%!         fullfile(d, 'inst', 'Sub', 'PkgSuperParent.m'), ...
+%!         'PkgSuperParent', 'PkgSuperParent'};
+%! for ii = 1:rows (spec)
+%!   fid = fopen (spec{ii,1}, 'w');
+%!   fprintf (fid, 'classdef %s\n', spec{ii,2});
+%!   fprintf (fid, '  ## -*- texinfo -*-\n');
+%!   fprintf (fid, '  ## @deftp {superpkg} %s\n  ##\n', spec{ii,3});
+%!   fprintf (fid, '  ## A class written for the package tests.\n  ##\n');
+%!   fprintf (fid, '  ## A body line that is distinctive enough to look for.\n');
+%!   fprintf (fid, '  ##\n  ## @end deftp\n');
+%!   fprintf (fid, '  properties\n  endproperties\nendclassdef\n');
+%!   fclose (fid);
+%! endfor
+%! fid = fopen (fullfile (d, 'INDEX'), 'w');
+%! fputs (fid, "superpkg >> Super Package\nDocumentation\n");
+%! fputs (fid, " PkgSuperChild\n PkgSuperParent\n");
+%! fclose (fid);
+%! old = pwd ();
+%! p = path ();
+%! unwind_protect
+%!   cd (d);
+%!   st = package_texi2cache ();
+%!   assert (st, 2);
+%!   s = load (fullfile (d, 'inst', 'doc-cache'));
+%!   assert (any (strcmp (s.cache(1,:), 'PkgSuperChild')));
+%!   assert (path (), p);
 %! unwind_protect_cleanup
 %!   cd (old);
 %!   confirm_recursive_rmdir (false, 'local');
