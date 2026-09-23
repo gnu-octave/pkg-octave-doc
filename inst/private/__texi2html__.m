@@ -291,7 +291,7 @@ endfunction
 function dt = i_parse_sig (line, pkgfcns)
   p = strfind (line, "{");
   if (isempty (p))
-    dt = ["<dt><code><h5 class=\"fs\">", i_text(strtrim(line)), ...
+    dt = ["<dt><h5 class=\"fs\"><code>", i_text(strtrim(line)), ...
           "</code></h5></dt>"];
     return;
   endif
@@ -325,7 +325,7 @@ function dt = i_parse_sig (line, pkgfcns)
   endif
   body = [body, "<b>", name_html, "</b>", args_html];
 
-  dt = ["<dt><code><h5 class=\"fs\">", cat_html, ":", body, ...
+  dt = ["<dt><h5 class=\"fs\"><code>", cat_html, ":", body, ...
         "</code></h5></dt>"];
 endfunction
 
