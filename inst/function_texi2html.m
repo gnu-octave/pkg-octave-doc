@@ -126,8 +126,11 @@ function function_texi2html (fcnname, pkgfcns, info, varargin)
       if (! isempty (url))
         url_text = strcat ("<p><strong>Source Code: </strong>\n", ...
                            "  <a href=""", url, """>", fcnname, ...
-                           "</a>\n</div>");
-      fcn_text = strrep (fcn_text, "</div>", url_text);
+                           "</a>\n</p>\n");
+        ## Inside the wrapper, whose closing tag is the last one: a table in
+        ## the body closes a div of its own
+        idx = strfind (fcn_text, "</div>")(end);
+        fcn_text = [fcn_text(1:idx-1), url_text, fcn_text(idx:end)];
       endif
     endif
 
@@ -216,6 +219,66 @@ function function_texi2html (fcnname, pkgfcns, info, varargin)
 
 endfunction
 
+## The cases write a fixture function into a temporary directory and cd into
+## it, the page being written to the current directory.  The last block
+## removes the fixture.
+
+%!test  # a help text holding a table carries the source link once, last
+%! d = fullfile (tempdir (), "pkg_octave_doc_fh_bist");
+%! if (! isfolder (d))
+%!   mkdir (d);
+%! endif
+%! fid = fopen (fullfile (d, "bisttabled.m"), "w");
+%! fprintf (fid, "## -*- texinfo -*-\n## @deftypefn {} {} bisttabled ()\n");
+%! fprintf (fid, "## A fixture function whose help holds a table.\n");
+%! fprintf (fid, "## @multitable @columnfractions 0.5 0.5\n");
+%! fprintf (fid, "## @item a @tab b\n## @end multitable\n");
+%! fprintf (fid, "## @seealso{bistother}\n## @end deftypefn\n");
+%! fprintf (fid, "function bisttabled ()\nendfunction\n");
+%! fclose (fid);
+%! info = struct ("PKG_ICON", "pkg.png", "PKG_NAME", "bist", ...
+%!                "PKG_TITLE", "Bist", "OCTAVE_LOGO", "octave-logo.svg");
+%! pf3 = {"bisttabled", "Cat", ...
+%!        "https://github.com/o/r/blob/abc1234/inst/bisttabled.m"};
+%! oldpwd = pwd ();
+%! addpath (d);
+%! unwind_protect
+%!   cd (d);
+%!   function_texi2html ("bisttabled", pf3, info);
+%!   page = fileread ("bisttabled.html");
+%! unwind_protect_cleanup
+%!   cd (oldpwd);
+%!   rmpath (d);
+%! end_unwind_protect
+%! at = strfind (page, "Source Code:");
+%! assert (numel (at), 1);
+%! assert (at > strfind (page, "See also:")(1));
+%! assert (numel (strfind (page, "<div")), numel (strfind (page, "</div>")));
+
+%!test  # without a source URL no link is written and the page stays balanced
+%! d = fullfile (tempdir (), "pkg_octave_doc_fh_bist");
+%! info = struct ("PKG_ICON", "pkg.png", "PKG_NAME", "bist", ...
+%!                "PKG_TITLE", "Bist", "OCTAVE_LOGO", "octave-logo.svg");
+%! oldpwd = pwd ();
+%! addpath (d);
+%! unwind_protect
+%!   cd (d);
+%!   function_texi2html ("bisttabled", {"bisttabled", "Cat"}, info);
+%!   page = fileread ("bisttabled.html");
+%! unwind_protect_cleanup
+%!   cd (oldpwd);
+%!   rmpath (d);
+%! end_unwind_protect
+%! assert (isempty (strfind (page, "Source Code:")));
+%! assert (numel (strfind (page, "<div")), numel (strfind (page, "</div>")));
+
+%!test  # remove the fixture directory
+%! d = fullfile (tempdir (), "pkg_octave_doc_fh_bist");
+%! delete (fullfile (d, "bisttabled.*"));
+%! rmdir (d);
+%! assert (! isfolder (d));
+
+## Test input validation
 %!error function_texi2html (1)
 %!error function_texi2html (1, 2)
 %!error function_texi2html (1, cell (2))

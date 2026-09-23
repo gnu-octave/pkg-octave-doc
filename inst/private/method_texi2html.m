@@ -75,8 +75,11 @@ function method_texi2html (clsname, method, groups, pkgfcns, info, figformat)
         endif
         url_text = strcat ("<p><strong>Source Code: </strong>\n", ...
                            "  <a href=""", url, anchor, """>", clsname, ...
-                           "</a>\n</div>");
-        fcn_text = strrep (fcn_text, "</div>", url_text);
+                           "</a>\n</p>\n");
+        ## Inside the wrapper, whose closing tag is the last one: a table in
+        ## the body closes a div of its own
+        idx = strfind (fcn_text, "</div>")(end);
+        fcn_text = [fcn_text(1:idx-1), url_text, fcn_text(idx:end)];
       endif
     endif
 
