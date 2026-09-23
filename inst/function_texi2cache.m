@@ -336,6 +336,28 @@ endfunction
 %!   rmpath (d);
 %! end_unwind_protect
 
+%!test  # an inline tag leaves no space in the text, a block tag still does
+%! d = fullfile (tempdir (), 'pkg_octave_doc_fc_bist');
+%! fid = fopen (fullfile (d, 'bisttags.m'), 'w');
+%! fprintf (fid, '## -*- texinfo -*-\n## @deftypefn {bistpkg} {} bisttags ()\n');
+%! fprintf (fid, '##\n## Use @code{alpha}, @var{beta}, or (@var{x}).\n##\n');
+%! fprintf (fid, '## @itemize\n## @item one\n## @item two\n## @end itemize\n');
+%! fprintf (fid, '##\n## @end deftypefn\nfunction bisttags ()\nendfunction\n');
+%! fclose (fid);
+%! old = pwd ();
+%! addpath (d);
+%! unwind_protect
+%!   cd (d);
+%!   function_texi2cache ('bisttags');
+%!   s = load ('doc-cache');
+%!   txt = s.cache{2, strcmp (s.cache(1,:), 'bisttags')};
+%!   assert (! isempty (strfind (txt, 'Use alpha, beta, or (x).')));
+%!   assert (isempty (strfind (txt, 'onetwo')));
+%! unwind_protect_cleanup
+%!   cd (old);
+%!   rmpath (d);
+%! end_unwind_protect
+
 %!test  # remove the fixture directory
 %! d = fullfile (tempdir (), 'pkg_octave_doc_fc_bist');
 %! leftover = [dir(fullfile (d, '*.m')); dir(fullfile (d, 'doc-cache')); ...

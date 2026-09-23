@@ -64,6 +64,10 @@ endfunction
 ## row is ever searched for
 function out = htmlToText (html)
   out = regexprep (html, '<(script|style)[^>]*>.*?</\1>', ' ');
+  ## An inline tag goes without a trace, or the punctuation touching it would
+  ## be spaced off; a block tag parts the words on either side of it
+  out = regexprep (out, ['</?(a|b|cite|code|em|i|kbd|samp|small|span|' ...
+                         'strong|sub|sup|tt|var)(\s[^>]*)?>'], '');
   out = regexprep (out, '<[^>]*>', ' ');
   out = strrep (out, '&lt;', '<');
   out = strrep (out, '&gt;', '>');
