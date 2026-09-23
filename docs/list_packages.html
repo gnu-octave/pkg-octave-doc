@@ -92,9 +92,18 @@
       });
     </script>
     <style>
-    h5.fs {
+    .fs {
     margin-top: -0.15em;
     margin-bottom: -0.15em;
+    }
+    .fs-last {
+    margin-bottom: calc(1rem - 0.15em);
+    }
+    p.description {
+    font-family: Consolas, "Courier New", monospace;
+    }
+    p.description code {
+    font-size: inherit;
     }
     h6:hover {
       color: gray;
@@ -231,10 +240,8 @@
               </div>
             </div>
             <div class="card-body">
-<dl>
-<dt><code><h5 class="fs">pkg-octave-doc: <var>valid_packages</var> = <b>list_packages</b> ()</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <var>valid_packages</var> = <b>list_packages</b> (<var>index</var>)</code></h5></dt>
-</dl>
+<p class="h5 fs"><code>pkg-octave-doc: <var>valid_packages</var> = <b>list_packages</b> ()</code></p>
+<p class="h5 fs fs-last"><code>pkg-octave-doc: <var>valid_packages</var> = <b>list_packages</b> (<var>index</var>)</code></p>
 <p> List <code>pkg</code>-installable packages from Octave Packages.
 </p>
 <div class="ms-5">
@@ -255,7 +262,8 @@
  nothing at all.
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/adf0d0c/inst/list_packages.m">list_packages</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/5d47e8d/inst/list_packages.m">list_packages</a>
+</p>
 </div>
 
             </div>

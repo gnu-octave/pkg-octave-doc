@@ -92,9 +92,18 @@
       });
     </script>
     <style>
-    h5.fs {
+    .fs {
     margin-top: -0.15em;
     margin-bottom: -0.15em;
+    }
+    .fs-last {
+    margin-bottom: calc(1rem - 0.15em);
+    }
+    p.description {
+    font-family: Consolas, "Courier New", monospace;
+    }
+    p.description code {
+    font-size: inherit;
     }
     h6:hover {
       color: gray;
@@ -231,11 +240,9 @@
               </div>
             </div>
             <div class="card-body">
-<dl>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2html</b> (<var>pkgname</var>)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2html</b> (<var>pkgname</var>, <var>Name</var>, <var>Value</var>)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: [<var>pkgfcns</var>, <var>info</var>] = <b>package_texi2html</b> (<var>pkgname</var>)</code></h5></dt>
-</dl>
+<p class="h5 fs"><code>pkg-octave-doc: <b>package_texi2html</b> (<var>pkgname</var>)</code></p>
+<p class="h5 fs"><code>pkg-octave-doc: <b>package_texi2html</b> (<var>pkgname</var>, <var>Name</var>, <var>Value</var>)</code></p>
+<p class="h5 fs fs-last"><code>pkg-octave-doc: [<var>pkgfcns</var>, <var>info</var>] = <b>package_texi2html</b> (<var>pkgname</var>)</code></p>
 <p> Generate HTML pages for an entire package.
 </p>
 <div class="ms-5">
@@ -297,8 +304,6 @@
 <tr><td width="20%"><code>OCTAVE_LOGO</code></td><td width="80%">The relative reference to Octave&rsquo;s logo, also
  located inside the <code>assets/</code> folder.</td></tr>
 </table>
-<p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/adf0d0c/inst/package_texi2html.m">package_texi2html</a>
 </div>
 
 
@@ -317,8 +322,6 @@
  but a figure rich in filled areas can cost tens of MB and, on a large
  package, exhaust the memory of the graphics back end.</td></tr>
 </table>
-<p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/adf0d0c/inst/package_texi2html.m">package_texi2html</a>
 </div>
 
 <p> <strong>See also: </strong>
@@ -327,7 +330,8 @@
   <a href="build_DEMOS.html">build_DEMOS</a>
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/adf0d0c/inst/package_texi2html.m">package_texi2html</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/5d47e8d/inst/package_texi2html.m">package_texi2html</a>
+</p>
 </div>
 
             </div>

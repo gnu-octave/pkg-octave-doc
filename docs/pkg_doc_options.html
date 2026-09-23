@@ -92,9 +92,18 @@
       });
     </script>
     <style>
-    h5.fs {
+    .fs {
     margin-top: -0.15em;
     margin-bottom: -0.15em;
+    }
+    .fs-last {
+    margin-bottom: calc(1rem - 0.15em);
+    }
+    p.description {
+    font-family: Consolas, "Courier New", monospace;
+    }
+    p.description code {
+    font-size: inherit;
     }
     h6:hover {
       color: gray;
@@ -231,7 +240,7 @@
               </div>
             </div>
             <div class="card-body">
-<dl><code><h5 class="description">pkg-octave-doc: pkg_doc_options</h5></code></dl>
+<p class="h5 description mb-3"><code>pkg-octave-doc: pkg_doc_options</code></p>
 <p> Settings for the documentation builders of a package.
 </p>
 <div class="ms-5">
@@ -273,7 +282,7 @@
   <a href="function_texi2cache.html">function_texi2cache</a>
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/adf0d0c/inst/pkg_doc_options.m">pkg_doc_options</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/5d47e8d/inst/pkg_doc_options.m">pkg_doc_options</a>
 </p>
 </div>
         <p class="lead my-3">The <code>pkg_doc_options</code> class contains the following properties:</p>
@@ -296,7 +305,6 @@ A <code>@deftypefn</code> header wrapped across lines
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_WrappedHeader">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Severity of a <code>@deftypefn</code> or <code>@deftypefnx</code> header broken
  across two or more lines, which <code>makeinfo</code> does not accept and which
@@ -327,7 +335,6 @@ Body text on an <code>@end</code> line
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_EndTrailingText">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Severity of an <code>@end</code> command carrying body text on the same line,
  as in <code>@end itemize and more text</code>, which is not a valid closing
@@ -357,7 +364,6 @@ A literal <code>@</code> that is neither doubled nor a command
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_BareAt">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Severity of a literal <code>@</code> that is neither doubled nor the start of
  a known texinfo command, as an anonymous function written inside
@@ -387,7 +393,6 @@ A brace that never closes, or closes too often
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_UnbalancedBrace">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Severity of an unbalanced brace in a docstring, which swallows the text
  following it or ends a command early.  Defaults to <code>'error'</code>.
@@ -416,7 +421,6 @@ A block opened and never ended
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_UnclosedBlock">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Severity of a block command, such as <code>@itemize</code> or
  <code>@example</code>, opened and never closed by a matching <code>@end</code>.
@@ -446,7 +450,6 @@ A category label naming no class in the package
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_CategoryLabel">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Severity of a category label that names no class in the package, or that
  is not an identifier at all, as a literal format specifier left in the
@@ -476,7 +479,6 @@ A public member carrying no docstring
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_MissingDocstring">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Severity of a public function or class member with no help text, for
  which <code>help</code> answers that it is undocumented and which no cache
@@ -506,7 +508,6 @@ Width limit of a docstring body line
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_BodyColumns">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Width limit of a docstring body line, specified as a positive integer
  giving the column past which a line is reported, or as <code>'off'</code>, the
@@ -540,7 +541,6 @@ Width limit of a docstring body line
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_SeealsoInMember">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Severity of a <code>@seealso</code> command in the help text of a class
  member.  Defaults to <code>'off'</code>, this being a house rule of the
@@ -570,7 +570,6 @@ Location of the package&rsquo;s <code>INDEX</code> file
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_IndexLocation">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Location of the package&rsquo;s <code>INDEX</code> file, specified as a character
  vector holding an absolute path, as <code>''</code> to use no <code>INDEX</code>
@@ -606,7 +605,6 @@ A name in the tree absent from <code>INDEX</code>
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_IndexMissingEntry">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Severity of a documented name found in the tree but absent from the
  package&rsquo;s <code>INDEX</code>, which leaves it out of the published
@@ -637,7 +635,6 @@ An <code>INDEX</code> entry answering to no file
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_IndexOrphanEntry">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Severity of an <code>INDEX</code> entry that answers to no file in the package,
  which is reported only by a run covering the whole package, a single
@@ -668,7 +665,6 @@ No <code>INDEX</code> where one was expected
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_IndexNotFound">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> Severity of a run that reads <code>INDEX</code> finding none to read.
  Defaults to <code>'warning'</code>, and is the rule to switch off for a
@@ -698,7 +694,6 @@ How much a run prints
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_Verbosity">
             <div class="border-bottom py-2">
-
 <p> </p>
 <p> How much a run prints, specified as <code>'all'</code>, the default, which
  prints every finding and then the summary; <code>'summary'</code>, which
@@ -733,10 +728,8 @@ Create a settings object for the documentation builders.
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_pkg_doc_options">
             <div class="border-bottom py-2">
-<dl>
-<dt><code><h5 class="fs">pkg_doc_options: <var>obj</var> = <b>pkg_doc_options</b> ()</code></h5></dt>
-<dt><code><h5 class="fs">pkg_doc_options: <var>obj</var> = <b>pkg_doc_options</b> (<var>filename</var>)</code></h5></dt>
-</dl>
+<p class="h5 fs"><code>pkg_doc_options: <var>obj</var> = <b>pkg_doc_options</b> ()</code></p>
+<p class="h5 fs fs-last"><code>pkg_doc_options: <var>obj</var> = <b>pkg_doc_options</b> (<var>filename</var>)</code></p>
 <p> </p>
 <p> <code><var>obj</var> = pkg_doc_options ()</code> returns an object holding the
  default settings.
@@ -773,9 +766,7 @@ Save the settings that differ from the defaults to a JSON file.
           </div>
           <div class="collapse multi-collapse" id="pkg_doc_options_save_to_json">
             <div class="border-bottom py-2">
-<dl>
-<dt><code><h5 class="fs">pkg_doc_options: <b>save_to_json</b> (<var>obj</var>, <var>filename</var>)</code></h5></dt>
-</dl>
+<p class="h5 fs fs-last"><code>pkg_doc_options: <b>save_to_json</b> (<var>obj</var>, <var>filename</var>)</code></p>
 <p> </p>
 <p> <code>save_to_json (<var>obj</var>, <var>filename</var>)</code> writes the properties of
  <var>obj</var> that differ from the default settings to <var>filename</var>, taking

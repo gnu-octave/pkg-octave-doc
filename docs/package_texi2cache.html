@@ -92,9 +92,18 @@
       });
     </script>
     <style>
-    h5.fs {
+    .fs {
     margin-top: -0.15em;
     margin-bottom: -0.15em;
+    }
+    .fs-last {
+    margin-bottom: calc(1rem - 0.15em);
+    }
+    p.description {
+    font-family: Consolas, "Courier New", monospace;
+    }
+    p.description code {
+    font-size: inherit;
     }
     h6:hover {
       color: gray;
@@ -231,14 +240,12 @@
               </div>
             </div>
             <div class="card-body">
-<dl>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2cache</b> ()</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2cache</b> (<code>'-auto'</code>)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2cache</b> (<code>'-check'</code>)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>package_texi2cache</b> (&hellip;, <var>options</var>)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <var>status</var> = <b>package_texi2cache</b> (&hellip;)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: [<var>status</var>, <var>report</var>] = <b>package_texi2cache</b> (&hellip;)</code></h5></dt>
-</dl>
+<p class="h5 fs"><code>pkg-octave-doc: <b>package_texi2cache</b> ()</code></p>
+<p class="h5 fs"><code>pkg-octave-doc: <b>package_texi2cache</b> (<code>'-auto'</code>)</code></p>
+<p class="h5 fs"><code>pkg-octave-doc: <b>package_texi2cache</b> (<code>'-check'</code>)</code></p>
+<p class="h5 fs"><code>pkg-octave-doc: <b>package_texi2cache</b> (&hellip;, <var>options</var>)</code></p>
+<p class="h5 fs"><code>pkg-octave-doc: <var>status</var> = <b>package_texi2cache</b> (&hellip;)</code></p>
+<p class="h5 fs fs-last"><code>pkg-octave-doc: [<var>status</var>, <var>report</var>] = <b>package_texi2cache</b> (&hellip;)</code></p>
 <p> Regenerate the <code>doc-cache</code> files of a package from its source tree.
 </p>
 <div class="ms-5">
@@ -295,6 +302,11 @@
  hold nothing to cache, and a line saying nothing happened in one would
  announce a file that is not there.
 </p>
+<p> All of them are put on the load path before any is read, <code>src</code> first,
+ as loading the package would put them, so a class resolves a superclass
+ defined anywhere in the tree.  The load path is restored afterwards.  A
+ package this one depends on is not loaded, and must be loaded beforehand.
+</p>
 <p> This is the only form that reports an <code>INDEX</code> entry answering to no
  file, a single directory being unable to tell one naming a file elsewhere
  from one naming nothing at all.
@@ -309,7 +321,8 @@ doc_cache_create,
 lookfor
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/adf0d0c/inst/package_texi2cache.m">package_texi2cache</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/5d47e8d/inst/package_texi2cache.m">package_texi2cache</a>
+</p>
 </div>
 
             </div>

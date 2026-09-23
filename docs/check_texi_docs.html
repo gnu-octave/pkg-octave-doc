@@ -92,9 +92,18 @@
       });
     </script>
     <style>
-    h5.fs {
+    .fs {
     margin-top: -0.15em;
     margin-bottom: -0.15em;
+    }
+    .fs-last {
+    margin-bottom: calc(1rem - 0.15em);
+    }
+    p.description {
+    font-family: Consolas, "Courier New", monospace;
+    }
+    p.description code {
+    font-size: inherit;
     }
     h6:hover {
       color: gray;
@@ -231,12 +240,10 @@
               </div>
             </div>
             <div class="card-body">
-<dl>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>check_texi_docs</b> ()</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>check_texi_docs</b> (<var>options</var>)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <var>status</var> = <b>check_texi_docs</b> (&hellip;)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: [<var>status</var>, <var>report</var>] = <b>check_texi_docs</b> (&hellip;)</code></h5></dt>
-</dl>
+<p class="h5 fs"><code>pkg-octave-doc: <b>check_texi_docs</b> ()</code></p>
+<p class="h5 fs"><code>pkg-octave-doc: <b>check_texi_docs</b> (<var>options</var>)</code></p>
+<p class="h5 fs"><code>pkg-octave-doc: <var>status</var> = <b>check_texi_docs</b> (&hellip;)</code></p>
+<p class="h5 fs fs-last"><code>pkg-octave-doc: [<var>status</var>, <var>report</var>] = <b>check_texi_docs</b> (&hellip;)</code></p>
 <p> Check the texinfo help texts of a tree, writing nothing.
 </p>
 <div class="ms-5">
@@ -277,7 +284,8 @@
   <a href="pkg_doc_options.html">pkg_doc_options</a>
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/adf0d0c/inst/check_texi_docs.m">check_texi_docs</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/5d47e8d/inst/check_texi_docs.m">check_texi_docs</a>
+</p>
 </div>
 
             </div>

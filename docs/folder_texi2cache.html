@@ -92,9 +92,18 @@
       });
     </script>
     <style>
-    h5.fs {
+    .fs {
     margin-top: -0.15em;
     margin-bottom: -0.15em;
+    }
+    .fs-last {
+    margin-bottom: calc(1rem - 0.15em);
+    }
+    p.description {
+    font-family: Consolas, "Courier New", monospace;
+    }
+    p.description code {
+    font-size: inherit;
     }
     h6:hover {
       color: gray;
@@ -231,13 +240,11 @@
               </div>
             </div>
             <div class="card-body">
-<dl>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>folder_texi2cache</b> ()</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>folder_texi2cache</b> (<code>'-auto'</code>)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>folder_texi2cache</b> (<code>'-check'</code>)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <b>folder_texi2cache</b> (&hellip;, <var>options</var>)</code></h5></dt>
-<dt><code><h5 class="fs">pkg-octave-doc: <var>report</var> = <b>folder_texi2cache</b> (&hellip;)</code></h5></dt>
-</dl>
+<p class="h5 fs"><code>pkg-octave-doc: <b>folder_texi2cache</b> ()</code></p>
+<p class="h5 fs"><code>pkg-octave-doc: <b>folder_texi2cache</b> (<code>'-auto'</code>)</code></p>
+<p class="h5 fs"><code>pkg-octave-doc: <b>folder_texi2cache</b> (<code>'-check'</code>)</code></p>
+<p class="h5 fs"><code>pkg-octave-doc: <b>folder_texi2cache</b> (&hellip;, <var>options</var>)</code></p>
+<p class="h5 fs fs-last"><code>pkg-octave-doc: <var>report</var> = <b>folder_texi2cache</b> (&hellip;)</code></p>
 <p> Rebuild the doc-cache of the current directory.
 </p>
 <div class="ms-5">
@@ -289,7 +296,8 @@
   <a href="pkg_doc_options.html">pkg_doc_options</a>
 </p>
 <p><strong>Source Code: </strong>
-  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/adf0d0c/inst/folder_texi2cache.m">folder_texi2cache</a>
+  <a href="https://github.com/gnu-octave/pkg-octave-doc/blob/5d47e8d/inst/folder_texi2cache.m">folder_texi2cache</a>
+</p>
 </div>
 
             </div>
