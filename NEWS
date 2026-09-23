@@ -1,13 +1,18 @@
-Summary of important user-visible changes for pkg-octave-doc 0.8.4:
+Summary of important user-visible changes for pkg-octave-doc 0.8.5:
 -------------------------------------------------------------------
 
- ** A cross-reference to a function or class the package documents
-    (`@seealso`, `@xref`, `@ref`, `@pxref`) links to its page again.  Since
-    0.8.2, `package_texi2html` linked every such name to a garbled form of its
-    source code URL, which resolves to nothing, so documentation built with
-    0.8.2 or 0.8.3 wants a rebuild.
+ ** `package_texi2cache` no longer fails with `class not found` on a class
+    whose superclass lives in another directory of the package.  The package
+    tree is on the load path for the whole run, and the path is left as it
+    was.
 
- ** Building a `doc-cache` with `package_texi2cache`, `folder_texi2cache` or
-    `classdef_texi2cache` no longer breaks the first demo of a class
-    documented later in the same session, which failed to find the class's
-    private functions.
+ ** A `doc-cache` no longer spaces punctuation off marked-up text: `alpha ,`
+    and `( x )` read `alpha,` and `(x)` again.  Rebuild the caches to pick it
+    up.
+
+ ** The signature lines and the class title of a help page are valid HTML.
+    Pages look the same; in the Qt help the signatures are larger, in regular
+    weight, with the name in bold.
+
+ ** A help page whose text holds a table no longer repeats the "Source Code"
+    link after every table; it is written once, at the end.
