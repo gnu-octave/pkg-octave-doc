@@ -74,6 +74,17 @@ function out = htmlToText (html)
   out = strrep (out, '&quot;', '"');
   out = strrep (out, '&#39;', "'");
   out = strrep (out, '&nbsp;', ' ');
+  ## The renderer's typography goes back to the ASCII the docstring was written
+  ## in, or a search typed at the keyboard would never match it
+  out = strrep (out, '&lsquo;', '`');
+  out = strrep (out, '&rsquo;', "'");
+  out = strrep (out, '&ldquo;', '"');
+  out = strrep (out, '&rdquo;', '"');
+  out = strrep (out, '&ndash;', '--');
+  out = strrep (out, '&mdash;', '---');
+  out = strrep (out, '&hellip;', '...');
+  out = strrep (out, '&times;', 'x');
+  out = strrep (out, '&rArr;', '=>');
   out = strrep (out, '&amp;', '&');
   out = regexprep (out, '[ \t]+', ' ');
   out = regexprep (out, ' ?\n ?', "\n");

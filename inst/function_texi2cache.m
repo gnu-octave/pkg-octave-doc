@@ -358,6 +358,29 @@ endfunction
 %!   rmpath (d);
 %! end_unwind_protect
 
+%!test  # typography is cached as ASCII, never as an HTML entity
+%! d = fullfile (tempdir (), 'pkg_octave_doc_fc_bist');
+%! fid = fopen (fullfile (d, 'bistglyph.m'), 'w');
+%! fprintf (fid, '## -*- texinfo -*-\n## @deftypefn {bistpkg} {} bistglyph ()\n');
+%! fprintf (fid, '##\n## A tree''s vote @dots{} is 2 @times{} 3 @result{} 6');
+%! fprintf (fid, ', pages 1--3.\n##\n## @end deftypefn\n');
+%! fprintf (fid, 'function bistglyph ()\nendfunction\n');
+%! fclose (fid);
+%! old = pwd ();
+%! addpath (d);
+%! unwind_protect
+%!   cd (d);
+%!   r = function_texi2cache ('bistglyph');
+%!   s = load ('doc-cache');
+%!   txt = s.cache{2, strcmp (s.cache(1,:), 'bistglyph')};
+%!   assert (! isempty (strfind (txt, "A tree's vote ... is 2 x 3 => 6")));
+%!   assert (! isempty (strfind (txt, 'pages 1--3.')));
+%!   assert (isempty (strfind (txt, '&')));
+%! unwind_protect_cleanup
+%!   cd (old);
+%!   rmpath (d);
+%! end_unwind_protect
+
 %!test  # remove the fixture directory
 %! d = fullfile (tempdir (), 'pkg_octave_doc_fc_bist');
 %! leftover = [dir(fullfile (d, '*.m')); dir(fullfile (d, 'doc-cache')); ...
