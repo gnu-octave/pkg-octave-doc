@@ -194,18 +194,15 @@ function classdef_texi2html (clsname, pkgfcns, info, varargin)
     ## Get help text from class definition
     [text, format] = get_help_text (clsname);
 
-    ## Build the HTML code for class definition
-    cls_text = __texi2html__ (text, clsname, pkgfcns);
+    ## Build the HTML code for class definition, without its signature
+    [~, ~, cls_text] = __texi2html__ (text, clsname, pkgfcns);
 
     ## Find the category the classdef belongs to
     fcn_idx = find (strcmp (pkgfcns(:,1), clsname));
     catname = pkgfcns{fcn_idx, 2};
 
-    ## Replace class signature at the beginning of the HTML code
-    ## inside the <dl></dl> tags with more appropriate formatting
-    end_DL = strfind (cls_text, "</dl>")(1) + 5;
-    cls_text(1:end_DL) = [];
-    html_tag = "<dl><code><h5 class=""description"">%s: %s</h5></code></dl>\n";
+    ## Put the class title where the signature was
+    html_tag = "<p class=""h5 description mb-3""><code>%s: %s</code></p>\n";
     classsig = sprintf (html_tag, info.PKG_NAME, clsname);
     cls_text = [classsig cls_text];
 
@@ -247,18 +244,10 @@ function classdef_texi2html (clsname, pkgfcns, info, varargin)
       ## Only if texinfo is available
       if (strcmp (format, "texinfo"))
         try
-          ## Build the HTML code for property
-          prop_text = __texi2html__ (text, prop_name, pkgfcns);
+          ## Build the HTML code for property, without its signature
+          [~, ~, prop_text] = __texi2html__ (text, prop_name, pkgfcns);
           ## Grab first sentence
           prop_fs = get_text_first_sentence (prop_text);
-          ## Remove texinfo header
-          idx = strfind (prop_text, "</dl>");
-          if (isempty (idx))
-            idx = 1;
-          else
-            idx = idx(1) + 5;
-          endif
-          prop_text = prop_text(idx:end);
           ## Remove first sentence from text body
           idx = strfind (prop_text, prop_fs);
           if (! isempty (idx))
@@ -320,9 +309,9 @@ function classdef_texi2html (clsname, pkgfcns, info, varargin)
   if (has_cntr && ! is_large && strcmp (format, "texinfo"))
     try
       ## Build the HTML code for class constructor
-      cntr_text = __texi2html__ (text, cntr_name, pkgfcns);
+      [cntr_text, ~, cntr_body] = __texi2html__ (text, cntr_name, pkgfcns);
       ## Grab first sentence
-      cntr_fs = get_text_first_sentence (cntr_text);
+      cntr_fs = get_text_first_sentence (cntr_body);
       ## Remove first sentence from text body
       idx = strfind (cntr_text, cntr_fs);
       if (! isempty (idx))
@@ -379,9 +368,10 @@ function classdef_texi2html (clsname, pkgfcns, info, varargin)
       if (strcmp (format, "texinfo"))
         try
           ## Build the HTML code for class method
-          mtds_text = __texi2html__ (text, method_name, pkgfcns);
+          [mtds_text, ~, mtds_body] = __texi2html__ (text, method_name, ...
+                                                     pkgfcns);
           ## Grab first sentence
-          mtds_fs = get_text_first_sentence (mtds_text);
+          mtds_fs = get_text_first_sentence (mtds_body);
           ## Remove first sentence from text body
           idx = strfind (mtds_text, mtds_fs);
           if (! isempty (idx))

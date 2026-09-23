@@ -18,6 +18,7 @@
 ## -*- texinfo -*-
 ## @deftypefn  {pkg-octave-doc} {@var{html_txt} =} __texi2html__ (@var{text}, @var{fcnname}, @var{pkgfcns})
 ## @deftypefnx {pkg-octave-doc} {[@var{html_txt}, @var{findings}] =} __texi2html__ (@dots{})
+## @deftypefnx {pkg-octave-doc} {[@var{html_txt}, @var{findings}, @var{body}] =} __texi2html__ (@dots{})
 ## @deftypefnx {pkg-octave-doc} {[@dots{}] =} __texi2html__ (@var{text}, @var{fcnname}, @var{pkgfcns}, @var{opts})
 ##
 ## Private function to generate HTML text from texinfo.
@@ -38,13 +39,20 @@
 ## the default settings.  Asking for the findings does not change the rendered
 ## output in any way, and neither does passing @var{opts}.
 ##
+## A third output, @var{body}, is @var{html_txt} without the signature lines
+## that open it, for a caller that puts a heading of its own in their place or
+## wants only the description.  The findings are collected only when the
+## second output is requested, so it may be ignored with @code{~}.
+##
 ## @end deftypefn
 
-function [html_txt, findings] = __texi2html__ (text, fcnname, pkgfcns, opts)
+function [html_txt, findings, body] = __texi2html__ (text, fcnname, ...
+                                                    pkgfcns, opts)
 
   ## Collect the structural findings before anything is rewritten, so that a
   ## reported line counts from the first line of the text as it was handed in
-  if (nargout > 1)
+  findings = [];
+  if (nargout > 1 && isargout (2))
     if (nargin < 4)
       opts = pkg_doc_options ();
     endif
@@ -124,12 +132,10 @@ function [html_txt, findings] = __texi2html__ (text, fcnname, pkgfcns, opts)
     k += 1;
   endwhile
 
-  ## Signature block.
-  sig_html = "<dl>\n";
-  for i = 1:numel (sigs)
-    sig_html = [sig_html, sigs{i}, "\n"];
-  endfor
-  sig_html = [sig_html, "</dl>\n"];
+  ## Signature block.  The last line carries the space the block keeps below
+  ## it, there being no wrapper to carry it.
+  sigs{end} = strrep (sigs{end}, "class=\"h5 fs\"", "class=\"h5 fs fs-last\"");
+  sig_html = [strjoin(sigs, "\n"), "\n"];
 
   ## Pull out @seealso (rendered separately, placed last inside the div).
   [body_lines, seealso_html] = i_extract_seealso (body_lines, pkgfcns);
@@ -145,8 +151,16 @@ function [html_txt, findings] = __texi2html__ (text, fcnname, pkgfcns, opts)
     rest = strjoin (blocks(2:end), "");
   endif
 
-  html_txt = [sig_html, summary, "<div class=\"ms-5\">\n", ...
-              rest, seealso_html, "</div>"];
+  body = [summary, "<div class=\"ms-5\">\n", rest, seealso_html, "</div>"];
+  sig_html = i_finish (sig_html, texkeys, texvals, fcnname);
+  body = i_finish (body, texkeys, texvals, fcnname);
+  html_txt = [sig_html, body];
+
+endfunction
+
+## Restore the protected @tex literals and qualify the example anchors of a
+## rendered fragment
+function html_txt = i_finish (html_txt, texkeys, texvals, fcnname)
 
   ## Restore protected @tex literals verbatim.
   for i = 1:numel (texkeys)
@@ -291,8 +305,8 @@ endfunction
 function dt = i_parse_sig (line, pkgfcns)
   p = strfind (line, "{");
   if (isempty (p))
-    dt = ["<dt><h5 class=\"fs\"><code>", i_text(strtrim(line)), ...
-          "</code></h5></dt>"];
+    dt = ["<p class=\"h5 fs\"><code>", i_text(strtrim(line)), ...
+          "</code></p>"];
     return;
   endif
   p = p(1);
@@ -325,8 +339,8 @@ function dt = i_parse_sig (line, pkgfcns)
   endif
   body = [body, "<b>", name_html, "</b>", args_html];
 
-  dt = ["<dt><h5 class=\"fs\"><code>", cat_html, ":", body, ...
-        "</code></h5></dt>"];
+  dt = ["<p class=\"h5 fs\"><code>", cat_html, ":", body, ...
+        "</code></p>"];
 endfunction
 
 ## --- cross-reference targets ---------------------------------------------

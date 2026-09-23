@@ -481,9 +481,9 @@ function [html, first, findings, examined] = i_render (name, tag, pkgfcns, ...
       findings = [findings, found];
     endif
     try
-      frag = __texi2html__ (i_untex (text), name, pkgfcns);
+      [frag, ~, fbody] = __texi2html__ (i_untex (text), name, pkgfcns);
       body = qch_postprocess (frag, name, qchmap);
-      first = get_text_first_sentence (body);
+      first = get_text_first_sentence (qch_postprocess (fbody, name, qchmap));
       html = [html, body, "\n"];
       return;
     catch
