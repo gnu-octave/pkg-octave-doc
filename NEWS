@@ -1,18 +1,11 @@
-Summary of important user-visible changes for pkg-octave-doc 0.8.5:
+Summary of important user-visible changes for pkg-octave-doc 0.8.6:
 -------------------------------------------------------------------
 
- ** `package_texi2cache` no longer fails with `class not found` on a class
-    whose superclass lives in another directory of the package.  The package
-    tree is on the load path for the whole run, and the path is left as it
-    was.
+ ** A `doc-cache` holds typography as the ASCII it was written in, not as
+    HTML entities: `tree&rsquo;s`, `&hellip;` and `&times;` read `tree's`,
+    `...` and `x` again, so `lookfor -all` finds text across them.  Rebuild
+    the caches to pick it up.
 
- ** A `doc-cache` no longer spaces punctuation off marked-up text: `alpha ,`
-    and `( x )` read `alpha,` and `(x)` again.  Rebuild the caches to pick it
-    up.
-
- ** The signature lines and the class title of a help page are valid HTML.
-    Pages look the same; in the Qt help the signatures are larger, in regular
-    weight, with the name in bold.
-
- ** A help page whose text holds a table no longer repeats the "Source Code"
-    link after every table; it is written once, at the end.
+ ** A method in an `@class` folder may be labelled with its class, as a
+    classdef member is, without a `CategoryLabel` warning from
+    `package_texi2cache`, `function_texi2cache` or `check_texi_docs`.
