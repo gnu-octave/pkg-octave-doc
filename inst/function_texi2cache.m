@@ -315,7 +315,8 @@ endfunction
 %!   r = function_texi2cache ('@bistcls/bistm', o);
 %!   assert (! any (strcmp ({r.findings.rule}, 'CategoryLabel')));
 %!   delete (fullfile (d, '@bistcls', 'bistm.m'));
-%!   function_texi2cache ('@bistcls/bistm', o);
+%!   r = function_texi2cache ('@bistcls/bistm', o);
+%!   assert (r.removed, {'@bistcls/bistm'});
 %! unwind_protect_cleanup
 %!   cd (old);
 %!   rmpath (d);
