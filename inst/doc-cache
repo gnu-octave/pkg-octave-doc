@@ -13,10 +13,10 @@ build_DEMOS
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 3605
+# length: 3594
 pkg-octave-doc: html = build_DEMOS (fcnname)
 pkg-octave-doc: html = build_DEMOS (fcnname, collapsed)
-pkg-octave-doc: html = build_DEMOS (&hellip;, Name, Value)
+pkg-octave-doc: html = build_DEMOS (..., Name, Value)
 Build notebook-style HTML for the DEMO blocks of a function or class member.
 
 build_DEMOS collects every %!demo block of fcnname and
@@ -31,7 +31,7 @@ link to one of its own demos with the
 short form @url{#exampleN}: the HTML converter expands the bare
 #exampleN fragment to this fully-qualified anchor, which keeps the
 reference readable in the command-line help while staying unique on a
-page that carries several members&rsquo; demos.
+page that carries several members' demos.
 
 The optional collapsed is a logical scalar. When true, each
 example card renders collapsed by default (used for lumped classdef members to
@@ -115,11 +115,11 @@ check_texi_docs
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 1782
+# length: 1772
 pkg-octave-doc: check_texi_docs ()
 pkg-octave-doc: check_texi_docs (options)
-pkg-octave-doc: status = check_texi_docs (&hellip;)
-pkg-octave-doc: [status, report] = check_texi_docs (&hellip;)
+pkg-octave-doc: status = check_texi_docs (...)
+pkg-octave-doc: [status, report] = check_texi_docs (...)
 Check the texinfo help texts of a tree, writing nothing.
 
 Every help text below the current directory is parsed and reported on, and
@@ -177,11 +177,11 @@ classdef_texi2cache
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 2139
+# length: 2122
 pkg-octave-doc: classdef_texi2cache (clsname)
 pkg-octave-doc: classdef_texi2cache (clsname, options)
-pkg-octave-doc: report = classdef_texi2cache (&hellip;)
-Write a class and its documented members into this directory&rsquo;s doc-cache.
+pkg-octave-doc: report = classdef_texi2cache (...)
+Write a class and its documented members into this directory's doc-cache.
 
 clsname is a class, qualified by its package when it lives in one, as
 in 'prob.NormalDistribution'. Its own entry and one per member are
@@ -195,7 +195,7 @@ stand: a cache inside one can be read by nothing, so a namespaced class is
 written from the directory holding the +pkg.
 
 The members are the ones the class documents: its public constructor, the
-methods declared in the class&rsquo;s own file, and the properties reported by
+methods declared in the class's own file, and the properties reported by
 properties, inherited ones included. This is what
 classdef_texi2html publishes, so a class reads the same way online
 and in lookfor, and it is not an arbitrary choice: help
@@ -246,19 +246,19 @@ classdef_texi2html
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 3901
+# length: 3816
 pkg-octave-doc: classdef_texi2html (clsname, pkgfcns, info)
-pkg-octave-doc: classdef_texi2html (&hellip;, Name, Value)
+pkg-octave-doc: classdef_texi2html (..., Name, Value)
 Generate HTML page for a class definition.
 
 classdef_texi2html requires three input arguments: clsname, a
-char string with the class&rsquo; name; pkgfcns, a cell array with all
+char string with the class' name; pkgfcns, a cell array with all
 available functions of a package; and info, a structure with relevant
 information about the package, which the function clsname belongs to.
 
 pkgfcns can be either a Nx2 or a Nx3 cell array, whose
 1st column list all available function names, the 2nd column list the each
-function&rsquo;s category, and the 3rd column contains the URL to the function&rsquo;s
+function's category, and the 3rd column contains the URL to the function's
 source code. pkgfcns is used to create relative references to other
 pages of functions which are listed in the seealso tag. When a third
 column is present, classdef_texi2html uses it to add a source code
@@ -267,13 +267,13 @@ link of the the function in clsname.
 The info structure requires at least the following fields:
 
 Field Name Description
-PKG_ICON The relative reference to the package&rsquo;s logo
+PKG_ICON The relative reference to the package's logo
 image which must be either in .svg or .png format and it is located in the
 newly created assets/ folder inside the working directory.
-PKG_NAME The package&rsquo;s name (e.g. "pkg-octave-doc")
-PKG_TITLE The package&rsquo;s title (e.g. "Octave Package
+PKG_NAME The package's name (e.g. "pkg-octave-doc")
+PKG_TITLE The package's title (e.g. "Octave Package
 Documentation")
-OCTAVE_LOGO The relative reference to Octave&rsquo;s logo, also
+OCTAVE_LOGO The relative reference to Octave's logo, also
 located inside the assets/ folder.
 
 To generate a suitable Nx2 cell array for a specific package, use the
@@ -288,9 +288,9 @@ class source:
 
 A lumped classdef (the default) becomes a single page:
 the class help and its properties, then the constructor and one collapsible
-block per public method, each holding that method&rsquo;s help and demos.
-A grouped classdef &ndash; one whose methods are organised into
-named groups by banner comment blocks (see below) &ndash; becomes a main page with
+block per public method, each holding that method's help and demos.
+A grouped classdef -- one whose methods are organised into
+named groups by banner comment blocks (see below) -- becomes a main page with
 the class help, the properties, and one collapsible block per group.
 Each group lists its methods, each with a one-line description, linking to a
 standalone Class.method.html page. Every public method
@@ -299,8 +299,8 @@ but with a class-scoped sidebar (the groups and their methods) and a
 breadcrumb back to the package index and the class page; its source-code link
 points to the class source file.
 
-A class counts as grouped when &ndash; and only when &ndash; its source holds at least
-one method-group banner; this is never decided by the class&rsquo; size or
+A class counts as grouped when -- and only when -- its source holds at least
+one method-group banner; this is never decided by the class' size or
 line count. A banner is a comment block of the form
 
 ################################################################
@@ -309,7 +309,7 @@ line count. A banner is a comment block of the form
 
 placed before a methods block, matching the convention used by the
 datatypes package, and never directly above a method: a comment run
-reaching down to one is that method&rsquo;s help text, so the banner would be
+reaching down to one is that method's help text, so the banner would be
 documenting it. Each public method is assigned to the most recent banner
 above its definition; groups whose methods are all non-public (Hidden
 or private) are omitted, and any public method before the first banner is
@@ -352,11 +352,11 @@ find_DEMOS
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 352
+# length: 346
 pkg-octave-doc: demos = find_DEMOS (fcnname)
 Retrieve the DEMO code blocks from a particular function.
 
-fcnname is a char string with the function&rsquo;s name.
+fcnname is a char string with the function's name.
 
 demos is cell array with each cell containing a char string with the
 code block of each DEMO available in fcnname.
@@ -386,14 +386,14 @@ find_GHurls
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 1884
+# length: 1848
 pkg-octave-doc: pkgfcns = find_GHurls (pkgurl, pkgfcns)
-Retrieve unique URLs to every function&rsquo;s location within the package&rsquo;s GitHub
+Retrieve unique URLs to every function's location within the package's GitHub
 repository.
 
 find_GHurls requires two input arguments, pkgurl, a char string
-with the URL to the root directory to the package&rsquo;s GitHub repository and
-pkgfcns, a Nx2 cell array containing the package&rsquo;s available functions
+with the URL to the root directory to the package's GitHub repository and
+pkgfcns, a Nx2 cell array containing the package's available functions
 (1st column) and their respective category (2nd column).
 
 Note: find_GHurls explicitly works with repositories hosted on GitHub!
@@ -412,12 +412,12 @@ in the other. tree/HEAD names the default branch instead, and is
 used wherever the two differ or the commit could not be read; a line number
 must not be appended to such a URL, the file it names being free to change.
 find_GHurls relies on curl and tar, which must be
-installed and available to the system&rsquo;s $PATH, and an active internet
+installed and available to the system's $PATH, and an active internet
 connection to download and extract the targeted repository to a temporary
 directory. If either curl or tar fail for any reason,
 find_GHurls returns a verbatim copy of the input pkgfcns.
 
-Use the following example to obtain a cell array with each function&rsquo;s URL to
+Use the following example to obtain a cell array with each function's URL to
 its source code location at GitHub:
 
 [pkgfcns, info] = package_texi2html ("pkg-octave-doc");
@@ -445,12 +445,12 @@ folder_texi2cache
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 2498
+# length: 2482
 pkg-octave-doc: folder_texi2cache ()
 pkg-octave-doc: folder_texi2cache ('-auto')
 pkg-octave-doc: folder_texi2cache ('-check')
-pkg-octave-doc: folder_texi2cache (&hellip;, options)
-pkg-octave-doc: report = folder_texi2cache (&hellip;)
+pkg-octave-doc: folder_texi2cache (..., options)
+pkg-octave-doc: report = folder_texi2cache (...)
 Rebuild the doc-cache of the current directory.
 
 Every function and class in the current directory is written afresh, along
@@ -483,7 +483,7 @@ already accounted for.
 
 options is a pkg_doc_options object. Unlike the per-item
 functions, an INDEX given through it decides what is cached:
-only the names it lists are written, so the cache holds the package&rsquo;s public
+only the names it lists are written, so the cache holds the package's public
 surface rather than whatever the directory happens to carry. A name found
 here but absent from INDEX is skipped and reported. An INDEX
 entry answering to no file is not reported at this scope, since a directory
@@ -519,11 +519,11 @@ function_texi2cache
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 1836
+# length: 1819
 pkg-octave-doc: function_texi2cache (fcnname)
 pkg-octave-doc: function_texi2cache (fcnname, options)
-pkg-octave-doc: report = function_texi2cache (&hellip;)
-Write one function&rsquo;s entry into this directory&rsquo;s doc-cache.
+pkg-octave-doc: report = function_texi2cache (...)
+Write one function's entry into this directory's doc-cache.
 
 fcnname is a function, whether an m-file or a compiled one, a function
 inside a package as 'pkg.fcnname', or a method of an old-style class
@@ -586,19 +586,19 @@ function_texi2html
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 1975
+# length: 1922
 pkg-octave-doc: function_texi2html (fcnname, pkgfcns, info)
-pkg-octave-doc: function_texi2html (&hellip;, Name, Value)
+pkg-octave-doc: function_texi2html (..., Name, Value)
 Generate HTML page for a particular function.
 
 function_texi2html requires three input arguments: fcnname, a
-char string with the function&rsquo;s name; pkgfcns, a cell array with all
+char string with the function's name; pkgfcns, a cell array with all
 available functions of a package; and info, a structure with relevant
 information about the package, which the function fcnname belongs to.
 
 pkgfcns can be either a Nx2 or a Nx3 cell array, whose
 1st column list all available function names, the 2nd column list the each
-function&rsquo;s category, and the 3rd column contains the URL to the function&rsquo;s
+function's category, and the 3rd column contains the URL to the function's
 source code. pkgfcns is used to relative references to other pages of
 functions which are listed in the See also tag. When a 3rd column is
 present, function_texi2html uses it to add a source code link of the
@@ -607,13 +607,13 @@ the function in fcnname.
 The info structure requires at least the following fields:
 
 Field Name Description
-PKG_ICON The relative reference to the package&rsquo;s logo
+PKG_ICON The relative reference to the package's logo
 image which must be either in .svg or .png format and it is located in the
 newly created assets/ folder inside the working directory.
-PKG_NAME The package&rsquo;s name (e.g. "pkg-octave-doc")
-PKG_TITLE The package&rsquo;s title (e.g. "Octave Package
+PKG_NAME The package's name (e.g. "pkg-octave-doc")
+PKG_TITLE The package's title (e.g. "Octave Package
 Documentation")
-OCTAVE_LOGO The relative reference to Octave&rsquo;s logo, also
+OCTAVE_LOGO The relative reference to Octave's logo, also
 located inside the assets/ folder.
 
 To generate a suitable Nx2 cell array for a specific package, use the
@@ -629,7 +629,7 @@ Optional Name/Value pairs
 Name Value
 'figformat' The file format the demo figures are printed
 in, either 'png' (default) or 'svg'. It applies to every
-figure of the function&rsquo;s demos.
+figure of the function's demos.
 
 See also:
 package_texi2html,
@@ -696,13 +696,13 @@ package_texi2cache
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 3770
+# length: 3749
 pkg-octave-doc: package_texi2cache ()
 pkg-octave-doc: package_texi2cache ('-auto')
 pkg-octave-doc: package_texi2cache ('-check')
-pkg-octave-doc: package_texi2cache (&hellip;, options)
-pkg-octave-doc: status = package_texi2cache (&hellip;)
-pkg-octave-doc: [status, report] = package_texi2cache (&hellip;)
+pkg-octave-doc: package_texi2cache (..., options)
+pkg-octave-doc: status = package_texi2cache (...)
+pkg-octave-doc: [status, report] = package_texi2cache (...)
 Regenerate the doc-cache files of a package from its source tree.
 
 A doc-cache is the file lookfor searches. Octave builds one
@@ -740,7 +740,7 @@ how a package is examined for broken texinfo without writing anything.
 
 options is a pkg_doc_options object. Called without one, the
 settings are read from doc-options.json at the package root if it
-carries one, and are the defaults if it does not, so a package&rsquo;s own
+carries one, and are the defaults if it does not, so a package's own
 conventions are applied by anyone who builds its documentation. The
 INDEX of the root is read unless the object names another, and it
 decides what is cached: only the names it lists are written.
@@ -795,20 +795,20 @@ package_texi2html
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 3426
+# length: 3342
 pkg-octave-doc: package_texi2html (pkgname)
 pkg-octave-doc: package_texi2html (pkgname, Name, Value)
 pkg-octave-doc: [pkgfcns, info] = package_texi2html (pkgname)
 Generate HTML pages for an entire package.
 
 package_texi2html takes a single input argument, pkgname, which
-is a char string with the package&rsquo;s name whose HTML documentation need to be
+is a char string with the package's name whose HTML documentation need to be
 generated. The function considers the current working path as the root
 directory of the built pages. It creates an index.html page with the
 available functions (and their subdivision into separate categories) of the
 package according to its INDEX file. Although the INDEX file (if absent) is
-automatically generated during the package&rsquo;s installation, it is best
-practice to include one in the package&rsquo;s source so there is full comtrol of
+automatically generated during the package's installation, it is best
+practice to include one in the package's source so there is full comtrol of
 the categorization among the functions. Individual functions HTML pages area
 generated with function_texi2html. Note that every existing HTML file
 matching an '.html' extension as well as an /assets named
@@ -819,17 +819,17 @@ based on bootstrap 5 and the generated HTML code is based on the
 index_template.html and default.html layouts.
 
 For packages whose repository is available at GitHub, individual URLs to each
-function&rsquo;s location within the reposity are retrieved and used to add a link
-to source code in each function&rsquo;s page. This requires an internet connection
-and git installed and available to the system&rsquo;s $PATH. If not
-available, the source code link is omitted and the functions&rsquo; HTML pages are
+function's location within the reposity are retrieved and used to add a link
+to source code in each function's page. This requires an internet connection
+and git installed and available to the system's $PATH. If not
+available, the source code link is omitted and the functions' HTML pages are
 generated without it.
 
 Optionally, package_texi2html can return two output arguments, namely
 pkgfcns and info, which are necessary for the find_GHurls
 and function_texi2html functions. In such case, the HTML pages
 generation is skipped. This is useful for building individual function pages
-without the need to regenerate the package&rsquo;s entire documentation.
+without the need to regenerate the package's entire documentation.
 
 Examples:
 
@@ -839,20 +839,20 @@ function_texi2html ("find_GHurls", pkgfcns, info);
 
 Returning arguments:
 
-pkgfcns is a Nx2 cell array containing the package&rsquo;s available
+pkgfcns is a Nx2 cell array containing the package's available
 functions (1st column) and their respective category (2nd column).
 
 info is a structure with the following fields:
 
 Field Name Description
-PKG_URL The URL to the package&rsquo;s repository at GitHub.
-PKG_ICON The relative reference to the package&rsquo;s logo
+PKG_URL The URL to the package's repository at GitHub.
+PKG_ICON The relative reference to the package's logo
 image which must be either in .svg or .png format and it is located in the
 newly created assets/ folder inside the working directory.
-PKG_NAME The package&rsquo;s name (e.g. "pkg-octave-doc")
-PKG_TITLE The package&rsquo;s title (e.g. "Octave Package
+PKG_NAME The package's name (e.g. "pkg-octave-doc")
+PKG_TITLE The package's title (e.g. "Octave Package
 Documentation")
-OCTAVE_LOGO The relative reference to Octave&rsquo;s logo, also
+OCTAVE_LOGO The relative reference to Octave's logo, also
 located inside the assets/ folder.
 
 Optional Name/Value pairs
@@ -890,21 +890,21 @@ package_texi2qch
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 5376
+# length: 5322
 pkg-octave-doc: package_texi2qch (pkgname)
 pkg-octave-doc: package_texi2qch (pkgname, Name, Value)
 Generate a Qt compressed help file for an entire package.
 
 package_texi2qch takes a single input argument, pkgname, which
-is a char string with the package&rsquo;s name whose Qt help file needs to be
+is a char string with the package's name whose Qt help file needs to be
 generated, and writes pkgname.qch into the current working
-directory. Octave&rsquo;s GUI reads such a file to populate its documentation
+directory. Octave's GUI reads such a file to populate its documentation
 tab: pkg load registers doc/pkgname.qch from the
-package&rsquo;s installation directory and pkg unload unregisters it, so
-the generated file must be placed in the package&rsquo;s doc/ directory
+package's installation directory and pkg unload unregisters it, so
+the generated file must be placed in the package's doc/ directory
 before the release tarball is built for it to have any effect.
 
-The help text of every function listed in the package&rsquo;s INDEX file is
+The help text of every function listed in the package's INDEX file is
 rendered to HTML, one page per INDEX category, and each function is
 registered as a keyword pointing at its own anchor within that page.
 
@@ -922,7 +922,7 @@ absent from a class that declares none.
 grouped classdef, one that sorts its methods under
 ** Group Name ** banner blocks as classdef_texi2html reads
 them, takes one page per group instead, named after it and carrying that
-group&rsquo;s methods, in the order the class declares them.
+group's methods, in the order the class declares them.
 
 The contents tree of the documentation browser therefore nests a class
 under its own category, and is entered rather than scrolled past among its
@@ -952,7 +952,7 @@ source. This is what makeinfo does for every output that is not
 TeX, and what help prints in the terminal for the same docstring.
 
 package_texi2qch requires the qhelpgenerator program of the Qt
-toolkit, which is located on the system&rsquo;s $PATH unless the
+toolkit, which is located on the system's $PATH unless the
 'generator' option names it explicitly. The program is looked up
 before any page is rendered and, if it cannot be found, an error is raised
 and nothing is written, rather than spending the build on documentation that
@@ -966,7 +966,7 @@ Optional Name/Value pairs
 
 Name Value
 'Generator' The qhelpgenerator executable, given
-as a char string. By default the program is looked up on the system&rsquo;s
+as a char string. By default the program is looked up on the system's
 $PATH. Name it explicitly on a system carrying more than one Qt
 version, since a file built by one Qt major version may not register with a
 GUI linked against another.
@@ -981,7 +981,7 @@ which read doc-options.json from the package root they are run in,
 this reads no settings file: it works from the installed package,
 and a file at a source root is not installed, only the contents of
 inst together with doc and packinfo being carried
-there. So a package&rsquo;s own conventions reach this route by being handed to
+there. So a package's own conventions reach this route by being handed to
 it, and the rules that are on by default, which are the ones wrong in any
 package, apply either way.
 
@@ -1022,11 +1022,11 @@ pkg_doc_options
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 1596
+# length: 1590
 pkg-octave-doc: pkg_doc_options
 Settings for the documentation builders of a package.
 
-A pkg_doc_options object carries the location of a package&rsquo;s
+A pkg_doc_options object carries the location of a package's
 INDEX file, how much a run prints, and the severity of each rule the
 documentation builders check a docstring against. Every property is
 public, so the object is itself the list of what a maintainer may
@@ -1193,11 +1193,11 @@ pkg_doc_options.IndexLocation
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 515
+# length: 503
 pkg_doc_options: property IndexLocation
-Location of the package&rsquo;s INDEX file
+Location of the package's INDEX file
 
-Location of the package&rsquo;s INDEX file, specified as a character
+Location of the package's INDEX file, specified as a character
 vector holding an absolute path, as '' to use no INDEX
 even where one exists, or as [], the default, to leave it
 unspecified.
@@ -1226,12 +1226,12 @@ pkg_doc_options.IndexMissingEntry
 # name: <cell-element>
 # type: sq_string
 # elements: 1
-# length: 317
+# length: 311
 pkg_doc_options: property IndexMissingEntry
 A name in the tree absent from INDEX
 
 Severity of a documented name found in the tree but absent from the
-package&rsquo;s INDEX, which leaves it out of the published
+package's INDEX, which leaves it out of the published
 documentation and, where INDEX decides what is cached, out of the
 doc-cache as well. Defaults to 'warning'.
 
