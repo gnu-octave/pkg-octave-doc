@@ -297,6 +297,32 @@ endfunction
 %!   rmpath (d);
 %! end_unwind_protect
 
+%!test  # a method of an old-style class is documented under its class
+%! d = fullfile (tempdir (), 'pkg_octave_doc_fc_bist');
+%! mkdir (fullfile (d, '@bistcls'));
+%! fid = fopen (fullfile (d, '@bistcls', 'bistm.m'), 'w');
+%! fprintf (fid, '## -*- texinfo -*-\n');
+%! fprintf (fid, '## @deftypefn {bistcls} {} bistm (@var{x})\n');
+%! fprintf (fid, '##\n## A method of an old-style class.\n');
+%! fprintf (fid, '##\n## @end deftypefn\nfunction bistm (x)\nendfunction\n');
+%! fclose (fid);
+%! old = pwd ();
+%! addpath (d);
+%! unwind_protect
+%!   cd (d);
+%!   o = pkg_doc_options ();
+%!   o.IndexLocation = fullfile (d, 'INDEX');
+%!   r = function_texi2cache ('@bistcls/bistm', o);
+%!   assert (! any (strcmp ({r.findings.rule}, 'CategoryLabel')));
+%!   delete (fullfile (d, '@bistcls', 'bistm.m'));
+%!   function_texi2cache ('@bistcls/bistm', o);
+%! unwind_protect_cleanup
+%!   cd (old);
+%!   rmpath (d);
+%!   confirm_recursive_rmdir (false, 'local');
+%!   rmdir (fullfile (d, '@bistcls'), 's');
+%! end_unwind_protect
+
 %!test  # a name that resolves to nothing drops its entry
 %! d = fullfile (tempdir (), 'pkg_octave_doc_fc_bist');
 %! delete (fullfile (d, 'bistother.m'));

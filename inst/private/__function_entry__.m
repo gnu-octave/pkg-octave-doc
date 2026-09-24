@@ -76,7 +76,13 @@ function [rows, findings] = __function_entry__ (caller, name, srcfile, opts, ...
 
   [rows, found] = __cache_rows__ (name, text, opts);
   if (! isempty (srclines))
+    ## A method of an old-style class lives in a folder named for the class
+    ## with an '@', and is documented under the class's name
     ctx = struct ('package', pkgname, 'class', '', 'member', '');
+    [~, folder] = fileparts (fileparts (srcfile));
+    if (! isempty (folder) && folder(1) == '@')
+      ctx.class = folder(2:end);
+    endif
     found = [found, __source_lint__(srclines, opts, ctx)];
   endif
   for ii = 1:numel (found)

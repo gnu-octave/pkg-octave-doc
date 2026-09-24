@@ -147,6 +147,13 @@ function findings = __check_file__ (file, root, options, pkgname)
     if (isclass)
       ctx.class = __qualified__ (file, base);
       ctx.member = blocks(jj).member;
+    else
+      ## A method of an old-style class lives in a folder named for the
+      ## class with an '@', and is documented under the class's name
+      [~, folder] = fileparts (fileparts (file));
+      if (! isempty (folder) && folder(1) == '@')
+        ctx.class = folder(2:end);
+      endif
     endif
     ## A private helper reaches no published page, so the rules about what a
     ## label says to a reader do not apply to it
@@ -293,6 +300,27 @@ endfunction
 %!   assert (! any (inclass));
 %! unwind_protect_cleanup
 %!   cd (old);
+%! end_unwind_protect
+
+%!test  # a method of an old-style class is documented under its class
+%! d = fullfile (tempdir (), 'pkg_octave_doc_ck_bist');
+%! mkdir (fullfile (d, '@ckcls'));
+%! fid = fopen (fullfile (d, '@ckcls', 'ckm.m'), 'w');
+%! fprintf (fid, '## -*- texinfo -*-\n');
+%! fprintf (fid, '## @deftypefn {ckcls} {} ckm (@var{x})\n');
+%! fprintf (fid, '##\n## A method of an old-style class.\n');
+%! fprintf (fid, '##\n## @end deftypefn\nfunction ckm (x)\nendfunction\n');
+%! fclose (fid);
+%! old = pwd ();
+%! unwind_protect
+%!   cd (d);
+%!   [~, rep] = check_texi_docs ();
+%!   inclass = strcmp ({rep.file}, fullfile ('@ckcls', 'ckm.m'));
+%!   assert (! any (inclass));
+%! unwind_protect_cleanup
+%!   cd (old);
+%!   confirm_recursive_rmdir (false, 'local');
+%!   rmdir (fullfile (d, '@ckcls'), 's');
 %! end_unwind_protect
 
 %!test  # src is passed over, and the tree is left exactly as it was found
